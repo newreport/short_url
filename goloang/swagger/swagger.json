@@ -1,0 +1,71 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "sort_url",
+        "description": "beego has a very cool tools to autogenerate documents for your API\n",
+        "version": "1.0.0",
+        "termsOfService": "http://beego.me/",
+        "contact": {
+            "email": "astaxie@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "basePath": "/v1",
+    "paths": {
+        "/login/getall": {
+            "get": {
+                "tags": [
+                    "login"
+                ],
+                "operationId": "LoginController.GetAll",
+                "responses": {
+                    "200": {
+                        "description": "string"
+                    }
+                }
+            }
+        },
+        "/short/editone": {
+            "put": {
+                "tags": [
+                    "short"
+                ],
+                "operationId": "ShortController.AddOne",
+                "responses": {
+                    "200": {
+                        "description": "bool"
+                    }
+                }
+            }
+        },
+        "/short/getlist": {
+            "get": {
+                "tags": [
+                    "short"
+                ],
+                "operationId": "ShortController.GetList",
+                "responses": {
+                    "200": {
+                        "description": "string"
+                    }
+                }
+            }
+        },
+        "/short/{url}": {
+            "post": {
+                "tags": [
+                    "short"
+                ],
+                "operationId": "ShortController.AddOne",
+                "responses": {
+                    "200": {
+                        "description": "string"
+                    }
+                }
+            }
+        }
+    }
+}

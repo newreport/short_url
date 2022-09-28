@@ -12,8 +12,9 @@
 *.out
 
 # golang
-golang/swagger
 lastupdate.tmp
+main.db
+golang/golang
 
 # Logs
 logs
