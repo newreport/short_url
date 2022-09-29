@@ -14,7 +14,8 @@
 # golang
 lastupdate.tmp
 main.db
-golang/golang
+short_url/short_url
+short_url/data
 
 # Logs
 logs
