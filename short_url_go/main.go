@@ -21,7 +21,7 @@ func main() {
 }
 
 func init() {
-	//1.创建data文件夹，用于存放数据
+	//1.创建data文件夹，用于存放数据2
 	_dir := "./data"
 	exist, err := common.PathExists(_dir)
 	if err != nil {
