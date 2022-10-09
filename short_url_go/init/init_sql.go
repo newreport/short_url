@@ -44,10 +44,11 @@ func init() {
 		}
 		fmt.Println("uuid:" + pwdUUID)
 		u5 := uuid.Must(uuid.FromString(pwdUUID))
-		db.AutoMigrate(&models.User{Name: "admin", NickName: "admin", Passwd: uuid.NewV5(u5, pwdUUID).String(), Role: 1, Remarks: "默认管理员"}, &models.Short{})
+		db.AutoMigrate(&models.User{Name: "admin", NickName: "admin", Passwd: uuid.NewV5(u5, pwdUUID).String(), Role: 1, Remarks: "默认管理员"}, &models.Short{SourceUrl: "baidu.com", Remarks: "备注", FkUser: 0})
 
+		//https://www.bookstack.cn/read/beego-2.0-zh/quickstart.md	
 		//初始化url
-		// urlOne := models.Short{Si SourceUrl: "baidu.com", Remarks: "备注", FkUser: 0}
+		// urlOne := models.Short{Si}
 
 	}
 }
