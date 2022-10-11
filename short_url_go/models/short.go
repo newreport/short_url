@@ -9,6 +9,17 @@ type Short struct {
 	UrlGroup  string
 }
 
-func AddShor(url string, userId int) {
+// 添加一条URL短链接
+func AddOneUrlDefault(url string, userId int) {
+
+}
+
+// 添加一条指定长度的短链接
+func AddOneUrlAssignLength(url string, userId int, lengthNum int) {
+
+}
+
+// 添加一条自定义长度的短链接
+func AddOneUrl(sourceUrl string, targetUrl string) {
 
 }
