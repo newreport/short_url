@@ -48,8 +48,9 @@ func init() {
 		common.DB.AutoMigrate(&models.User{}, &models.Short{})
 		user := models.User{Name: "admin", NickName: "admin", Passwd: uuid.NewV5(u5, pwdUUID).String(), Role: 1, Remarks: "默认管理员"}
 		common.DB.Create(&user)
-		// short := models.Short{SourceUrl: "baidu.com", Remarks: "备注", FkUser: 0}
-		// common.DB.Create(&user)
+		sid := uuid.Must(uuid.NewV4(), err)
+		short := models.Short{Sid: sid.String(), SourceUrl: "baidu.com", TargetUrl: "123", Remarks: "备注", FkUser: 0}
+		common.DB.Create(&short)
 		//https://www.bookstack.cn/read/beego-2.0-zh/quickstart.md
 		//初始化url
 		// urlOne := models.Short{Si}
@@ -60,9 +61,10 @@ func init() {
 			panic("failed to connect database")
 		}
 	}
-	// var v models.User
-	// v = models.FirstOrDefault()
-	// fmt.Println(v)
+	model1 := models.FirstOrDefault[models.User]()
+	fmt.Println(model1)
+	model2 := models.FirstOrDefault[models.Short]()
+	fmt.Println(model2)
 }
 
 func checkErr(err error) {
