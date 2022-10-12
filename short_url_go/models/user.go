@@ -13,22 +13,26 @@ type User struct {
 	Passwd   string `gorm:"not null"`
 	Role     int8   `gorm:"not null"`
 	Remarks  string
-	BaseStruct
+	baseSqlStruct
 }
 
-type UserMethod interface {
-	baseSqlMethod[User]
+type UserInterface interface {
+	BaseSqlInterface[User]
+	SayUser()
 }
 
 func (T User) SayUser() {
 	fmt.Println("this is User")
 }
 func Test() {
-	var u UserMethod
+	// var u BaseSqlInterface[User]
+	// var us User
+	// u = us
+	// u.FirstOrDefault()
+
+	var u UserInterface
 	var us User
 	u = us
 	u.FirstOrDefault()
-	// fmt.Println(us.FirstOrDefault().Name)
-	// fmt.Println(FirstOrDefault[User]().Name)
-
+	u.SayUser()
 }

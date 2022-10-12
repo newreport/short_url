@@ -5,26 +5,23 @@ import (
 	"short_url_go/common"
 )
 
-type baseSqlMethod[T SqlModel] interface {
-	FirstOrDefault() *T
-}
-
+// Sql类型限定
 type SqlModel interface {
 	User | Short
 }
 
-type BaseStruct struct{}
-
-func FirstOrDefault[T SqlModel]() User {
-	var newU User
-	common.DB.First(&newU)
-	fmt.Printf("fisrt success")
-	return newU
+// 基接口
+type BaseSqlInterface[T SqlModel] interface {
+	FirstOrDefault() *T
 }
 
-func (T BaseStruct) FirstOrDefault() *User {
+// 空基struct
+type baseSqlStruct struct{}
+
+func (T baseSqlStruct) FirstOrDefault() *User {
 	var newU User
 	common.DB.First(&newU)
 	fmt.Println("fisrt success 继承")
+	fmt.Println(newU)
 	return &newU
 }

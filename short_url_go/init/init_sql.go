@@ -61,10 +61,6 @@ func init() {
 			panic("failed to connect database")
 		}
 	}
-
-	// var um models.UserMethod[models.User]
-	// um.FirstOrDefault()
-	models.Test()
 }
 
 func checkErr(err error) {
