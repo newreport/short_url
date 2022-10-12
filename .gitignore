@@ -17,6 +17,7 @@ main.db
 short_url_go/short_url_go
 short_url_go/data
 
+
 # Logs
 logs
 *.log

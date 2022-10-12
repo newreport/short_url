@@ -1,5 +1,11 @@
 ﻿package models
 
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
 type Short struct {
 	Sid       string `gorm:"primaryKey,size:50;"`
 	SourceUrl string `gorm:"not null"`
@@ -7,6 +13,9 @@ type Short struct {
 	Remarks   string
 	FkUser    uint `gorm:"not null"` //外键
 	UrlGroup  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 // 添加一条URL短链接

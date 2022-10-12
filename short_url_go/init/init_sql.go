@@ -61,10 +61,10 @@ func init() {
 			panic("failed to connect database")
 		}
 	}
-	model1 := models.FirstOrDefault[models.User]()
-	fmt.Println(model1)
-	model2 := models.FirstOrDefault[models.Short]()
-	fmt.Println(model2)
+
+	// var um models.UserMethod[models.User]
+	// um.FirstOrDefault()
+	models.Test()
 }
 
 func checkErr(err error) {
