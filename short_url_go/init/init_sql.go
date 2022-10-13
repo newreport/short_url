@@ -46,7 +46,9 @@ func init() {
 		//uuid v5加密
 		u5 := uuid.Must(uuid.FromString(pwdUUID))
 		common.DB.AutoMigrate(&models.User{}, &models.Short{})
-		user := models.User{Name: "admin", NickName: "admin", Passwd: uuid.NewV5(u5, pwdUUID).String(), Role: 1, Remarks: "默认管理员"}
+		user := models.User{Name: "admin", NickName: "admin", Passwd: uuid.NewV5(u5, "admin").String(), Role: 1, Remarks: "默认管理员"}
+		common.DB.Create(&user)
+		user = models.User{Name: "user", NickName: "user", Passwd: uuid.NewV5(u5, "user").String(), Role: 1, Remarks: "用户"}
 		common.DB.Create(&user)
 		sid := uuid.Must(uuid.NewV4(), err)
 		short := models.Short{Sid: sid.String(), SourceUrl: "baidu.com", TargetUrl: "123", Remarks: "备注", FkUser: 0}
@@ -61,6 +63,7 @@ func init() {
 			panic("failed to connect database")
 		}
 	}
+	models.Test()
 }
 
 func checkErr(err error) {
