@@ -14,10 +14,8 @@ func FirstOrDefault[T SqlModel](query interface{}, args ...interface{}) (one *T)
 
 func Where[T SqlModel](query ...interface{}) (list *[]T) {
 	fmt.Println(reflect.TypeOf(query[0]))
-
 	if len(query) == 0 { //查询所有
 		common.DB.Find(&list)
-
 	} else if len(query) == 1 { //查找
 		switch query[0].(type) {
 		case *T, []int64, map[string]interface{}:
@@ -35,6 +33,18 @@ func Where[T SqlModel](query ...interface{}) (list *[]T) {
 			}
 		}
 	} else if len(query) == 3 { //查找，排序,选择
+		switch query[0].(type) {
+		case *T, []int64, map[string]interface{}:
+			switch query[1].(type) {
+			case string:
+				switch query[2].(type) {
+				case []string:
+					common.DB.Where(query[0]).Order(query[1]).Select(query[2]).Find(&list)
+				case int:
+					common.DB.Where(query[0]).Order(query[1]).Limit(int(query[2].(int))).Find(&list)
+				}
+			}
+		}
 	}
 	return
 }
