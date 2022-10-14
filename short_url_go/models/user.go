@@ -9,11 +9,12 @@ import (
 
 type User struct {
 	gorm.Model
-	Name     string `gorm:"not null"`
-	NickName string `gorm:"not null"`
-	Passwd   string `gorm:"not null"`
-	Role     int8   `gorm:"not null"`
-	Remarks  string
+	Name             string `gorm:"not null"` //用户名，登录名称
+	NickName         string `gorm:"not null"`
+	Passwd           string `gorm:"not null"`
+	Role             int8   `gorm:"not null"`
+	DefaultUrlLength uint8  `gorm:"not null"`
+	Remarks          string
 	baseSqlStruct
 }
 

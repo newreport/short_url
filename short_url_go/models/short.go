@@ -7,15 +7,15 @@ import (
 )
 
 type Short struct {
-	Sid       string `gorm:"primaryKey,size:50;"`
-	SourceUrl string `gorm:"not null"`
-	TargetUrl string `gorm:"not null"`
-	Remarks   string
-	FkUser    uint `gorm:"not null"` //外键
-	UrlGroup  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	Sid          string `gorm:"primaryKey,size:50;"`
+	SourceUrl    string `gorm:"not null"`
+	TargetUrl    string `gorm:"not null;uniqueIndex"`
+	Remarks      string
+	FkUser       uint `gorm:"not null"` //外键
+	FKShortGroup uint `gorm:"not null"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    gorm.DeletedAt `gorm:"index"`
 }
 
 // 添加一条URL短链接
@@ -30,5 +30,9 @@ func AddOneUrlAssignLength(url string, userId int, lengthNum int) {
 
 // 添加一条自定义长度的短链接
 func AddOneUrl(sourceUrl string, targetUrl string) {
+
+}
+
+func generateUrl() {
 
 }
