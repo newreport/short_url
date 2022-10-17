@@ -45,7 +45,7 @@ func init() {
 		fmt.Println("uuid:" + pwdUUID)
 		//uuid v5加密
 		u5 := uuid.Must(uuid.FromString(pwdUUID))
-		common.DB.AutoMigrate(&models.User{}, &models.Short{})
+		common.DB.AutoMigrate(&models.User{}, &models.Short{}, &models.ShortGroup{})
 		userAdmin := models.User{Name: "admin", NickName: "admin", Passwd: uuid.NewV5(u5, "admin").String(), Role: 1, DefaultUrlLength: 9, Remarks: "默认管理员"}
 		common.DB.Create(&userAdmin)
 		userUser1 := models.User{Name: "user", NickName: "user", Passwd: uuid.NewV5(u5, "user").String(), DefaultUrlLength: 9, Role: 1, Remarks: "用户"}
@@ -53,7 +53,7 @@ func init() {
 		shortGroup := models.ShortGroup{Name: "默认组", FkUser: userAdmin.ID}
 		common.DB.Create(&shortGroup)
 		sid := uuid.Must(uuid.NewV4(), err)
-		short := models.Short{Sid: sid.String(), SourceUrl: "baidu.com", TargetUrl: "123", Remarks: "备注", FkUser: userAdmin.ID, FKShortGroup: shortGroup.ID}
+		short := models.Short{Sid: sid.String(), SourceUrl: "baidu.com", TargetUrl: models.GenerateUrlDefault("baidu.com"), Remarks: "备注", SourceUrlMD5: common.MD5("baidu.com"), FkUser: userAdmin.ID, FKShortGroup: shortGroup.ID}
 		common.DB.Create(&short)
 
 		//https://www.bookstack.cn/read/beego-2.0-zh/quickstart.md

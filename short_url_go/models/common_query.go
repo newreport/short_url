@@ -15,7 +15,9 @@ func FirstOrDefault[T SqlModel](query interface{}, args ...interface{}) (one *T)
 
 // 常用sqlwhere
 func Where[T SqlModel](query ...interface{}) (list *[]T) {
-	fmt.Println(reflect.TypeOf(query[0]))
+	if len(query) > 0 {
+		fmt.Println(reflect.TypeOf(query[0]))
+	}
 	if len(query) == 0 { //查询所有
 		common.DB.Find(&list)
 	} else if len(query) == 1 { //查找
