@@ -25,26 +25,31 @@ type Short struct {
 	DeletedAt    gorm.DeletedAt `gorm:"index"`
 }
 
-// 添加一条URL短链接
-func AddOneUrlDefault(url string, userId int) {
-
-}
-
-// 添加一条指定长度的短链接
-func AddOneUrlAssignLength(url string, userId int, lengthNum int) {
-
-}
-
-// 添加一条自定义长度的短链接
-func AddOneUrl(sourceUrl string, targetUrl string) {
-
-}
-
 // URL种子，即浏览器支持的非转义字符，这里只取了64个
 // ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~!*
 const URLSTRS = "LMndefNq3~ZaUVWvw4sQRABCY56rHz0DEFJ127KxyX89IbcPhijklmGS-TgtOopu"
 
-// @title			AddShortUrlUserdefine
+func AddShortUrlDefault(sourceUrl string, userId uint, shortGroupId uint) bool {
+	var err error
+	short := Short{Sid: uuid.Must(uuid.NewV4(), err).String(), SourceUrl: sourceUrl, TargetUrl: GenerateUrlDefault(sourceUrl), Remarks: "备注", SourceUrlMD5: common.MD5(sourceUrl), FkUser: userId, FKShortGroup: shortGroupId}
+	result := common.DB.Create(short)
+	if err != nil {
+		panic("failed to add one short url")
+	}
+	return result.RowsAffected > 0
+}
+
+func AddShortUrlAssignLength(sourceUrl string, userId uint, shortGroupId uint, length int) bool {
+	var err error
+	short := Short{Sid: uuid.Must(uuid.NewV4(), err).String(), SourceUrl: sourceUrl, TargetUrl: GenerateUrl(sourceUrl, length), Remarks: "备注", SourceUrlMD5: common.MD5(sourceUrl), FkUser: userId, FKShortGroup: shortGroupId}
+	result := common.DB.Create(short)
+	if err != nil {
+		panic("failed to add one assign length short url")
+	}
+	return result.RowsAffected > 0
+}
+
+// @title			AddShortUrlsUserdefine
 // @description		生成自定义的短链接,直接插入数据库
 // @auth			sfhj
 // @date			2022-10-18
@@ -53,7 +58,7 @@ const URLSTRS = "LMndefNq3~ZaUVWvw4sQRABCY56rHz0DEFJ127KxyX89IbcPhijklmGS-TgtOop
 // @param     		shortGroupId    	uint					"分组主键"
 // @return			alreadyResult		map[string]string		"已经存在于数据库中的链接集合"
 // @return			repeatResult		map[string]string		"目标target重复的集合"
-func AddShortUrlUserdefine(data map[string]string, userId uint, shortGroupId uint) (alreadyResult map[string]string, repeatResult map[string]string) {
+func AddShortUrlsUserdefine(data map[string]string, userId uint, shortGroupId uint) (alreadyResult map[string]string, repeatResult map[string]string) {
 	keys := common.GetMapAllKeys(data)
 	vlues := common.GetMapAllValues(data)
 	var keysMD5 []string
@@ -69,11 +74,11 @@ func AddShortUrlUserdefine(data map[string]string, userId uint, shortGroupId uin
 		repeatResult[shortsRepeat[i].SourceUrl] = shortsRepeat[i].TargetUrl
 	}
 	var installShorts []Short
-	for k, v := range data {
-		if _, ok := alreadyResult[k]; !ok {
-			if _, ok := repeatResult[v]; !ok {
+	for sourceUrl, targetUrl := range data {
+		if _, ok := alreadyResult[sourceUrl]; !ok {
+			if _, ok := repeatResult[targetUrl]; !ok {
 				var err error
-				one := Short{Sid: uuid.Must(uuid.NewV4(), err).String(), SourceUrl: k, TargetUrl: GenerateUrlDefault(k), Remarks: "备注", SourceUrlMD5: common.MD5(k), FkUser: userId, FKShortGroup: shortGroupId}
+				one := Short{Sid: uuid.Must(uuid.NewV4(), err).String(), SourceUrl: sourceUrl, TargetUrl: GenerateUrlDefault(sourceUrl), Remarks: "备注", SourceUrlMD5: common.MD5(sourceUrl), FkUser: userId, FKShortGroup: shortGroupId}
 				if err != nil {
 					panic("failed to connect database")
 				}
@@ -83,14 +88,6 @@ func AddShortUrlUserdefine(data map[string]string, userId uint, shortGroupId uin
 	}
 	common.DB.Create(&installShorts)
 	return
-}
-
-func AddShortUrl() {
-
-}
-
-func AddShortUrls() {
-
 }
 
 // @title			GenerateUrlDefault
