@@ -2,7 +2,6 @@
 
 import (
 	"fmt"
-	"short_url_go/common"
 
 	"gorm.io/gorm"
 )
@@ -32,12 +31,12 @@ func Test() {
 	// fmt.Println(reflect.TypeOf(map[string]interface{}{"name": "jinzhu", "age": 20}))
 	// u2 := Where[User]([]int64{1})
 	// fmt.Println(u2)
-	s := Where[Short]()
-	fmt.Println(s)
-	fmt.Print("MD5:")
-	str := common.MD5("baidu.com")
-	fmt.Println(str)
-	GenerateUrlDefault("baidu.com")
+	// s := Where[Short]()
+	// fmt.Println(s)
+	// fmt.Print("MD5:")
+	// str := common.MD5("baidu.com")
+	// fmt.Println(str)
+	// GenerateUrlDefault("baidu.com")
 
 	// var u BaseSqlInterface[User]
 	// var us User
@@ -49,5 +48,8 @@ func Test() {
 	// u = us
 	// u.FirstOrDefault()
 	// u.SayUser()
-
+	// var models []Short
+	// arr := [2]string{"google.com"}
+	// common.DB.Debug().Where(map[string]interface{}{"source_url": arr}).Find(&models)
+	// fmt.Println(models)
 }

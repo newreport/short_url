@@ -52,8 +52,8 @@ func init() {
 		common.DB.Create(&userUser1)
 		shortGroup := models.ShortGroup{Name: "默认组", FkUser: userAdmin.ID}
 		common.DB.Create(&shortGroup)
-		sid := uuid.Must(uuid.NewV4(), err)
-		short := models.Short{Sid: sid.String(), SourceUrl: "baidu.com", TargetUrl: models.GenerateUrlDefault("baidu.com"), Remarks: "备注", SourceUrlMD5: common.MD5("baidu.com"), FkUser: userAdmin.ID, FKShortGroup: shortGroup.ID}
+		short := []models.Short{{Sid: uuid.Must(uuid.NewV4(), err).String(), SourceUrl: "baidu.com", TargetUrl: models.GenerateUrlDefault("baidu.com"), Remarks: "备注", SourceUrlMD5: common.MD5("baidu.com"), FkUser: userAdmin.ID, FKShortGroup: shortGroup.ID},
+			{Sid: uuid.Must(uuid.NewV4(), err).String(), SourceUrl: "google.com", TargetUrl: models.GenerateUrlDefault("google.com"), Remarks: "备注", SourceUrlMD5: common.MD5("google.com"), FkUser: userAdmin.ID, FKShortGroup: shortGroup.ID}}
 		common.DB.Create(&short)
 
 		//https://www.bookstack.cn/read/beego-2.0-zh/quickstart.md

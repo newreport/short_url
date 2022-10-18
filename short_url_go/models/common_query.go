@@ -14,7 +14,7 @@ func FirstOrDefault[T SqlModel](query interface{}, args ...interface{}) (one *T)
 }
 
 // 常用sqlwhere
-func Where[T SqlModel](query ...interface{}) (list *[]T) {
+func Where[T SqlModel](query ...interface{}) (list []T) {
 	if len(query) > 0 {
 		fmt.Println(reflect.TypeOf(query[0]))
 	}
