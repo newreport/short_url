@@ -49,6 +49,33 @@ func AddShortUrlAssignLength(sourceUrl string, userId uint, shortGroupId uint, l
 	return result.RowsAffected > 0
 }
 
+func AddShortUrlsAssignLengths(sourceUrls []string, userId uint, shortGroupId uint, length int) bool {
+	var err error
+	var shorts []Short
+	targetUrls := GenerateUrls(sourceUrls, length)
+	for i := 0; i < len(sourceUrls); i++ {
+		sourceUrl := sourceUrls[i]
+		short := Short{Sid: uuid.Must(uuid.NewV4(), err).String(), SourceUrl: sourceUrl, TargetUrl: targetUrls[sourceUrl], SourceUrlMD5: common.MD5(sourceUrl), FkUser: userId, FKShortGroup: shortGroupId}
+		shorts = append(shorts, short)
+	}
+
+	result := common.DB.Create(shorts)
+	if err != nil {
+		panic("failed to add one assign length short url")
+	}
+	return result.RowsAffected > 0
+}
+
+func DeletedShortUrlById(id string) bool {
+	result := common.DB.Delete(&Short{}, id)
+	return result.RowsAffected > 0
+}
+
+func DeletedShortUrlByIds(ids []string) bool {
+	result := common.DB.Delete(&Short{}, "sid IN ?", ids)
+	return result.RowsAffected > 0
+}
+
 // @title			AddShortUrlsUserdefine
 // @description		生成自定义的短链接,直接插入数据库
 // @auth			sfhj
@@ -59,6 +86,8 @@ func AddShortUrlAssignLength(sourceUrl string, userId uint, shortGroupId uint, l
 // @return			alreadyResult		map[string]string		"已经存在于数据库中的链接集合"
 // @return			repeatResult		map[string]string		"目标target重复的集合"
 func AddShortUrlsUserdefine(data map[string]string, userId uint, shortGroupId uint) (alreadyResult map[string]string, repeatResult map[string]string) {
+	alreadyResult = make(map[string]string)
+	repeatResult = make(map[string]string)
 	keys := common.GetMapAllKeys(data)
 	vlues := common.GetMapAllValues(data)
 	var keysMD5 []string

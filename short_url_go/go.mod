@@ -12,9 +12,12 @@ require (
 )
 
 require (
+	github.com/Unknwon/goconfig v1.0.0 // indirect
 	github.com/ahmetb/go-linq/v3 v3.2.0 // indirect
+	github.com/beego/i18n v0.0.0-20161101132742-e9308947f407 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect

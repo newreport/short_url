@@ -17,15 +17,8 @@ type User struct {
 	baseSqlStruct
 }
 
-type UserInterface interface {
-	BaseSqlInterface[User]
-	SayUser()
-}
-
-func (T User) SayUser() {
-	fmt.Println("this is User")
-}
 func Test() {
+
 	// u := FirstOrDefault[User]("id = ?", 1)
 	// fmt.Println(u)
 	// fmt.Println(reflect.TypeOf(map[string]interface{}{"name": "jinzhu", "age": 20}))
@@ -52,4 +45,13 @@ func Test() {
 	// arr := [2]string{"google.com"}
 	// common.DB.Debug().Where(map[string]interface{}{"source_url": arr}).Find(&models)
 	// fmt.Println(models)
+}
+
+type UserInterface interface {
+	BaseSqlInterface[User]
+	SayUser()
+}
+
+func (T User) SayUser() {
+	fmt.Println("this is User")
 }
