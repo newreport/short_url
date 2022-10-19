@@ -15,30 +15,35 @@
     },
     "basePath": "/v1",
     "paths": {
-        "/login/logout": {
+        "/user/login": {
             "get": {
                 "tags": [
-                    "login"
+                    "user"
                 ],
-                "description": "Logs out current logged in user session\n\u003cbr\u003e",
-                "operationId": "LoginController.logout",
-                "responses": {
-                    "200": {
-                        "description": "{string} logout success"
+                "description": "Logs user into the system\n\u003cbr\u003e",
+                "operationId": "UserController.Login",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "username",
+                        "description": "The username for login",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "password",
+                        "description": "The password for login",
+                        "required": true,
+                        "type": "string"
                     }
-                }
-            }
-        },
-        "/login/logout1": {
-            "get": {
-                "tags": [
-                    "login"
                 ],
-                "description": "Logs1 out current logged in user session\n\u003cbr\u003e",
-                "operationId": "LoginController.logout1",
                 "responses": {
                     "200": {
-                        "description": "{string} logout1 success"
+                        "description": "{string} login success"
+                    },
+                    "403": {
+                        "description": "user not exist"
                     }
                 }
             }
@@ -46,7 +51,7 @@
     },
     "tags": [
         {
-            "name": "login",
+            "name": "user",
             "description": "Operations about Users\n"
         }
     ]

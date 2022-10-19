@@ -2,7 +2,9 @@
 
 import (
 	"fmt"
+	"short_url_go/common"
 
+	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
@@ -54,4 +56,17 @@ type UserInterface interface {
 
 func (T User) SayUser() {
 	fmt.Println("this is User")
+}
+
+func Login(username, password string) bool {
+	var count int64
+	ini := common.INIconf
+	pwdUUID, err := ini.String("UUID::UserPwd")
+	fmt.Println(pwdUUID)
+	fmt.Println(err)
+	u5 := uuid.Must(uuid.FromString(pwdUUID))
+	password = uuid.NewV5(u5, password).String()
+	common.DB.Model(&User{}).Where(&User{Name: username, Passwd: password}).Count(&count)
+
+	return count == 1
 }

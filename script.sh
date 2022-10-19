@@ -2,6 +2,7 @@
 bee api golang # 创建api
 cd golang
 go mod tidy
+bee generate routers 
 bee run -gendoc=true -downdoc=true #使用swagger运行
 
 npm i   # 更新node包

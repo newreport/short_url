@@ -14,7 +14,9 @@ import (
 )
 
 func init() {
-	iniconf, err := config.NewConfig("ini", "conf/secret.conf")
+	var err error
+	common.INIconf, err = config.NewConfig("ini", "conf/secret.conf")
+
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +40,7 @@ func init() {
 		}
 
 		//迁移数据表(初始化)
-		pwdUUID, err := iniconf.String("UUID::UserPwd")
+		pwdUUID, err := common.INIconf.String("UUID::UserPwd")
 		if err != nil {
 			panic(err)
 		}

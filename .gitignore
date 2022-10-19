@@ -15,7 +15,7 @@
 lastupdate.tmp
 main.db
 short_url_go/short_url_go
-short_url_go/data
+short_url_go/data/main.db
 
 
 # Logs
@@ -42,3 +42,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
