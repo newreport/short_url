@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"short_url_go/common"
 
+	"github.com/beego/beego/v2/core/config"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
@@ -58,15 +59,40 @@ func (T User) SayUser() {
 	fmt.Println("this is User")
 }
 
-func Login(username, password string) bool {
-	var count int64
-	ini := common.INIconf
-	pwdUUID, err := ini.String("UUID::UserPwd")
-	fmt.Println(pwdUUID)
-	fmt.Println(err)
-	u5 := uuid.Must(uuid.FromString(pwdUUID))
-	password = uuid.NewV5(u5, password).String()
-	common.DB.Model(&User{}).Where(&User{Name: username, Passwd: password}).Count(&count)
+var U5Seed uuid.UUID
 
-	return count == 1
+func init() {
+	ini, err := config.NewConfig("ini", "conf/secret.conf")
+	if err != nil {
+		panic(err)
+	}
+	pwdUUID, err := ini.String("UUID::UserPwd")
+	if err != nil {
+		fmt.Println(err)
+	}
+	U5Seed = uuid.Must(uuid.FromString(pwdUUID))
+	fmt.Println("u5Ini:", U5Seed)
+}
+
+func GetAllUsers() []User {
+	var users []User
+	common.DB.Find(&users)
+	return users
+}
+
+func Login(username, password string) User {
+	var user User
+	fmt.Println("u5:", U5Seed)
+	fmt.Println("be", uuid.NewV5(U5Seed, password).String())
+	password = uuid.NewV5(U5Seed, password).String()
+	fmt.Print("login:")
+	fmt.Println(password)
+	common.DB.Model(&User{}).Where(&User{Name: username, Passwd: password}).First(&user)
+	return user
+}
+
+func AddUser(user User) bool {
+	user.Passwd = uuid.NewV5(U5Seed, user.Passwd).String()
+	result := common.DB.Create(&user)
+	return result.RowsAffected > 0
 }

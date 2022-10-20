@@ -16,7 +16,8 @@ lastupdate.tmp
 main.db
 short_url_go/short_url_go
 short_url_go/data/main.db
-
+short_url_go/swagger/*
+short_url_go/swagger.zip
 
 # Logs
 logs
@@ -42,4 +43,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
 

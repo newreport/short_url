@@ -15,6 +15,23 @@
     },
     "basePath": "/v1",
     "paths": {
+        "/user/GetAll": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "description": "Logs user into the system\n\u003cbr\u003e",
+                "operationId": "UserController.GetAll",
+                "responses": {
+                    "200": {
+                        "description": "{string}"
+                    },
+                    "403": {
+                        "description": "user not exist"
+                    }
+                }
+            }
+        },
         "/user/login": {
             "get": {
                 "tags": [
@@ -47,6 +64,118 @@
                     }
                 }
             }
+        },
+        "/user/register": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "description": "Logs user into the system\n\u003cbr\u003e",
+                "operationId": "UserController.Register",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for user content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{bool} register success"
+                    },
+                    "403": {
+                        "description": "not role"
+                    }
+                }
+            }
+        },
+        "/user/{uid}": {
+            "delete": {
+                "tags": [
+                    "user"
+                ],
+                "description": "delete the user\n\u003cbr\u003e",
+                "operationId": "UserController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "uid",
+                        "description": "The uid you want to delete",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} delete success!"
+                    },
+                    "403": {
+                        "description": "uid is empty"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "gorm.DeletedAt": {
+            "title": "DeletedAt",
+            "type": "object"
+        },
+        "gorm.Model": {
+            "title": "Model",
+            "type": "object",
+            "properties": {
+                "CreatedAt": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DeletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "ID": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "UpdatedAt": {
+                    "type": "string",
+                    "format": "datetime"
+                }
+            }
+        },
+        "models.User": {
+            "title": "User",
+            "type": "object",
+            "properties": {
+                "DefaultUrlLength": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "Name": {
+                    "description": "用户名，登录名称",
+                    "type": "string"
+                },
+                "NickName": {
+                    "type": "string"
+                },
+                "Passwd": {
+                    "type": "string"
+                },
+                "Remarks": {
+                    "type": "string"
+                },
+                "Role": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            }
+        },
+        "models.baseSqlStruct": {
+            "title": "baseSqlStruct",
+            "type": "object"
         }
     },
     "tags": [

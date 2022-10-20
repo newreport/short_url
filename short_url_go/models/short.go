@@ -2,7 +2,6 @@
 
 import (
 	"encoding/binary"
-	"fmt"
 	"short_url_go/common"
 	"strconv"
 	"time"
@@ -149,7 +148,7 @@ func generateUrl(url string, length int) (result string) {
 	md5Arr := []string{md5Url[0:8], md5Url[8:16], md5Url[16:24], md5Url[24:32]}
 	for i := 0; i < len(md5Arr); i++ {
 		num, _ := strconv.ParseUint(md5Arr[i], 16, 32)
-		fmt.Print("num:", num)
+		// fmt.Print("num:", num)
 		by := UInt32ToBytes(uint32(num))
 		//将数据密度提升至16个字节，即短url支持4~16长度，有(4*5*6*....*15*16)^64种可能性
 		by = append(by, by[0]&by[1])
@@ -167,7 +166,7 @@ func generateUrl(url string, length int) (result string) {
 		by = append(by, by[2]^by[1])
 		by = append(by, by[3]&^by[2])
 
-		fmt.Println("   ;smbit：", by)
+		// fmt.Println("   ;smbit：", by)
 		for j := 0; j < length; j++ {
 			urlNum := by[j] % 64
 			result += string(URLSTRS[urlNum])
