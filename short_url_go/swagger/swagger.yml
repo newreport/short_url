@@ -12,6 +12,19 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
+  /user/:
+    get:
+      tags:
+      - user
+      description: |-
+        Logs user into the system
+        <br>
+      operationId: UserController.users
+      responses:
+        "200":
+          description: '{string}'
+        "403":
+          description: user not exist
   /user/{uid}:
     delete:
       tags:
@@ -31,19 +44,6 @@ paths:
           description: '{string} delete success!'
         "403":
           description: uid is empty
-  /user/GetAll:
-    get:
-      tags:
-      - user
-      description: |-
-        Logs user into the system
-        <br>
-      operationId: UserController.GetAll
-      responses:
-        "200":
-          description: '{string}'
-        "403":
-          description: user not exist
   /user/login:
     get:
       tags:
@@ -75,12 +75,11 @@ paths:
       description: |-
         Logs user into the system
         <br>
-      operationId: UserController.Register
+      operationId: UserController.register
       parameters:
       - in: body
-        name: body
-        description: body for user content
-        required: true
+        name: register
+        description: body for user
         schema:
           $ref: '#/definitions/models.User'
       responses:
@@ -119,7 +118,7 @@ definitions:
         type: string
       NickName:
         type: string
-      Passwd:
+      Password:
         type: string
       Remarks:
         type: string

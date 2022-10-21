@@ -13,7 +13,7 @@ type User struct {
 	gorm.Model
 	Name             string `gorm:"not null"` //用户名，登录名称
 	NickName         string `gorm:"not null"`
-	Passwd           string `gorm:"not null"`
+	Password         string `gorm:"not null"`
 	Role             int8   `gorm:"not null"`
 	DefaultUrlLength uint8  `gorm:"not null"`
 	Remarks          string
@@ -87,12 +87,12 @@ func Login(username, password string) User {
 	password = uuid.NewV5(U5Seed, password).String()
 	fmt.Print("login:")
 	fmt.Println(password)
-	common.DB.Model(&User{}).Where(&User{Name: username, Passwd: password}).First(&user)
+	common.DB.Model(&User{}).Where(&User{Name: username, Password: password}).First(&user)
 	return user
 }
 
 func AddUser(user User) bool {
-	user.Passwd = uuid.NewV5(U5Seed, user.Passwd).String()
+	user.Password = uuid.NewV5(U5Seed, user.Password).String()
 	result := common.DB.Create(&user)
 	return result.RowsAffected > 0
 }

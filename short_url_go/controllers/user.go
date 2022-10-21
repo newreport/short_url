@@ -1,6 +1,7 @@
 ﻿package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"short_url_go/models"
 
@@ -10,18 +11,6 @@ import (
 // Operations about Users
 type UserController struct {
 	beego.Controller
-}
-
-//https://cloud.tencent.com/developer/article/1557075
-
-// @Title GetAll
-// @Description Logs user into the system
-// @Success 200 {string}
-// @Failure 403 user not exist
-// @router /GetAll [get]
-func (u *UserController) AllUsers() {
-	u.Data["json"] = models.GetAllUsers()
-	u.ServeJSON()
 }
 
 // @Title Login
@@ -45,22 +34,43 @@ func (u *UserController) Login() {
 	u.ServeJSON()
 }
 
-// @Title Register
+// @Title register
 // @Description Logs user into the system
-// @Param	body		body 	models.User	true		"body for user content"
+// @Param	register		body 	models.User		"body for user"
 // @Success 200 {bool} register success
 // @Failure 403 not role
 // @router /register [post]
 func (u *UserController) Register() {
 	var user models.User
-	data := u.Ctx.Input.RequestBody
-	fmt.Println(data)
-	user.Name = u.GetString("username")
-	user.Passwd = u.GetString("password")
-	user.NickName = u.GetString("nickname")
+	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
 	user.Role = 0
 	user.DefaultUrlLength = 6
 	u.Data["json"] = models.AddUser(user)
+	u.ServeJSON()
+}
+
+// // @Title user
+// // @Description Logs user into the system
+// // @Param	user		body 	models.User		"body for user"
+// // @Success 200 {bool} register success
+// // @Failure 403 not role
+// // @router / [post]
+// func (u *UserController) AddUser() {
+// 	var user models.User
+// 	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
+// 	u.Data["json"] = models.AddUser(user)
+// 	u.ServeJSON()
+// }
+
+//https://cloud.tencent.com/developer/article/1557075
+
+// @Title users
+// @Description Logs user into the system
+// @Success 200 {string}
+// @Failure 403 user not exist
+// @router / [get]
+func (u *UserController) GetAllUsers() {
+	u.Data["json"] = models.GetAllUsers()
 	u.ServeJSON()
 }
 
