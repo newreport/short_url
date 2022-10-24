@@ -1,5 +1,7 @@
 ﻿package common
 
+import "encoding/binary"
+
 type MapKY interface {
 	string | int
 }
@@ -20,4 +22,11 @@ func GetMapAllValues[T MapKY](m map[T]T) []T {
 		values = append(values, v)
 	}
 	return values
+}
+
+// 无符号int转byte数组
+func UInt32ToBytes(i uint32) []byte {
+	var buf = make([]byte, 4)
+	binary.LittleEndian.PutUint32(buf, i)
+	return buf
 }

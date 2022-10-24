@@ -91,8 +91,41 @@ func Login(username, password string) User {
 	return user
 }
 
-func AddUser(user User) bool {
+func CreateUser(user User) bool {
 	user.Password = uuid.NewV5(U5Seed, user.Password).String()
 	result := common.DB.Create(&user)
+	return result.RowsAffected > 0
+}
+
+func DeleteUser(id uint) bool {
+	var count int64
+	common.DB.Model(Short{}).Where("fk_user = ? ", id).Count(&count)
+	if count > 0 {
+		return false
+	}
+	result := common.DB.Delete(&User{}, id)
+	return result.RowsAffected > 0
+}
+
+func UpdateUser(user User) bool {
+	user.Password = uuid.NewV5(U5Seed, user.Password).String()
+	result := common.DB.Model(&user).Updates(User{Name: user.Name, NickName: user.NickName, Password: user.Password, Role: user.Role, DefaultUrlLength: user.DefaultUrlLength})
+	return result.RowsAffected > 0
+}
+
+func UpdatePassword(id uint, pwd string) bool {
+	pwd = uuid.NewV5(U5Seed, pwd).String()
+	result := common.DB.Model(&User{}).Where("id = ?", id).Update("password", pwd)
+	return result.RowsAffected > 0
+}
+
+func DeleteUsers(ids []uint) bool {
+	var count int64
+	common.DB.Model(Short{}).Where("fk_user IN ?", ids).Count(&count)
+	if count > 0 {
+		return false
+	}
+	var users []User
+	result := common.DB.Model(User{}).Where(&users, ids).Delete(&User{})
 	return result.RowsAffected > 0
 }

@@ -1,7 +1,6 @@
 ﻿package models
 
 import (
-	"encoding/binary"
 	"short_url_go/common"
 	"strconv"
 	"time"
@@ -18,6 +17,7 @@ type Short struct {
 	Remarks      string    //备注
 	FkUser       uint      `gorm:"not null"` //外键关联用户
 	FKShortGroup uint      `gorm:"not null"` //外键关联分组
+	IsEnable     bool      `gorm:"not null"` //是否启用
 	ExpireAt     time.Time //过期时间
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
@@ -28,19 +28,18 @@ type Short struct {
 // ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~!*
 const URLSTRS = "LMndefNq3~ZaUVWvw4sQRABCY56rHz0DEFJ127KxyX89IbcPhijklmGS-TgtOopu"
 
-func AddShortUrlDefault(sourceUrl string, userId uint, shortGroupId uint) bool {
+// @title			CreateShort
+// @description		生成单个短链接url
+// @auth			sfhj
+// @date			2022-10-23
+// @param     		short		models.Short	"需要生成短链接的url"
+// @param     		length		int				"短链接长度"
+// @return			result		string			"生成后的短链接(查找到的)"
+func CreateShort(short Short, length int) bool {
 	var err error
-	short := Short{Sid: uuid.Must(uuid.NewV4(), err).String(), SourceUrl: sourceUrl, TargetUrl: GenerateUrlDefault(sourceUrl), Remarks: "备注", SourceUrlMD5: common.MD5(sourceUrl), FkUser: userId, FKShortGroup: shortGroupId}
-	result := common.DB.Create(short)
-	if err != nil {
-		panic("failed to add one short url")
-	}
-	return result.RowsAffected > 0
-}
-
-func AddShortUrlAssignLength(sourceUrl string, userId uint, shortGroupId uint, length int) bool {
-	var err error
-	short := Short{Sid: uuid.Must(uuid.NewV4(), err).String(), SourceUrl: sourceUrl, TargetUrl: GenerateUrl(sourceUrl, length), Remarks: "备注", SourceUrlMD5: common.MD5(sourceUrl), FkUser: userId, FKShortGroup: shortGroupId}
+	short.Sid = uuid.Must(uuid.NewV4(), err).String()
+	short.TargetUrl = generateUrl(short.TargetUrl, length)
+	short.SourceUrlMD5 = common.MD5(short.SourceUrl)
 	result := common.DB.Create(short)
 	if err != nil {
 		panic("failed to add one assign length short url")
@@ -48,22 +47,57 @@ func AddShortUrlAssignLength(sourceUrl string, userId uint, shortGroupId uint, l
 	return result.RowsAffected > 0
 }
 
-func AddShortUrlsAssignLengths(sourceUrls []string, userId uint, shortGroupId uint, length int) bool {
+// @title			CreateShortCustom
+// @description		生成单个短链接url，自定义target url
+// @auth			sfhj
+// @date			2022-10-23
+// @param     		short		models.Short	"需要生成短链接的url"
+// @return			result		string			"是否成功"
+func CreateShortCustom(short Short) bool {
 	var err error
-	var shorts []Short
-	targetUrls := GenerateUrls(sourceUrls, length)
-	for i := 0; i < len(sourceUrls); i++ {
-		sourceUrl := sourceUrls[i]
-		short := Short{Sid: uuid.Must(uuid.NewV4(), err).String(), SourceUrl: sourceUrl, TargetUrl: targetUrls[sourceUrl], SourceUrlMD5: common.MD5(sourceUrl), FkUser: userId, FKShortGroup: shortGroupId}
-		shorts = append(shorts, short)
+	short.Sid = uuid.Must(uuid.NewV4(), err).String()
+	short.SourceUrlMD5 = common.MD5(short.SourceUrl)
+	var count int64
+	common.DB.Where("target_url = ?", short.TargetUrl).Count(&count)
+	if count > 0 { //已存在
+		return false
 	}
-
-	result := common.DB.Create(shorts)
+	result := common.DB.Create(short)
 	if err != nil {
 		panic("failed to add one assign length short url")
 	}
 	return result.RowsAffected > 0
 }
+
+// @title			CreateShortsCustom
+// @description		生成多个短链接url，自定义target url
+// @auth			sfhj
+// @date			2022-10-23
+// @param     		short		models.Short	"需要生成短链接的url"
+// @return			result		string			"是否成功"
+// @return			alreadyResult		map[string]string		"已经存在于数据库中的链接集合"
+// @return			repeatResult		map[string]string		"目标target重复的集合"
+// func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeatResult map[string]string) {
+// 	var err error
+// 	var targetStrs []string
+// 	var sourceUrlMD5s []string
+// 	for _, v := range shorts {
+// 		v.Sid = uuid.Must(uuid.NewV4(), err).String()
+// 		v.SourceUrlMD5 = common.MD5(v.SourceUrl)
+// 		targetStrs = append(targetStrs, v.TargetUrl)
+// 		sourceUrlMD5s = append(sourceUrlMD5s, v.SourceUrlMD5)
+// 	}
+// 	var count int64
+// 	common.DB.Where("target_url IN ? OR source_url_md5 IN ?", targetStrs, sourceUrlMD5s).Count(&count)
+// 	if count > 0 { //已存在
+// 		return false
+// 	}
+// 	result := common.DB.Create(shorts)
+// 	if err != nil {
+// 		panic("failed to add one assign length short url")
+// 	}
+// 	return result.RowsAffected > 0
+// }
 
 func DeletedShortUrlById(id string) bool {
 	result := common.DB.Delete(&Short{}, id)
@@ -75,64 +109,13 @@ func DeletedShortUrlByIds(ids []string) bool {
 	return result.RowsAffected > 0
 }
 
-// @title			AddShortUrlsUserdefine
-// @description		生成自定义的短链接,直接插入数据库
-// @auth			sfhj
-// @date			2022-10-18
-// @param     		data        		map[string]string		"需要生成短链接的source和target集合"
-// @param     		userId        		uint					"关联用户主键"
-// @param     		shortGroupId    	uint					"分组主键"
-// @return			alreadyResult		map[string]string		"已经存在于数据库中的链接集合"
-// @return			repeatResult		map[string]string		"目标target重复的集合"
-func AddShortUrlsUserdefine(data map[string]string, userId uint, shortGroupId uint) (alreadyResult map[string]string, repeatResult map[string]string) {
-	alreadyResult = make(map[string]string)
-	repeatResult = make(map[string]string)
-	keys := common.GetMapAllKeys(data)
-	vlues := common.GetMapAllValues(data)
-	var keysMD5 []string
-	for i := 0; i < len(keys); i++ {
-		keysMD5 = append(keysMD5, common.MD5(keys[i]))
-	}
-	shortsAlready := Where[Short](map[string]interface{}{"source_url_md5": keysMD5}, []string{"source_url", "target_url"})
-	for i := 0; i < len(shortsAlready); i++ {
-		alreadyResult[shortsAlready[i].SourceUrl] = shortsAlready[i].TargetUrl
-	}
-	shortsRepeat := Where[Short](map[string]interface{}{"target_url": vlues}, []string{"source_url", "target_url"})
-	for i := 0; i < len(shortsRepeat); i++ {
-		repeatResult[shortsRepeat[i].SourceUrl] = shortsRepeat[i].TargetUrl
-	}
-	var installShorts []Short
-	for sourceUrl, targetUrl := range data {
-		if _, ok := alreadyResult[sourceUrl]; !ok {
-			if _, ok := repeatResult[targetUrl]; !ok {
-				var err error
-				one := Short{Sid: uuid.Must(uuid.NewV4(), err).String(), SourceUrl: sourceUrl, TargetUrl: GenerateUrlDefault(sourceUrl), Remarks: "备注", SourceUrlMD5: common.MD5(sourceUrl), FkUser: userId, FKShortGroup: shortGroupId}
-				if err != nil {
-					panic("failed to connect database")
-				}
-				installShorts = append(installShorts, one)
-			}
-		}
-	}
-	common.DB.Create(&installShorts)
-	return
-}
-
 // @title			GenerateUrlDefault
 // @description		生成单个短链接url，默认6位
 // @auth			sfhj
 // @date			2022-10-17
 // @param     		urls        string		"需要生成短链接的url"
+// @param     		length       int		"短链接长度"
 // @return			result		string		"生成后的短链接(查找到的)"
-func GenerateUrlDefault(urls string) string {
-	return generateUrl(urls, 6)
-}
-
-func GenerateUrl(url string, length int) string {
-	return generateUrl(url, length)
-}
-
-// @title 生成单个url
 func generateUrl(url string, length int) (result string) {
 
 	md5Url := common.MD5(url)
@@ -149,7 +132,7 @@ func generateUrl(url string, length int) (result string) {
 	for i := 0; i < len(md5Arr); i++ {
 		num, _ := strconv.ParseUint(md5Arr[i], 16, 32)
 		// fmt.Print("num:", num)
-		by := UInt32ToBytes(uint32(num))
+		by := common.UInt32ToBytes(uint32(num))
 		//将数据密度提升至16个字节，即短url支持4~16长度，有(4*5*6*....*15*16)^64种可能性
 		by = append(by, by[0]&by[1])
 		by = append(by, by[1]|by[2])
@@ -179,21 +162,13 @@ func generateUrl(url string, length int) (result string) {
 	return
 }
 
-// @title			GenerateUrlsDefault
+// @title			generateUrls
 // @description		生成多个短链接url，默认6位
 // @auth			sfhj
 // @date			2022-10-18
 // @param     		urls        []string				"需要生成短链接的url"
+// @param     		length        int				"url长度"
 // @return			result		map[string]string		"生成后的键值对集合"
-func GenerateUrlsDefault(urls []string) map[string]string {
-	return generateUrls(urls, 6)
-}
-
-func GenerateUrls(urls []string, length int) map[string]string {
-	return generateUrls(urls, length)
-}
-
-// 生成多个url
 func generateUrls(urls []string, length int) (result map[string]string) {
 	var md5Urls []string
 	for i := 0; i < len(urls); i++ {
@@ -222,7 +197,7 @@ func generateUrls(urls []string, length int) (result map[string]string) {
 			// fmt.Print("   ;转int:")
 			num, _ := strconv.ParseUint(md5Arr[j], 16, 32)
 			// fmt.Print("num:", num)
-			by := UInt32ToBytes(uint32(num))
+			by := common.UInt32ToBytes(uint32(num))
 			//将数据密度提升至16个字节，即短url支持4~16长度，有(4*5*6*....*15*16)^64种可能性
 			by = append(by, by[0]&by[1])
 			by = append(by, by[1]|by[2])
@@ -251,11 +226,4 @@ func generateUrls(urls []string, length int) (result map[string]string) {
 		}
 	}
 	return
-}
-
-// 无符号int转byte数组
-func UInt32ToBytes(i uint32) []byte {
-	var buf = make([]byte, 4)
-	binary.LittleEndian.PutUint32(buf, i)
-	return buf
 }

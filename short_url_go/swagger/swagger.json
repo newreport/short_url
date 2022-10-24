@@ -15,19 +15,105 @@
     },
     "basePath": "/v1",
     "paths": {
+        "/short/": {
+            "post": {
+                "tags": [
+                    "short"
+                ],
+                "summary": "新增一个短链接",
+                "description": "add one short url\n\u003cbr\u003e",
+                "operationId": "ShortController.create short",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "short",
+                        "description": "body for short",
+                        "schema": {
+                            "$ref": "#/definitions/models.Short"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{bool} add success"
+                    },
+                    "403": {
+                        "description": "not role"
+                    }
+                }
+            }
+        },
         "/user/": {
             "get": {
                 "tags": [
                     "user"
                 ],
+                "summary": "获取所有用户",
                 "description": "Logs user into the system\n\u003cbr\u003e",
                 "operationId": "UserController.users",
                 "responses": {
                     "200": {
-                        "description": "{string}"
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
                     },
                     "403": {
                         "description": "user not exist"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "修改一个用户",
+                "description": "update the user\n\u003cbr\u003e",
+                "operationId": "UserController.update",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "user",
+                        "description": "body for user",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{bool} update success!"
+                    },
+                    "403": {
+                        "description": "not have role"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "新增一个用户",
+                "description": "Logs user into the system\n\u003cbr\u003e",
+                "operationId": "UserController.user",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for user",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{bool} create success"
+                    },
+                    "403": {
+                        "description": "not role"
                     }
                 }
             }
@@ -37,6 +123,7 @@
                 "tags": [
                     "user"
                 ],
+                "summary": "登录",
                 "description": "Logs user into the system\n\u003cbr\u003e",
                 "operationId": "UserController.Login",
                 "parameters": [
@@ -65,11 +152,42 @@
                 }
             }
         },
+        "/user/pwd/{uid}": {
+            "patch": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "修改一个用户的密码",
+                "description": "update the user's password\n\u003cbr\u003e",
+                "operationId": "UserController.update_password",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "password",
+                        "description": "body for string",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{bool} update success!"
+                    },
+                    "403": {
+                        "description": "not have role"
+                    }
+                }
+            }
+        },
         "/user/register": {
             "post": {
                 "tags": [
                     "user"
                 ],
+                "summary": "注册",
                 "description": "Logs user into the system\n\u003cbr\u003e",
                 "operationId": "UserController.register",
                 "parameters": [
@@ -77,6 +195,7 @@
                         "in": "body",
                         "name": "register",
                         "description": "body for user",
+                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/models.User"
                         }
@@ -97,6 +216,7 @@
                 "tags": [
                     "user"
                 ],
+                "summary": "删除一个用户",
                 "description": "delete the user\n\u003cbr\u003e",
                 "operationId": "UserController.Delete",
                 "parameters": [
@@ -105,7 +225,9 @@
                         "name": "uid",
                         "description": "The uid you want to delete",
                         "required": true,
-                        "type": "string"
+                        "schema": {
+                            "$ref": "#/definitions/unit"
+                        }
                     }
                 ],
                 "responses": {
@@ -145,11 +267,76 @@
                 }
             }
         },
+        "models.Short": {
+            "title": "Short",
+            "type": "object",
+            "properties": {
+                "CreatedAt": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "DeletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "ExpireAt": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "FKShortGroup": {
+                    "description": "外键关联分组",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "FkUser": {
+                    "description": "外键关联用户",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "IsEnable": {
+                    "description": "是否启用",
+                    "type": "boolean"
+                },
+                "Remarks": {
+                    "type": "string"
+                },
+                "Sid": {
+                    "description": "主键uuid",
+                    "type": "string"
+                },
+                "SourceUrl": {
+                    "description": "需要跳转的url",
+                    "type": "string"
+                },
+                "SourceUrlMD5": {
+                    "description": "需要跳转url的MD5",
+                    "type": "string"
+                },
+                "TargetUrl": {
+                    "description": "目标URL",
+                    "type": "string"
+                },
+                "UpdatedAt": {
+                    "type": "string",
+                    "format": "datetime"
+                }
+            }
+        },
         "models.User": {
             "title": "User",
             "type": "object",
             "properties": {
+                "CreatedAt": {
+                    "type": "string",
+                    "format": "datetime"
+                },
                 "DefaultUrlLength": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "DeletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "ID": {
                     "type": "integer",
                     "format": "int32"
                 },
@@ -169,11 +356,19 @@
                 "Role": {
                     "type": "integer",
                     "format": "int32"
+                },
+                "UpdatedAt": {
+                    "type": "string",
+                    "format": "datetime"
                 }
             }
         },
         "models.baseSqlStruct": {
             "title": "baseSqlStruct",
+            "type": "object"
+        },
+        "unit": {
+            "title": "unit",
             "type": "object"
         }
     },
@@ -181,6 +376,10 @@
         {
             "name": "user",
             "description": "Operations about Users\n"
+        },
+        {
+            "name": "short",
+            "description": "Operations about Shorts\n"
         }
     ]
 }

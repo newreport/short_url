@@ -7,10 +7,19 @@ import (
 
 func init() {
 
+    beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
+        beego.ControllerComments{
+            Method: "CreateShort",
+            Router: `/`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
         beego.ControllerComments{
             Method: "GetAllUsers",
-            Router: `//`,
+            Router: `/`,
             AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,
@@ -18,7 +27,25 @@ func init() {
 
     beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
         beego.ControllerComments{
-            Method: "Delete",
+            Method: "CreateUser",
+            Router: `/`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
+        beego.ControllerComments{
+            Method: "UpdateUser",
+            Router: `/`,
+            AllowHTTPMethods: []string{"put"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
+        beego.ControllerComments{
+            Method: "DeleteUser",
             Router: `/:uid`,
             AllowHTTPMethods: []string{"delete"},
             MethodParams: param.Make(),
@@ -30,6 +57,15 @@ func init() {
             Method: "Login",
             Router: `/login`,
             AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
+        beego.ControllerComments{
+            Method: "UpdateUserPassword",
+            Router: `/pwd/:uid`,
+            AllowHTTPMethods: []string{"patch"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})
