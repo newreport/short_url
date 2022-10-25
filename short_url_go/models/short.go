@@ -40,7 +40,7 @@ func CreateShort(short Short, length int) bool {
 	short.Sid = uuid.Must(uuid.NewV4(), err).String()
 	short.TargetUrl = generateUrl(short.TargetUrl, length)
 	short.SourceUrlMD5 = common.MD5(short.SourceUrl)
-	result := common.DB.Create(short)
+	result := DB.Create(short)
 	if err != nil {
 		panic("failed to add one assign length short url")
 	}
@@ -58,11 +58,11 @@ func CreateShortCustom(short Short) bool {
 	short.Sid = uuid.Must(uuid.NewV4(), err).String()
 	short.SourceUrlMD5 = common.MD5(short.SourceUrl)
 	var count int64
-	common.DB.Where("target_url = ?", short.TargetUrl).Count(&count)
+	DB.Where("target_url = ?", short.TargetUrl).Count(&count)
 	if count > 0 { //已存在
 		return false
 	}
-	result := common.DB.Create(short)
+	result := DB.Create(short)
 	if err != nil {
 		panic("failed to add one assign length short url")
 	}
@@ -88,11 +88,11 @@ func CreateShortCustom(short Short) bool {
 // 		sourceUrlMD5s = append(sourceUrlMD5s, v.SourceUrlMD5)
 // 	}
 // 	var count int64
-// 	common.DB.Where("target_url IN ? OR source_url_md5 IN ?", targetStrs, sourceUrlMD5s).Count(&count)
+// 	DB.Where("target_url IN ? OR source_url_md5 IN ?", targetStrs, sourceUrlMD5s).Count(&count)
 // 	if count > 0 { //已存在
 // 		return false
 // 	}
-// 	result := common.DB.Create(shorts)
+// 	result := DB.Create(shorts)
 // 	if err != nil {
 // 		panic("failed to add one assign length short url")
 // 	}
@@ -100,12 +100,12 @@ func CreateShortCustom(short Short) bool {
 // }
 
 func DeletedShortUrlById(id string) bool {
-	result := common.DB.Delete(&Short{}, id)
+	result := DB.Delete(&Short{}, id)
 	return result.RowsAffected > 0
 }
 
 func DeletedShortUrlByIds(ids []string) bool {
-	result := common.DB.Delete(&Short{}, "sid IN ?", ids)
+	result := DB.Delete(&Short{}, "sid IN ?", ids)
 	return result.RowsAffected > 0
 }
 
@@ -120,10 +120,10 @@ func generateUrl(url string, length int) (result string) {
 
 	md5Url := common.MD5(url)
 	var count int64
-	common.DB.Model(&Short{}).Where("source_url_md5 = ? ", md5Url).Count(&count)
+	DB.Model(&Short{}).Where("source_url_md5 = ? ", md5Url).Count(&count)
 	if count > 0 { //存在记录，直接使用
 		var one Short
-		common.DB.Where("source_url_md5 = ?", md5Url).First(&one)
+		DB.Where("source_url_md5 = ?", md5Url).First(&one)
 		result = one.TargetUrl
 		return
 	}
@@ -154,7 +154,7 @@ func generateUrl(url string, length int) (result string) {
 			urlNum := by[j] % 64
 			result += string(URLSTRS[urlNum])
 		}
-		common.DB.Model(&Short{}).Where("target_url = ? ", result).Count(&count)
+		DB.Model(&Short{}).Where("target_url = ? ", result).Count(&count)
 		if count == 0 {
 			return //不重复，则直接结束循环
 		}
@@ -176,10 +176,10 @@ func generateUrls(urls []string, length int) (result map[string]string) {
 	}
 
 	var count int64
-	common.DB.Model(&Short{}).Where("source_url_md5 IN ? ", md5Urls).Count(&count)
+	DB.Model(&Short{}).Where("source_url_md5 IN ? ", md5Urls).Count(&count)
 	if count > 0 { //存在记录，直接使用
 		var alreadyShort []Short
-		common.DB.Where("source_url_md5 IN ?", md5Urls).Select([]string{"source_url", "target_url"}).Find(&alreadyShort)
+		DB.Where("source_url_md5 IN ?", md5Urls).Select([]string{"source_url", "target_url"}).Find(&alreadyShort)
 		for i := 0; i < len(alreadyShort); i++ {
 			result[alreadyShort[i].SourceUrl] = alreadyShort[i].TargetUrl
 		}
@@ -219,7 +219,7 @@ func generateUrls(urls []string, length int) (result map[string]string) {
 				urlNum := by[k] % 64
 				result[urls[i]] += string(URLSTRS[urlNum])
 			}
-			common.DB.Model(&Short{}).Where("target_url = ? ", result).Count(&count)
+			DB.Model(&Short{}).Where("target_url = ? ", result).Count(&count)
 			if count == 0 {
 				break //不重复，则直接结束循环
 			}

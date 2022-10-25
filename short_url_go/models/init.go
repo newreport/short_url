@@ -1,17 +1,24 @@
-﻿package init
+﻿package models
 
 import (
 	"fmt"
 	"os"
 	"short_url_go/common"
 
-	"short_url_go/models"
-
 	"github.com/beego/beego/v2/core/config"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
+
+var DB *gorm.DB
+
+type Page struct {
+	PageNum  int    `form:"page_num"`
+	PageSize int    `form:"page_size"`
+	Keyword  string `form:"keyword"`
+	Desc     bool   `form:"desc"`
+}
 
 func init() {
 	var err error
@@ -34,7 +41,7 @@ func init() {
 	_path += "/main.db"
 	if existSqlFile, _ := common.PathExists(_path); !existSqlFile {
 		//创建sqlite文件
-		common.DB, err = gorm.Open(sqlite.Open(_path), &gorm.Config{})
+		DB, err = gorm.Open(sqlite.Open(_path), &gorm.Config{})
 		if err != nil {
 			panic("failed to connect database")
 		}
@@ -47,24 +54,23 @@ func init() {
 		//uuid v5加密
 		u5 := uuid.Must(uuid.FromString(pwdUUID))
 		fmt.Println("u5:", u5)
-		common.DB.AutoMigrate(&models.User{}, &models.Short{}, &models.ShortGroup{})
-		userAdmin := models.User{Name: "admin", NickName: "admin", Password: uuid.NewV5(u5, "admin").String(), Role: 1, DefaultUrlLength: 9, Remarks: "默认管理员"}
-		common.DB.Create(&userAdmin)
+		DB.AutoMigrate(&User{}, &Short{}, &ShortGroup{})
+		userAdmin := User{Name: "admin", Nickname: "admin", Password: uuid.NewV5(u5, "admin").String(), Role: 1, DefaultUrlLength: 9, Remarks: "默认管理员"}
+		DB.Create(&userAdmin)
 		fmt.Print("admin:")
 		fmt.Println(userAdmin.Password)
-		userUser1 := models.User{Name: "user", NickName: "user", Password: uuid.NewV5(u5, "user").String(), DefaultUrlLength: 9, Role: 1, Remarks: "用户"}
-		common.DB.Create(&userUser1)
+		userUser1 := User{Name: "user", Nickname: "user", Password: uuid.NewV5(u5, "user").String(), DefaultUrlLength: 9, Role: 1, Remarks: "用户"}
+		DB.Create(&userUser1)
 		//https://www.bookstack.cn/read/beego-2.0-zh/quickstart.md
 		//初始化url
-		// urlOne := models.Short{Si}
+		// urlOne := Short{Si}
 
 	} else {
-		common.DB, err = gorm.Open(sqlite.Open(_path), &gorm.Config{})
+		DB, err = gorm.Open(sqlite.Open(_path), &gorm.Config{})
 		if err != nil {
 			panic("failed to connect database")
 		}
 	}
-	models.Test()
 }
 
 func checkErr(err error) {

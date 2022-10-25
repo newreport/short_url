@@ -12,33 +12,13 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
-  /short/:
-    post:
-      tags:
-      - short
-      summary: 新增一个短链接
-      description: |-
-        add one short url
-        <br>
-      operationId: ShortController.create short
-      parameters:
-      - in: body
-        name: short
-        description: body for short
-        schema:
-          $ref: '#/definitions/models.Short'
-      responses:
-        "200":
-          description: '{bool} add success'
-        "403":
-          description: not role
   /user/:
     get:
       tags:
       - user
       summary: 获取所有用户
       description: |-
-        Logs user into the system
+        logs.Info user into the system
         <br>
       operationId: UserController.users
       responses:
@@ -73,7 +53,7 @@ paths:
       - user
       summary: 新增一个用户
       description: |-
-        Logs user into the system
+        logs.Info user into the system
         <br>
       operationId: UserController.user
       parameters:
@@ -115,7 +95,7 @@ paths:
       - user
       summary: 登录
       description: |-
-        Logs user into the system
+        logs.Info user into the system
         <br>
       operationId: UserController.Login
       parameters:
@@ -149,8 +129,7 @@ paths:
         description: body for string
         required: true
         schema:
-          type: string
-        type: string
+          $ref: '#/definitions/models.Page'
       responses:
         "200":
           description: '{bool} update success!'
@@ -160,82 +139,47 @@ paths:
     post:
       tags:
       - user
-      summary: 注册
       description: |-
-        Logs user into the system
+        logs.Info user into the system
         <br>
-      operationId: UserController.register
       parameters:
       - in: body
-        name: register
+        name: body
         description: body for user
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/controllers.Test'
       responses:
         "200":
           description: '{bool} register success'
         "403":
           description: not role
 definitions:
+  controllers.Test:
+    title: Test
+    type: object
+    properties:
+      Nickname:
+        type: string
+      name_js:
+        type: string
   gorm.DeletedAt:
     title: DeletedAt
     type: object
-  gorm.Model:
-    title: Model
+  models.Page:
+    title: Page
     type: object
     properties:
-      CreatedAt:
-        type: string
-        format: datetime
-      DeletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
-      ID:
-        type: integer
-        format: int32
-      UpdatedAt:
-        type: string
-        format: datetime
-  models.Short:
-    title: Short
-    type: object
-    properties:
-      CreatedAt:
-        type: string
-        format: datetime
-      DeletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
-      ExpireAt:
-        type: string
-        format: datetime
-      FKShortGroup:
-        description: 外键关联分组
-        type: integer
-        format: int32
-      FkUser:
-        description: 外键关联用户
-        type: integer
-        format: int32
-      IsEnable:
-        description: 是否启用
+      Desc:
         type: boolean
-      Remarks:
+      Keyword:
         type: string
-      Sid:
-        description: 主键uuid
-        type: string
-      SourceUrl:
-        description: 需要跳转的url
-        type: string
-      SourceUrlMD5:
-        description: 需要跳转url的MD5
-        type: string
-      TargetUrl:
-        description: 目标URL
-        type: string
-      UpdatedAt:
-        type: string
-        format: datetime
+      PageNum:
+        type: integer
+        format: int64
+      PageSize:
+        type: integer
+        format: int64
   models.User:
     title: User
     type: object
@@ -248,13 +192,15 @@ definitions:
         format: int32
       DeletedAt:
         $ref: '#/definitions/gorm.DeletedAt'
+      Group:
+        type: string
       ID:
         type: integer
         format: int32
       Name:
         description: 用户名，登录名称
         type: string
-      NickName:
+      Nickname:
         type: string
       Password:
         type: string
@@ -266,9 +212,6 @@ definitions:
       UpdatedAt:
         type: string
         format: datetime
-  models.baseSqlStruct:
-    title: baseSqlStruct
-    type: object
   unit:
     title: unit
     type: object

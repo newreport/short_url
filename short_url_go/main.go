@@ -3,8 +3,6 @@ package main
 import (
 	_ "short_url_go/routers"
 
-	_ "short_url_go/init"
-
 	beego "github.com/beego/beego/v2/server/web"
 )
 
