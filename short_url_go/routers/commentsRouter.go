@@ -47,7 +47,7 @@ func init() {
         beego.ControllerComments{
             Method: "Login",
             Router: `/login`,
-            AllowHTTPMethods: []string{"get"},
+            AllowHTTPMethods: []string{"post"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})
@@ -75,6 +75,15 @@ func init() {
             Method: "Test",
             Router: `/test`,
             AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
+        beego.ControllerComments{
+            Method: "RefreshTocken",
+            Router: `/tocken/account`,
+            AllowHTTPMethods: []string{"post"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})

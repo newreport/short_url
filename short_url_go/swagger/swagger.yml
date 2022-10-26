@@ -90,7 +90,7 @@ paths:
         "403":
           description: The uid is empty
   /user/login:
-    get:
+    post:
       tags:
       - user
       summary: 登录
@@ -99,23 +99,17 @@ paths:
         <br>
       operationId: UserController.Login
       parameters:
-      - in: query
-        name: username
+      - in: body
+        name: body
         description: The username for login
         required: true
-        type: string
-      - in: query
-        name: password
-        description: The password for login
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/models.User'
       responses:
         "200":
           description: '{models.User} Login success'
         "401":
           description: The user does not exist.
-        "403":
-          description: Wrong password.
   /user/pwd/{uid}:
     patch:
       tags:
@@ -173,6 +167,28 @@ paths:
           description: '{string} string'
         "403":
           description: User not exist
+  /user/tocken/account:
+    post:
+      tags:
+      - user
+      summary: 刷新 account tocken
+      description: |-
+        logs.Info user into the system
+        <br>
+      operationId: UserController.account tocken
+      parameters:
+      - in: body
+        name: jwt
+        description: The refresh jwt tocken
+        required: true
+        schema:
+          type: string
+        type: string
+      responses:
+        "200":
+          description: string Refresh success
+        "401":
+          description: The user does not exist.
 definitions:
   gorm.DeletedAt:
     title: DeletedAt
@@ -181,6 +197,9 @@ definitions:
     title: User
     type: object
     properties:
+      author_url:
+        description: 头像地址
+        type: string
       create_at:
         description: 创建时间
         type: string

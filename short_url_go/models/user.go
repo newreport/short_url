@@ -19,6 +19,7 @@ type User struct { //用户表
 	Nickname         string         `json:"nickname" gorm:"not null"`       //昵称
 	Password         string         `json:"pwd" gorm:"not null"`            //密码
 	Role             int8           `json:"role" gorm:"not null"`           //角色
+	AuthorURL        string         `json:"author_url"`                     //头像地址
 	DefaultUrlLength uint8          `json:"url_length" gorm:"not null"`     //配置项：url默认长度
 	Group            string         `json:"group"`                          //分组
 	Remarks          string         `json:"remarks"`                        //备注
@@ -81,6 +82,12 @@ func Login(username, password string) User {
 	var user User
 	password = uuid.NewV5(U5Seed, password).String()
 	DB.Model(&User{}).Where(&User{Name: username, Password: password}).First(&user)
+	return user
+}
+
+func QueryUserById(id uint) User {
+	var user User
+	DB.First(&user, id)
 	return user
 }
 

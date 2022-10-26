@@ -3,6 +3,7 @@
 import (
 	"encoding/json"
 	"fmt"
+	"short_url_go/common"
 	"short_url_go/models"
 	"strconv"
 	"time"
@@ -57,22 +58,44 @@ func (u *UserController) Register() {
 // @Title Login
 // @Description logs.Info user into the system
 // @Summary 登录
-// @Param	username		query 	string	true		"The username for login"
-// @Param	password		query 	string	true		"The password for login"
+// @Param	body		body 	models.User	true		"The username for login"
 // @Success 200 {models.User} Login success
 // @Failure 401 The user does not exist.
-// @Failure 403 Wrong password.
-// @router /login [get]
+// @router /login [post]
 func (u *UserController) Login() {
-	username := u.GetString("username")
-	password := u.GetString("password")
-	fmt.Println("登录中...", password)
-
+	requestBody := u.JsonData()
+	username := requestBody["name"].(string)
+	password := requestBody["pwd"].(string)
 	user := models.Login(username, password)
 	if user.ID > 0 && len(user.Name) > 0 {
-		u.Data["json"] = user
+		u.Data["json"] = generateRefreshJWT(user.ID)
 	} else {
+		u.Ctx.ResponseWriter.WriteHeader(401)
 		u.Data["json"] = "user not exist"
+	}
+	u.ServeJSON()
+}
+
+// @Title account tocken
+// @Description logs.Info user into the system
+// @Summary 刷新 account tocken
+// @Param	jwt		body 	string	true	"The refresh jwt tocken"
+// @Success 200 string Refresh success
+// @Failure 401 The user does not exist.
+// @router /tocken/account [post]
+func (u *UserController) RefreshTocken() {
+	tokenString := string(u.Ctx.Input.RequestBody)
+	token, err := jwt.ParseWithClaims(tokenString, &RefreshClaims{}, func(token *jwt.Token) (interface{}, error) {
+		key, _ := common.INIconf.String("JWT::RefreshTokenKey")
+		return []byte(key), nil
+	})
+
+	if claims, ok := token.Claims.(*RefreshClaims); ok && token.Valid {
+		fmt.Println(claims.ID)
+		user := models.QueryUserById(claims.ID)
+		u.Data["json"] = generateAccountJWT(user)
+	} else {
+		fmt.Println(err)
 	}
 	u.ServeJSON()
 }
@@ -87,38 +110,70 @@ func (u *UserController) Test() {
 	var user models.User
 	user.Name = "33"
 	user.Nickname = "张三"
-	u.Data["json"] = generateJWT(user)
+	u.Data["json"] = generateAccountJWT(user)
 	u.ServeJSON()
 }
 
-type MyCustomClaims struct {
-	Foo  string      `json:"foo"`
-	User models.User `json:"user"`
+type AccountClaims struct {
+	ID       uint   `json:"id"`
+	Name     string `json:"name"`
+	Nickname string `json:"nickname"`
+	Role     int8   `json:"role"`
 	jwt.RegisteredClaims
 }
 
-func generateJWT(user models.User) (res string) {
-	claims := MyCustomClaims{
-		"bar",
-		user,
+type RefreshClaims struct {
+	ID uint `json:"id"`
+	jwt.RegisteredClaims
+}
+
+// @Title generateAccountJWT
+// @Auth sfhj
+// @Date 2022-10-26
+// @Param user models.User 用户模型
+// @Return accountJWT string 请求用的JWT字符串
+func generateAccountJWT(user models.User) string {
+	claims := AccountClaims{
+		user.ID,
+		user.Name,
+		user.Nickname,
+		user.Role,
 		jwt.RegisteredClaims{
-			// A usual scenario is to set the expiration time relative to the current time
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(10 * time.Minute)), //10分组刷新一次
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
-			Issuer:    "test",
+			Issuer:    "newreport",
 			Subject:   "somebody",
-			ID:        "1",
 			Audience:  []string{"somebody_else"},
 		},
 	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("asdaSD432423423sF@f"))
+	key, _ := common.INIconf.String("JWT::AccessTokenKey")
+	tokenString, _ := token.SignedString([]byte(key))
+	return tokenString
+}
 
-	fmt.Println(tokenString, err)
-	res = tokenString
-	return
+// @Title generateRefreshJWT
+// @Auth sfhj
+// @Date 2022-10-26
+// @Param id uint 用户id
+// @Return refreshJWT string 刷新用的JWT字符串
+func generateRefreshJWT(id uint) string {
+	claims := RefreshClaims{
+		id,
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * 24 * time.Hour)), //15天刷新一次
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+			Issuer:    "newreport",
+			Subject:   "somebody",
+			Audience:  []string{"somebody_else"},
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	key, _ := common.INIconf.String("JWT::RefreshTokenKey")
+	tokenString, _ := token.SignedString([]byte(key))
+	return tokenString
 }
 
 // @Title user
