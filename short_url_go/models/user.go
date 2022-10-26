@@ -9,29 +9,52 @@ import (
 	"gorm.io/gorm"
 )
 
-type User struct {
-	ID               uint `gorm:"primaryKey;<-:create"`
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
-	DeletedAt        gorm.DeletedAt `gorm:"index"`
-	Name             string         `gorm:"not null"` //用户名，登录名称
-	Nickname         string         `gorm:"not null"`
-	Password         string         `gorm:"not null"`
-	Role             int8           `gorm:"not null"`
-	DefaultUrlLength uint8          `gorm:"not null"`
-	Group            string
-	Remarks          string
+// 用户表2
+type User struct { //用户表
+	ID               uint           `json:"id" gorm:"primaryKey;<-:create"` //id
+	CreatedAt        time.Time      `json:"create_at" gorm:"<-:create"`     //创建时间
+	UpdatedAt        time.Time      `json:"update_at" gorm:"<-"`            //最后更新时间
+	DeletedAt        gorm.DeletedAt `json:"delete_at" gorm:"index"`         //软删除时间
+	Name             string         `json:"name" gorm:"not null"`           //用户名，登录名称
+	Nickname         string         `json:"nickname" gorm:"not null"`       //昵称
+	Password         string         `json:"pwd" gorm:"not null"`            //密码
+	Role             int8           `json:"role" gorm:"not null"`           //角色
+	DefaultUrlLength uint8          `json:"url_length" gorm:"not null"`     //配置项：url默认长度
+	Group            string         `json:"group"`                          //分组
+	Remarks          string         `json:"remarks"`                        //备注
 }
 
-type UserShort string
+type UserOrderBy int
 
 const (
-	Id        UserShort = "id"
-	Name                = "name"
-	NickName            = "nickname"
-	CreatedAt           = "created_at"
-	Group               = "group"
+	Id UserOrderBy = iota
+	Name
+	Nickname
+	CreatedAt
+	UpdatedAt
+	UrlLength
+	Group
 )
+
+func (field UserOrderBy) String() (res string) {
+	switch field {
+	case 0:
+		res = "id"
+	case 1:
+		res = "name"
+	case 2:
+		res = "nickname"
+	case 3:
+		res = "create_at"
+	case 4:
+		res = "update_at"
+	case 5:
+		res = "default_url_length"
+	case 6:
+		res = "group"
+	}
+	return
+}
 
 var U5Seed uuid.UUID
 
@@ -90,7 +113,7 @@ func UpdateUser(user User) bool {
 // @Param	nicknmae	string 昵称
 // @Param	group	string 分组
 // @Param	role	uint	权限
-// @Param	page	models.Page	分页查询累
+// @Param	page	models.Page	分页查询struct
 // @Return	users	[]models.User
 func QueryPageUsers(name string, nicknmae string, group string, role uint, page Page) []User {
 	express := DB.Model(&User{})

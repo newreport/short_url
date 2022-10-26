@@ -27,7 +27,7 @@ paths:
           schema:
             $ref: '#/definitions/models.User'
         "403":
-          description: user not exist
+          description: User not exist
     put:
       tags:
       - user
@@ -46,8 +46,8 @@ paths:
       responses:
         "200":
           description: '{bool} update success!'
-        "403":
-          description: not have role
+        "401":
+          description: Insufficient user permissions
     post:
       tags:
       - user
@@ -65,9 +65,9 @@ paths:
           $ref: '#/definitions/models.User'
       responses:
         "200":
-          description: '{bool} create success'
-        "403":
-          description: not role
+          description: '{bool} Create success'
+        "401":
+          description: Insufficient user permissions
   /user/{uid}:
     delete:
       tags:
@@ -88,7 +88,7 @@ paths:
         "200":
           description: '{string} delete success!'
         "403":
-          description: uid is empty
+          description: The uid is empty
   /user/login:
     get:
       tags:
@@ -111,9 +111,11 @@ paths:
         type: string
       responses:
         "200":
-          description: '{string} login success'
+          description: '{models.User} Login success'
+        "401":
+          description: The user does not exist.
         "403":
-          description: user not exist
+          description: Wrong password.
   /user/pwd/{uid}:
     patch:
       tags:
@@ -122,96 +124,101 @@ paths:
       description: |-
         update the user's password
         <br>
-      operationId: UserController.update_password
+      operationId: UserController.Update password
       parameters:
       - in: body
-        name: password
-        description: body for string
+        name: body
+        description: body for password
         required: true
         schema:
-          $ref: '#/definitions/models.Page'
+          type: string
+        type: string
       responses:
         "200":
-          description: '{bool} update success!'
-        "403":
-          description: not have role
+          description: '{bool} update password success!'
+        "401":
+          description: Insufficient user permissions
   /user/register:
     post:
       tags:
       - user
+      summary: 注册
       description: |-
         logs.Info user into the system
         <br>
+      operationId: UserController.Register
       parameters:
       - in: body
         name: body
         description: body for user
         required: true
         schema:
-          $ref: '#/definitions/controllers.Test'
+          $ref: '#/definitions/models.User'
       responses:
         "200":
           description: '{bool} register success'
         "403":
-          description: not role
+          description: Prohibiting the registration
+  /user/test:
+    get:
+      tags:
+      - user
+      summary: 测试
+      description: |-
+        测试使用
+        <br>
+      operationId: UserController.Test
+      responses:
+        "200":
+          description: '{string} string'
+        "403":
+          description: User not exist
 definitions:
-  controllers.Test:
-    title: Test
-    type: object
-    properties:
-      Nickname:
-        type: string
-      name_js:
-        type: string
   gorm.DeletedAt:
     title: DeletedAt
     type: object
-  models.Page:
-    title: Page
-    type: object
-    properties:
-      Desc:
-        type: boolean
-      Keyword:
-        type: string
-      PageNum:
-        type: integer
-        format: int64
-      PageSize:
-        type: integer
-        format: int64
   models.User:
     title: User
     type: object
     properties:
-      CreatedAt:
+      create_at:
+        description: 创建时间
         type: string
         format: datetime
-      DefaultUrlLength:
-        type: integer
-        format: int32
-      DeletedAt:
+      delete_at:
         $ref: '#/definitions/gorm.DeletedAt'
-      Group:
+        description: 软删除时间
+      group:
+        description: 分组
         type: string
-      ID:
+      id:
+        description: id
         type: integer
         format: int32
-      Name:
+      name:
         description: 用户名，登录名称
         type: string
-      Nickname:
+      nickname:
+        description: 昵称
         type: string
-      Password:
+      pwd:
+        description: 密码
         type: string
-      Remarks:
+      remarks:
+        description: 备注
         type: string
-      Role:
+      role:
+        description: 角色
         type: integer
         format: int32
-      UpdatedAt:
+      update_at:
+        description: 最后更新时间
         type: string
         format: datetime
+      url_length:
+        description: 配置项：url默认长度
+        type: integer
+        format: int32
   unit:
     title: unit
     type: object

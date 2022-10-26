@@ -4,36 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"short_url_go/models"
+	"strconv"
+	"time"
 
 	"github.com/beego/beego/v2/core/logs"
-	beego "github.com/beego/beego/v2/server/web"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 // Operations about Users
 type UserController struct {
-	beego.Controller
-}
-
-// @Title Login
-// @Description logs.Info user into the system
-// @Summary 登录
-// @Param	username		query 	string	true		"The username for login"
-// @Param	password		query 	string	true		"The password for login"
-// @Success 200 {string} login success
-// @Failure 403 user not exist
-// @router /login [get]
-func (u *UserController) Login() {
-	username := u.GetString("username")
-	password := u.GetString("password")
-	fmt.Println("登录中...", password)
-
-	user := models.Login(username, password)
-	if user.ID > 0 && len(user.Name) > 0 {
-		u.Data["json"] = user
-	} else {
-		u.Data["json"] = "user not exist"
-	}
-	u.ServeJSON()
+	BaseController
 }
 
 //https://cloud.tencent.com/developer/article/1557075
@@ -42,7 +22,7 @@ func (u *UserController) Login() {
 // @Summary 获取所有用户
 // @Description logs.Info user into the system
 // @Success 200 {object} models.User
-// @Failure 403 user not exist
+// @Failure 403 User not exist
 // @router / [get]
 func (u *UserController) GetAllUsers() {
 	u.Data["json"] = models.GetAllUsers()
@@ -59,11 +39,10 @@ func (u *UserController) GetAllUsers() {
 
 // @Title Register
 // @Summary 注册
-
 // @Description logs.Info user into the system
 // @Param	body		body 	models.User	true	"body for user"
 // @Success 200 {bool} register success
-// @Failure 403 not role
+// @Failure 403 Prohibiting the registration
 // @router /register [post]
 func (u *UserController) Register() {
 	// Infos(u)
@@ -75,17 +54,83 @@ func (u *UserController) Register() {
 	u.ServeJSON()
 }
 
+// @Title Login
+// @Description logs.Info user into the system
+// @Summary 登录
+// @Param	username		query 	string	true		"The username for login"
+// @Param	password		query 	string	true		"The password for login"
+// @Success 200 {models.User} Login success
+// @Failure 401 The user does not exist.
+// @Failure 403 Wrong password.
+// @router /login [get]
+func (u *UserController) Login() {
+	username := u.GetString("username")
+	password := u.GetString("password")
+	fmt.Println("登录中...", password)
+
+	user := models.Login(username, password)
+	if user.ID > 0 && len(user.Name) > 0 {
+		u.Data["json"] = user
+	} else {
+		u.Data["json"] = "user not exist"
+	}
+	u.ServeJSON()
+}
+
+// @Title Test
+// @Summary 测试
+// @Description 测试使用
+// @Success 200 {string} string
+// @Failure 403 User not exist
+// @router /test [get]
+func (u *UserController) Test() {
+	var user models.User
+	user.Name = "33"
+	user.Nickname = "张三"
+	u.Data["json"] = generateJWT(user)
+	u.ServeJSON()
+}
+
+type MyCustomClaims struct {
+	Foo  string      `json:"foo"`
+	User models.User `json:"user"`
+	jwt.RegisteredClaims
+}
+
+func generateJWT(user models.User) (res string) {
+	claims := MyCustomClaims{
+		"bar",
+		user,
+		jwt.RegisteredClaims{
+			// A usual scenario is to set the expiration time relative to the current time
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+			Issuer:    "test",
+			Subject:   "somebody",
+			ID:        "1",
+			Audience:  []string{"somebody_else"},
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte("asdaSD432423423sF@f"))
+
+	fmt.Println(tokenString, err)
+	res = tokenString
+	return
+}
+
 // @Title user
 // @Summary 新增一个用户
 // @Description logs.Info user into the system
 // @Param	body	body 	models.User	true	"body for user"
-// @Success 200 {bool} create success
-// @Failure 403 not role
+// @Success 200 {bool} Create success
+// @Failure 401	Insufficient user permissions
 // @router / [post]
 func (u *UserController) CreateUser() {
 	var user models.User
 	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
-	user.Name = "asd"
 	u.Data["json"] = models.CreateUser(user)
 	u.ServeJSON()
 }
@@ -95,7 +140,8 @@ func (u *UserController) CreateUser() {
 // @Description delete the user
 // @Param	uid		path 	unit	true	"The uid you want to delete"
 // @Success 200 {string} delete success!
-// @Failure 403 uid is empty
+// @Failure 403 The uid is empty
+// @Faulure 401 Insufficient user permissions
 // @router /:uid [delete]
 func (u *UserController) DeleteUser() {
 	uid, err := u.GetUint64(":uid")
@@ -112,7 +158,7 @@ func (u *UserController) DeleteUser() {
 // @Description update the user
 // @Param	user	body 	models.User true	"body for user"
 // @Success 200 {bool} update success!
-// @Failure 403 not have role
+// @Failure 401 Insufficient user permissions
 // @router / [put]
 func (u *UserController) UpdateUser() {
 	var user models.User
@@ -121,15 +167,20 @@ func (u *UserController) UpdateUser() {
 	u.ServeJSON()
 }
 
-// @Title update_password
+// @Title Update password
 // @Summary 修改一个用户的密码
 // @Description update the user's password
-// @Param	password	body 	models.Page true "body for string"
-// @Success 200 {bool} update success!
-// @Failure 403 not have role
+// @Param	body	body 	string true "body for password"
+// @Success 200 {bool} update password success!
+// @Failure 401 Insufficient user permissions
 // @router /pwd/:uid [patch]
 func (u *UserController) UpdateUserPassword() {
-
+	uid := u.GetString(":uid")
+	id, _ := strconv.ParseUint(uid, 10, 64)
+	var pwd string
+	json.Unmarshal(u.Ctx.Input.RequestBody, &pwd)
+	u.Data["json"] = models.UpdatePassword(uint(id), pwd)
+	u.ServeJSON()
 }
 
 func Infos(u *UserController) {
@@ -155,6 +206,4 @@ func Infos(u *UserController) {
 	logs.Info(u.Ctx.Input.Port())        //返回请求的服务器端口:3000
 	logs.Info(u.Ctx.Input.UserAgent())   //客户端浏览器的信息:Mozilla/5.0 (Linux; Android 5.1.1; vivo X7 Build/LMY47V) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/39.0.0.0 Mobile Safari/537.36 Html5Plus/1.0 (Immersed/24.0)
 	logs.Info(u.Ctx.Input.Query("name")) //该函数返回 Get 请求和 Post 请求中的所有数据，和 PHP 中$_REQUEST 类似
-	// logs.Info(u.Ctx.Input.RequestBody) //该函数返回 Get 请求和 Post 请求中的所有数据，和 PHP 中$_REQUEST 类似
-
 }
