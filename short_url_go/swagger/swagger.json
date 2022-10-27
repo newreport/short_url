@@ -178,24 +178,6 @@
                 }
             }
         },
-        "/user/test": {
-            "get": {
-                "tags": [
-                    "user"
-                ],
-                "summary": "测试",
-                "description": "测试使用\n\u003cbr\u003e",
-                "operationId": "UserController.Test",
-                "responses": {
-                    "200": {
-                        "description": "{string} string"
-                    },
-                    "403": {
-                        "description": "User not exist"
-                    }
-                }
-            }
-        },
         "/user/tocken/account": {
             "post": {
                 "tags": [
@@ -293,6 +275,10 @@
                 },
                 "nickname": {
                     "description": "昵称",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "手机号",
                     "type": "string"
                 },
                 "pwd": {

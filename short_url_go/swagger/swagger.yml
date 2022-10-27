@@ -153,20 +153,6 @@ paths:
           description: '{bool} register success'
         "403":
           description: Prohibiting the registration
-  /user/test:
-    get:
-      tags:
-      - user
-      summary: 测试
-      description: |-
-        测试使用
-        <br>
-      operationId: UserController.Test
-      responses:
-        "200":
-          description: '{string} string'
-        "403":
-          description: User not exist
   /user/tocken/account:
     post:
       tags:
@@ -219,6 +205,9 @@ definitions:
         type: string
       nickname:
         description: 昵称
+        type: string
+      phone:
+        description: 手机号
         type: string
       pwd:
         description: 密码

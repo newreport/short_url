@@ -10,14 +10,12 @@ export class UserService {       // 模块一
      * @return {HttpResponse} result
      */
     static async login1(params) {   // 接口一
-        return request('/login',params, 'post')
+        return request('/user/login',params, 'post')
     }
-    static async login2(params) {   // 接口二
-        return request('/login',params, 'post')
+    static async getall() {   // 接口二
+        return request('/user',{},'get')
     }
-    static async login3(params) {   // 接口三
-        return request('/login',params, 'post')
-    }
+ 
 }
 
 export class landRelevant {     // 模块二
@@ -29,4 +27,3 @@ export class landRelevant {     // 模块二
         return request('/land_list_info',params, 'get')
     }
 }
-复制代码

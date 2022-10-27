@@ -2,24 +2,39 @@
 import { h, reactive, ref } from 'vue'
 import { ElNotification } from 'element-plus'
 import {UserService} from '../../api/api'
+import axios from 'axios';
 const name = ref('')
 const pwd = ref('')
 
 
-
 const open1 = () => {
-  ElNotification({
-    title: 'Title',
-    message: h('i', { style: 'color: teal' }, name.value + pwd.value),
+  console.log('open1 VITE_APP_TITLE:' + import.meta.env.VITE_API_DOMAIN);
+
+  axios.get('http://127.0.0.1:7777/v1/user', {
   })
-  const login1 = async () => {
-  const loginParams = {
-    username: 'test',
-    password: 'test',
-  }
-  const res = await UserService.login1(loginParams)
+  .then(function (response) {
+    console.log(response.data);
+    let ress= UserService.getall()
+  console.log(ress)
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  // ElNotification({
+  //   title: 'Title',
+  //   message: h('i', { style: 'color: teal' }, name.value + pwd.value),
+  // })
+
+  // const login1 = async () => {
+  // let loginParams = {
+  //   name: 'admin',
+  //   pwd: 'admin',
+  // }
+  // console.log("调用了api")
+  // let res = await UserService.login1(loginParams)
   // console.log(res)
-}
+// }
+// login1()
 }
 </script>
 

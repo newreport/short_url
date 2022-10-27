@@ -63,6 +63,7 @@ func (u *UserController) Register() {
 // @Failure 401 The user does not exist.
 // @router /login [post]
 func (u *UserController) Login() {
+	Infos(u)
 	requestBody := u.JsonData()
 	username := requestBody["name"].(string)
 	password := requestBody["pwd"].(string)
