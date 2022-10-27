@@ -14,8 +14,13 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver()],
     }),
-    importToCDN({
+    importToCDN({//CDN只会在build时生效，yarn dev不生效
       modules: [
+        {
+          name:"axios",
+          var: "Axios",
+          path:"https://unpkg.com/axios/dist/axios.min.js"
+        },
         {
           name: "vue",
           var: "Vue",
