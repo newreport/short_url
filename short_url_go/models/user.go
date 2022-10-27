@@ -21,6 +21,7 @@ type User struct { //用户表
 	Role             int8           `json:"role" gorm:"not null"`           //角色
 	AuthorURL        string         `json:"author_url"`                     //头像地址
 	DefaultUrlLength uint8          `json:"url_length" gorm:"not null"`     //配置项：url默认长度
+	Phone            string         `json:"phone"`                          //手机号
 	Group            string         `json:"group"`                          //分组
 	Remarks          string         `json:"remarks"`                        //备注
 }

@@ -100,20 +100,6 @@ func (u *UserController) RefreshTocken() {
 	u.ServeJSON()
 }
 
-// @Title Test
-// @Summary 测试
-// @Description 测试使用
-// @Success 200 {string} string
-// @Failure 403 User not exist
-// @router /test [get]
-func (u *UserController) Test() {
-	var user models.User
-	user.Name = "33"
-	user.Nickname = "张三"
-	u.Data["json"] = generateAccountJWT(user)
-	u.ServeJSON()
-}
-
 type AccountClaims struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`
