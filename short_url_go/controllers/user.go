@@ -24,7 +24,7 @@ type UserController struct {
 // @Description logs.Info user into the system
 // @Success 200 {object} models.User
 // @Failure 403 User not exist
-// @router / [get]
+// @router /all [get]
 func (u *UserController) GetAllUsers() {
 	u.Data["json"] = models.GetAllUsers()
 	// var num uint
@@ -112,6 +112,17 @@ type AccountClaims struct {
 type RefreshClaims struct {
 	ID uint `json:"id"`
 	jwt.RegisteredClaims
+}
+
+func AuthenticationJWT(tokenString string) bool {
+	token, _ := jwt.ParseWithClaims(tokenString, &AccountClaims{}, func(token *jwt.Token) (interface{}, error) {
+		key, _ := common.INIconf.String("JWT::AccessTokenKey")
+		return []byte(key), nil
+	})
+	if _, ok := token.Claims.(*AccountClaims); ok && token.Valid {
+		return true
+	}
+	return false
 }
 
 // @Title generateAccountJWT

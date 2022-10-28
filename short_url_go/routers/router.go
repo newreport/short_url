@@ -8,51 +8,39 @@
 package routers
 
 import (
-	"short_url_go/common"
 	"short_url_go/controllers"
 	"strings"
 
 	"github.com/beego/beego/v2/server/web/context"
 	cors "github.com/beego/beego/v2/server/web/filter/cors"
-	"github.com/golang-jwt/jwt"
 
 	"github.com/beego/beego/logs"
 	beego "github.com/beego/beego/v2/server/web"
 )
 
-// 过滤器
+// 过滤器all
 var FilterToken = func(ctx *context.Context) {
 	logs.Info("current router path is ", ctx.Request.RequestURI)
-	if ctx.Request.RequestURI != "/login" && ctx.Request.RequestURI != "/register" && ctx.Input.Header("Authorization") == "" {
+	if ctx.Request.RequestURI != "/v1/user/all" && ctx.Request.RequestURI != "/v1/user/login" && ctx.Request.RequestURI != "/v1/user/register" && ctx.Input.Header("Authorization") == "" {
 		logs.Error("without token, unauthorized !!")
 		ctx.ResponseWriter.WriteHeader(401)
 		ctx.ResponseWriter.Write([]byte("no permission"))
 	}
-	if ctx.Request.RequestURI != "/login" && ctx.Request.RequestURI != "/register" && ctx.Input.Header("Authorization") != "" {
+	if ctx.Request.RequestURI != "/v1/user/all" && ctx.Request.RequestURI != "/v1/user/login" && ctx.Request.RequestURI != "/v1/user/register" && ctx.Input.Header("Authorization") != "" {
 		token := ctx.Input.Header("Authorization")
 		token = strings.Split(token, "")[1]
 		logs.Info("curernttoken: ", token)
-		authenticationJWT(token)
-		// validate token
-		// invoke ValidateToken in utils/token
-		// invalid or expired todo res 401
+		ok := controllers.AuthenticationJWT(token)
+		if !ok {
+			ctx.ResponseWriter.WriteHeader(401)
+			ctx.ResponseWriter.Write([]byte("no permission"))
+		}
 	}
 }
 
-func authenticationJWT(tokenString string) (controllers.AccountClaims, bool) {
-	token, _ := jwt.ParseWithClaims(tokenString, &controllers.AccountClaims{}, func(token *jwt.Token) (interface{}, error) {
-		key, _ := common.INIconf.String("JWT::AccessTokenKey")
-		return []byte(key), nil
-	})
-	if claims, ok := token.Claims.(*controllers.AccountClaims); ok && token.Valid {
-		return *claims, true
-	}
-	var c controllers.AccountClaims
-	return c, false
-}
-
+// https://beego.gocn.vip/
 func init() {
-	// beego.InsertFilter("/*", beego.BeforeRouter, FilterToken)
+	// beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
 	// beego.InsertFilter("/*", beego.BeforeRouter, cors.Allow(&cors.Options{
 	// 	// 允许访问所有源
 	// 	AllowAllOrigins: true,
@@ -65,11 +53,12 @@ func init() {
 	// 	// 如果设置，则允许共享身份验证凭据，例如cookie
 	// 	// AllowCredentials: true,
 	// }))
-	beego.InsertFilter("/*", beego.BeforeRouter, cors.Allow(&cors.Options{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"*"},
-		AllowHeaders:     []string{"*"},
-		AllowCredentials: true,
+	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
+		AllowAllOrigins: true,
+		// AllowOrigins:    []string{"*"},
+		// AllowMethods:    []string{"*"},
+		// AllowHeaders:    []string{"*"},
+		// AllowCredentials: true,
 	}))
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/user",

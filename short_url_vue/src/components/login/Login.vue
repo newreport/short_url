@@ -1,40 +1,28 @@
 ﻿<script lang="ts" setup>
-import { h, reactive, ref } from 'vue'
-import { ElNotification } from 'element-plus'
-import {UserService} from '../../api/api'
-import axios from 'axios';
+import { defineComponent, h, reactive, ref } from 'vue'
+import { ElButton, ElCard, ElCol, ElContainer, ElFooter, ElForm, ElFormItem, ElHeader, ElImage, ElInput, ElMain, ElNotification, ElRow } from 'element-plus'
+import { UserService } from '../../api/api'
+
 const name = ref('')
 const pwd = ref('')
 
+// console.log('open1 VITE_APP_TITLE:' + import.meta.env.VITE_API_DOMAIN);
 
-const open1 = () => {
-  console.log('open1 VITE_APP_TITLE:' + import.meta.env.VITE_API_DOMAIN);
-
-  axios.get('http://127.0.0.1:7777/v1/user', {
-  })
-  .then(function (response) {
-    console.log(response.data);
-    let ress= UserService.getall()
-  console.log(ress)
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
-  // ElNotification({
-  //   title: 'Title',
-  //   message: h('i', { style: 'color: teal' }, name.value + pwd.value),
-  // })
-
-  // const login1 = async () => {
-  // let loginParams = {
-  //   name: 'admin',
-  //   pwd: 'admin',
-  // }
-  // console.log("调用了api")
-  // let res = await UserService.login1(loginParams)
-  // console.log(res)
-// }
-// login1()
+const login = () => {
+  const login = async () => {
+    const loginParams = {
+      name: name.value,
+      pwd: pwd.value,
+    }
+    UserService.login(loginParams)
+  .then(res_login=>{
+    if(res_login.status==200){
+      console.log("res:")
+      console.log(res_login)
+    }
+    })
+  }
+  login()
 }
 </script>
 
@@ -47,43 +35,33 @@ const open1 = () => {
         <el-row>
           <el-col :span="1"></el-col>
           <el-col :xs="24" :sm="24" :md="14">
-            <el-image src="https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg">
-              <template #placeholder>
+            <el-image src="https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg"><template
+                #placeholder>
                 <div class="image-slot">Loading<span class="dot">...</span></div>
-              </template>
-            </el-image>
+              </template></el-image>
           </el-col>
           <el-col :span="1"></el-col>
-
           <el-col :span="6">
-
-            <el-card class="box-card">
-              <template #header>
-                <div class="card-header">
-                  <span>Login</span>
-                </div>
+            <el-card class="box-card"><template #header>
+                <div class="card-header"><span>Login</span></div>
               </template>
-              <el-form ref="ruleFormRef" status-icon label-width="120px" class="demo-ruleForm">
+              <el-form class="demo-ruleForm" ref="ruleFormRef" status-icon label-width="120px">
                 <el-form-item label="Name">
-                  <el-input v-model="name" />
+                  <el-input v-model="name"></el-input>
                 </el-form-item>
                 <el-form-item label="Password" prop="pass">
-                  <el-input v-model="pwd" type="password" autocomplete="off" />
+                  <el-input v-model="pwd" type="password" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="open1">Submit</el-button>
+                  <el-button type="primary" @click="login">Submit</el-button>
                 </el-form-item>
               </el-form>
-
             </el-card>
           </el-col>
-
           <el-col :span="2"></el-col>
-
         </el-row>
       </el-main>
-      <el-footer>
-      </el-footer>
+      <el-footer></el-footer>
     </el-container>
   </div>
 </template>

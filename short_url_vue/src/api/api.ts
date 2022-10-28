@@ -9,11 +9,11 @@ export class UserService {       // 模块一
      * @param {string} username - 用户名
      * @return {HttpResponse} result
      */
-    static async login1(params) {   // 接口一
+    static async login(params) {   // 接口一
         return request('/user/login',params, 'post')
     }
     static async getall() {   // 接口二
-        return request('/user',{},'get')
+        return request('/user/all',{},'get')
     }
  
 }

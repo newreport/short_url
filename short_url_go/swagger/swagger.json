@@ -16,25 +16,6 @@
     "basePath": "/v1",
     "paths": {
         "/user/": {
-            "get": {
-                "tags": [
-                    "user"
-                ],
-                "summary": "获取所有用户",
-                "description": "logs.Info user into the system\n\u003cbr\u003e",
-                "operationId": "UserController.users",
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    },
-                    "403": {
-                        "description": "User not exist"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "user"
@@ -86,6 +67,27 @@
                     },
                     "401": {
                         "description": "Insufficient user permissions"
+                    }
+                }
+            }
+        },
+        "/user/all": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "获取所有用户",
+                "description": "logs.Info user into the system\n\u003cbr\u003e",
+                "operationId": "UserController.users",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "403": {
+                        "description": "User not exist"
                     }
                 }
             }

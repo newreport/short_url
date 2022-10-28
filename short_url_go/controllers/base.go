@@ -2,8 +2,11 @@
 
 import (
 	"encoding/json"
+	"short_url_go/common"
+	"strings"
 
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 //http://bartontang.github.io/2017/10/12/beego-%E8%8E%B7%E5%8F%96request-body%E5%86%85%E5%AE%B9/
@@ -30,4 +33,17 @@ func (b *BaseController) decodeRawRequestBodyJson() map[string]interface{} {
 }
 func (b *BaseController) JsonData() map[string]interface{} {
 	return b.decodeRawRequestBodyJson()
+}
+
+func analysisAccountClaims(b *BaseController) (result AccountClaims) {
+	tokenString := b.Ctx.Input.Header("Authorization")
+	tokenString = strings.Split(tokenString, "")[1]
+	token, _ := jwt.ParseWithClaims(tokenString, &AccountClaims{}, func(token *jwt.Token) (interface{}, error) {
+		key, _ := common.INIconf.String("JWT::AccessTokenKey")
+		return []byte(key), nil
+	})
+	if claims, ok := token.Claims.(*AccountClaims); ok && token.Valid {
+		result = *claims
+	}
+	return
 }

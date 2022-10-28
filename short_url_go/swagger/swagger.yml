@@ -13,21 +13,6 @@ info:
 basePath: /v1
 paths:
   /user/:
-    get:
-      tags:
-      - user
-      summary: 获取所有用户
-      description: |-
-        logs.Info user into the system
-        <br>
-      operationId: UserController.users
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/models.User'
-        "403":
-          description: User not exist
     put:
       tags:
       - user
@@ -89,6 +74,22 @@ paths:
           description: '{string} delete success!'
         "403":
           description: The uid is empty
+  /user/all:
+    get:
+      tags:
+      - user
+      summary: 获取所有用户
+      description: |-
+        logs.Info user into the system
+        <br>
+      operationId: UserController.users
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.User'
+        "403":
+          description: User not exist
   /user/login:
     post:
       tags:
