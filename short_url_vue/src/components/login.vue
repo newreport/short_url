@@ -1,5 +1,6 @@
 ﻿<script lang="ts" setup>
-import { defineComponent, h, reactive, ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { defineComponent, h, reactive, ref,computed  } from 'vue'
 import { ElButton, ElCard, ElCol, ElContainer, ElFooter, ElForm, ElFormItem, ElHeader, ElImage, ElInput, ElMain, ElNotification, ElRow } from 'element-plus'
 import { UserService } from '../api/api'
 
@@ -24,13 +25,20 @@ const login = () => {
   // }
   // login()
 }
+const router = useRouter()
+const route = useRoute()
+
 </script>
 
 
 <template>
   <div class="login-box">
     <el-container style="height:100%">
-      <el-header>url link</el-header>
+      <el-header>url link
+   <a href="#/">Home</a> |
+  <a href="#/index">index</a> |
+
+      </el-header>
       <el-main>
         <el-row>
           <el-col :span="1"></el-col>

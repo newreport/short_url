@@ -5,12 +5,12 @@ const routes = [
     {
         path: '/',
         name: 'login',
-        component: () => import('../components/Login.vue')
+        component: () => import('../components/login.vue')
     },
     {
         path: '/index',
         name: 'index',
-        component: () => import('../components/index/Index.vue')
+        component: () => import('../components/index.vue')
     }
 ];
 const router = createRouter({
@@ -19,5 +19,10 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 });
+router.beforeEach(async (to, from) => {
+      // 将用户重定向到登录页面
+      return { name: 'index' }
+  })
+  
 
 export default router;

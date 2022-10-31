@@ -5,7 +5,6 @@ import router from './router/index'
 
 const app= createApp(App)
 
-app.mount('#app')
+app.use(router).mount('#app')
 
-app.use(router)
 
