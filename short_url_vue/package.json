@@ -15,7 +15,8 @@
     "qs": "^6.11.0",
     "rollup-plugin-visualizer": "^5.8.2",
     "vite-plugin-cdn-import": "^0.3.5",
-    "vue": "^3.2.37"
+    "vue": "^3.2.37",
+    "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.0.3",

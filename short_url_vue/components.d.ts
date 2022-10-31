@@ -20,6 +20,9 @@ declare module '@vue/runtime-core' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElMain: typeof import('element-plus/es')['ElMain']
     ElRow: typeof import('element-plus/es')['ElRow']
-    Login: typeof import('./src/components/login/Login.vue')['default']
+    Index: typeof import('./src/components/index/index.vue')['default']
+    Login: typeof import('./src/components/Login.vue')['default']
+    RouterLink: typeof import('vue-router')['RouterLink']
+    RouterView: typeof import('vue-router')['RouterView']
   }
 }
