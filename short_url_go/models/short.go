@@ -10,18 +10,18 @@ import (
 )
 
 type Short struct {
-	Sid          string    `gorm:"primaryKey,size:50;"`  //主键uuid
-	SourceUrl    string    `gorm:"not null"`             //需要跳转的url
-	SourceUrlMD5 string    `gorm:"not null"`             //需要跳转url的MD5
-	TargetUrl    string    `gorm:"not null;uniqueIndex"` //目标URL
-	Remarks      string    //备注
-	FkUser       uint      `gorm:"not null"` //外键关联用户
-	FKShortGroup uint      `gorm:"not null"` //外键关联分组
-	IsEnable     bool      `gorm:"not null"` //是否启用
-	ExpireAt     time.Time //过期时间
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    gorm.DeletedAt `gorm:"index"`
+	Sid          string         `json:"sid" gorm:"primaryKey,size:50;"`        //主键uuid
+	SourceURL    string         `json:"sourceUrl" gorm:"not null"`             //需要跳转的url
+	SourceUrlMD5 string         `json:"sourceMD5" gorm:"not null"`             //需要跳转url的MD5
+	TargetURL    string         `json:"targetURL" gorm:"not null;uniqueIndex"` //目标URL
+	Remarks      string         //备注
+	FkUser       uint           `json:"fkUser" gorm:"not null"`      //外键关联用户
+	FKShortGroup uint           `json:"fkShortGroup"gorm:"not null"` //外键关联分组
+	IsEnable     bool           `json:"isEnable" gorm:"not null"`    //是否启用
+	ExpireAt     time.Time      `json:"exp"`                         //过期时间
+	CreatedAt    time.Time      `json:"crt"`
+	UpdatedAt    time.Time      `json:"upt"`
+	DeletedAt    gorm.DeletedAt `json:"det" gorm:"index"`
 }
 
 // URL种子，即浏览器支持的非转义字符，这里只取了64个

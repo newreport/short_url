@@ -1,16 +1,18 @@
 ﻿import { createRouter, createWebHistory } from 'vue-router'
 
+import Login from './components/login.vue'
+import Index from './components/index.vue'
 //注册路由
 const routes = [
     {
         path: '/',
         name: 'login',
-        component: () => import('../components/login.vue')
+        component: Login
     },
     {
         path: '/index',
         name: 'index',
-        component: () => import('../components/index.vue')
+        component: Index
     }
 ];
 const router = createRouter({
@@ -19,10 +21,6 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 });
-router.beforeEach(async (to, from) => {
-      // 将用户重定向到登录页面
-      return { name: 'index' }
-  })
   
 
 export default router;

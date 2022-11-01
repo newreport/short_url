@@ -1,5 +1,5 @@
 ﻿<script lang="ts" setup>
-import { useRouter, useRoute } from 'vue-router'
+import router from '../router'
 import { defineComponent, h, reactive, ref,computed  } from 'vue'
 import { ElButton, ElCard, ElCol, ElContainer, ElFooter, ElForm, ElFormItem, ElHeader, ElImage, ElInput, ElMain, ElNotification, ElRow } from 'element-plus'
 import { UserService } from '../api/api'
@@ -10,6 +10,7 @@ const pwd = ref('')
 // console.log('open1 VITE_APP_TITLE:' + import.meta.env.VITE_API_DOMAIN);
 
 const login = () => {
+  router.push({ path:'/index'})
   // const login = async () => {
   //   const loginParams = {
   //     name: name.value,
@@ -25,8 +26,7 @@ const login = () => {
   // }
   // login()
 }
-const router = useRouter()
-const route = useRoute()
+
 
 </script>
 
@@ -34,26 +34,19 @@ const route = useRoute()
 <template>
   <div class="login-box">
     <el-container style="height:100%">
-      <el-header>url link
-   <a href="#/">Home</a> |
-  <a href="#/index">index</a> |
-
+      <el-header>
       </el-header>
       <el-main>
-        <el-row>
-          <el-col :span="1"></el-col>
-          <el-col :xs="24" :sm="24" :md="14">
-            <el-image src="https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg"><template
-                #placeholder>
-                <div class="image-slot">Loading<span class="dot">...</span></div>
-              </template></el-image>
+        <el-row :gutter="24">
+          <el-col class="hidden-xs-only" :xl="{span: 15, offset: 1}" :lg="{span: 14, offset: 1}" :md="{span: 14}" :sm="13" :xs="24">
+            <el-image src="https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg">
+            </el-image>
           </el-col>
-          <el-col :span="1"></el-col>
-          <el-col :span="6">
+          <el-col :xl="{span: 7}"  :lg="{span: 8}" :md="{span: 10}"  :sm="11" :xs="{span: 20, offset: 2}">
             <el-card class="box-card"><template #header>
                 <div class="card-header"><span>Login</span></div>
               </template>
-              <el-form class="demo-ruleForm" ref="ruleFormRef" status-icon label-width="120px">
+              <el-form class="demo-ruleForm" ref="ruleFormRef" status-icon >
                 <el-form-item label="Name">
                   <el-input v-model="name"></el-input>
                 </el-form-item>
@@ -66,7 +59,6 @@ const route = useRoute()
               </el-form>
             </el-card>
           </el-col>
-          <el-col :span="2"></el-col>
         </el-row>
       </el-main>
       <el-footer></el-footer>
@@ -74,9 +66,7 @@ const route = useRoute()
   </div>
 </template>
 
-
-
-<style lang="scss" scoped>
+<style lang="scss" >
 .login-box {
   position: absolute;
   top: 0;
@@ -84,7 +74,9 @@ const route = useRoute()
   width: 100%;
   height: 100%;
 }
+</style>
 
+<style lang="scss" scoped>
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -99,9 +91,9 @@ const route = useRoute()
   margin-bottom: 18px;
 }
 
-.box-card {
-  width: 480px;
-}
+// .box-card {
+//   width: 480px;
+// }
 
 .el-footer {
   background-color: #1359a0;

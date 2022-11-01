@@ -11,16 +11,16 @@ import (
 
 // 用户表2
 type User struct { //用户表
-	ID               uint           `json:"id" gorm:"primaryKey;<-:create"` //id
-	CreatedAt        time.Time      `json:"create_at" gorm:"<-:create"`     //创建时间
-	UpdatedAt        time.Time      `json:"update_at" gorm:"<-"`            //最后更新时间
-	DeletedAt        gorm.DeletedAt `json:"delete_at" gorm:"index"`         //软删除时间
+	ID               uint           `json:"ID" gorm:"primaryKey;<-:create"` //id
+	CreatedAt        time.Time      `json:"crt" gorm:"<-:create"`           //创建时间
+	UpdatedAt        time.Time      `json:"upt" gorm:"<-"`                  //最后更新时间
+	DeletedAt        gorm.DeletedAt `json:"det" gorm:"index"`               //软删除时间
 	Name             string         `json:"name" gorm:"not null"`           //用户名，登录名称
 	Nickname         string         `json:"nickname" gorm:"not null"`       //昵称
 	Password         string         `json:"pwd" gorm:"not null"`            //密码
 	Role             int8           `json:"role" gorm:"not null"`           //角色
-	AuthorURL        string         `json:"author_url"`                     //头像地址
-	DefaultUrlLength uint8          `json:"url_length" gorm:"not null"`     //配置项：url默认长度
+	AuthorURL        string         `json:"authorUrl"`                      //头像地址
+	DefaultUrlLength uint8          `json:"urlLength" gorm:"not null"`      //配置项：url默认长度
 	Phone            string         `json:"phone"`                          //手机号
 	Group            string         `json:"group"`                          //分组
 	Remarks          string         `json:"remarks"`                        //备注

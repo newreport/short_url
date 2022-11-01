@@ -1,29 +1,101 @@
 ﻿<template>
-    <div>
-      <el-checkbox v-model="checked1" label="Option 1" size="large" />
-      <el-checkbox v-model="checked2" label="Option 2" size="large" />
-    </div>
-    <div>
-      <el-checkbox v-model="checked3" label="Option 1" />
-      <el-checkbox v-model="checked4" label="Option 2" />
-    </div>
-    <div>
-      <el-checkbox v-model="checked5" label="Option 1" size="small" />
-      <el-checkbox v-model="checked6" label="Option 2" size="small" />
-    </div>
-    <div>
-      <el-checkbox v-model="checked5" label="Option 1" size="small" disabled />
-      <el-checkbox v-model="checked6" label="Option 2" size="small" disabled />
-    </div>
-  </template>
+  <div class="common-layout login-box">
+    <el-container  style="height:100%">
+      <el-header><el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
+    <el-radio-button :label="false">expand</el-radio-button>
+    <el-radio-button :label="true">collapse</el-radio-button>
+  </el-radio-group></el-header>
+      <el-container>
+        <el-aside> 
+  <el-menu
+    default-active="2"
+    class="el-menu-vertical-demo"
+    :collapse="isCollapse"
+    @open="handleOpen"
+    @close="handleClose"
+  >
+    <el-sub-menu index="1">
+      <template #title>
+        <el-icon><location /></el-icon>
+        <span>Navigator One</span>
+      </template>
+      <el-menu-item-group>
+        <template #title><span>Group One</span></template>
+        <el-menu-item index="1-1">item one</el-menu-item>
+        <el-menu-item index="1-2">item two</el-menu-item>
+      </el-menu-item-group>
+      <el-menu-item-group title="Group Two">
+        <el-menu-item index="1-3">item three</el-menu-item>
+      </el-menu-item-group>
+      <el-sub-menu index="1-4">
+        <template #title><span>item four</span></template>
+        <el-menu-item index="1-4-1">item one</el-menu-item>
+      </el-sub-menu>
+    </el-sub-menu>
+    <el-menu-item index="2">
+      <el-icon><icon-menu /></el-icon>
+      <template #title>Navigator Two</template>
+    </el-menu-item>
+    <el-menu-item index="3" disabled>
+      <el-icon><document /></el-icon>
+      <template #title>Navigator Three</template>
+    </el-menu-item>
+    <el-menu-item index="4">
+      <el-icon><setting /></el-icon>
+      <template #title>Navigator Four</template>
+    </el-menu-item>
+  </el-menu>
+</el-aside>
+        <el-main>Main</el-main>
+      </el-container>
+    </el-container>
+  </div>
+</template>
+
   
   <script lang="ts" setup>
-  import { ref } from 'vue'
+  import { getCurrentInstance, ref,onMounted } from 'vue'
+  import {
+  Document,
+  Menu as IconMenu,
+  Location,
+  Setting,
+} from '@element-plus/icons-vue'
+
+
+const isCollapse = ref(true)
+const handleOpen = (key: string, keyPath: string[]) => {
+  console.log(key, keyPath)
+}
+const handleClose = (key: string, keyPath: string[]) => {
+  console.log(key, keyPath)
+}
+const {proxy} =getCurrentInstance()
+let c_width=ref("")
+onMounted(()=>{
+// c_width.value=proxy.$el.
+
+})
+
+const menuWidth=ref(300)
+// 组件中
+function calcMenuWidth() {
+  return menuWidth+'px'
+}
+
+ </script>
   
-  const checked1 = ref(true)
-  const checked2 = ref(false)
-  const checked3 = ref(false)
-  const checked4 = ref(false)
-  const checked5 = ref(false)
-  const checked6 = ref(false)
-  </script>
+<style lang="scss" scoped>
+.el-menu-vertical-demo:not(.el-menu--collapse) {
+  // width: 200px;
+  min-height: 400px;
+}
+.el-aside {
+  width: this.calcMenuWidth();
+  background-color: #e0f194;
+}
+
+.el-header {
+  background-color: #1359a0;
+}
+</style>
