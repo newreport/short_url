@@ -1,7 +1,7 @@
 ﻿import { createRouter, createWebHistory } from 'vue-router'
 
-import Login from './components/login.vue'
-import Index from './components/index.vue'
+import Login from './components/Login.vue'
+import Index from './components/Index.vue'
 //注册路由
 const routes = [
     {

@@ -33,6 +33,7 @@ const login = () => {
 
 <template>
   <div class="login-box">
+
     <el-container style="height:100%">
       <el-header>
       </el-header>
@@ -44,7 +45,7 @@ const login = () => {
           </el-col>
           <el-col :xl="{span: 7}"  :lg="{span: 8}" :md="{span: 10}"  :sm="11" :xs="{span: 20, offset: 2}">
             <el-card class="box-card"><template #header>
-                <div class="card-header"><span>Login</span></div>
+                <div class="card-header"><span>    {{ $t("message.hello") }}</span></div>
               </template>
               <el-form class="demo-ruleForm" ref="ruleFormRef" status-icon >
                 <el-form-item label="Name">

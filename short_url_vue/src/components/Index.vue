@@ -1,12 +1,14 @@
 ﻿<template>
   <div class="common-layout login-box">
     <el-container  style="height:100%">
-      <el-header><el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
+      <el-header>
+        <el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
     <el-radio-button :label="false">expand</el-radio-button>
     <el-radio-button :label="true">collapse</el-radio-button>
-  </el-radio-group></el-header>
+  </el-radio-group>
+</el-header>
       <el-container>
-        <el-aside> 
+  <el-aside ref="hello" :style="{width:menuWidth}"> 
   <el-menu
     default-active="2"
     class="el-menu-vertical-demo"
@@ -61,14 +63,25 @@
   Location,
   Setting,
 } from '@element-plus/icons-vue'
-
+let menuWidth=ref('63px')
+const hello = ref<any>(null);
 
 const isCollapse = ref(true)
 const handleOpen = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
+  // console.log(key, keyPath)
+  // console.log(hello.value)
+  console.log("打开")
+  menuWidth.value='200px'
+  // hello.value.clientWidth=6000
+  // menuWidth.value='500px'
 }
 const handleClose = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
+  // console.log(key, keyPath)
+  console.log("关闭")
+  menuWidth.value='63px'
+  // console.log(hello.value)
+  // hello.value.width='200px'
+
 }
 const {proxy} =getCurrentInstance()
 let c_width=ref("")
@@ -77,11 +90,8 @@ onMounted(()=>{
 
 })
 
-const menuWidth=ref(300)
 // 组件中
-function calcMenuWidth() {
-  return menuWidth+'px'
-}
+
 
  </script>
   
@@ -91,7 +101,6 @@ function calcMenuWidth() {
   min-height: 400px;
 }
 .el-aside {
-  width: this.calcMenuWidth();
   background-color: #e0f194;
 }
 
