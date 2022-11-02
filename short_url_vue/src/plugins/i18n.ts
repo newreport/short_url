@@ -1,4 +1,5 @@
-﻿import { createI18n } from "vue-i18n";
+﻿//https://juejin.cn/post/7029609093539037197
+import { createI18n } from "vue-i18n";
 
 const messages = {
     en: {
@@ -17,11 +18,9 @@ const messages = {
           } 
     }
   }
-const locale = "ja";
-
   // 通过选项创建 VueI18n 实例
 const i18n =   createI18n({
-    locale:locale, // 设置地区
+    locale:"ja", // 设置地区
     messages, // 设置地区信息
   })
   
