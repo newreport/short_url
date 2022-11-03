@@ -11,8 +11,19 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
+    "importHelpers": true, // 不让同样的辅助函数重复的出现在多个文件中
     "lib": ["ESNext", "DOM"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@assets*": ["./src/assets/*"],
+      "@components*": ["./src/components/*"],
+      "@images*": ["./src/images/*"],
+      "@views*": ["./src/views/*"],
+      "@store*": ["./src/store/*"],
+      "@plugins*": ["./src/plugins/*"],
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "./auto-imports.d.ts","./components.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]

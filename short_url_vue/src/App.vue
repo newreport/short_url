@@ -7,6 +7,7 @@ import 'element-plus/theme-chalk/display.css'
 
 </script>
 <template>
+
     <router-view></router-view>
 </template>
 
