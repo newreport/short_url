@@ -38,8 +38,8 @@ const URLSTRS = "LMndefNq3~ZaUVWvw4sQRABCY56rHz0DEFJ127KxyX89IbcPhijklmGS-TgtOop
 func CreateShort(short Short, length int) bool {
 	var err error
 	short.Sid = uuid.Must(uuid.NewV4(), err).String()
-	short.TargetUrl = generateUrl(short.TargetUrl, length)
-	short.SourceUrlMD5 = common.MD5(short.SourceUrl)
+	short.TargetUrl = generateUrl(short.TargetURL, length)
+	short.SourceUrlMD5 = common.MD5(short.SourceURL)
 	result := DB.Create(short)
 	if err != nil {
 		panic("failed to add one assign length short url")
@@ -56,9 +56,9 @@ func CreateShort(short Short, length int) bool {
 func CreateShortCustom(short Short) bool {
 	var err error
 	short.Sid = uuid.Must(uuid.NewV4(), err).String()
-	short.SourceUrlMD5 = common.MD5(short.SourceUrl)
+	short.SourceUrlMD5 = common.MD5(short.SourceURL)
 	var count int64
-	DB.Where("target_url = ?", short.TargetUrl).Count(&count)
+	DB.Where("target_url = ?", short.TargetURL).Count(&count)
 	if count > 0 { //已存在
 		return false
 	}
@@ -124,7 +124,7 @@ func generateUrl(url string, length int) (result string) {
 	if count > 0 { //存在记录，直接使用
 		var one Short
 		DB.Where("source_url_md5 = ?", md5Url).First(&one)
-		result = one.TargetUrl
+		result = one.TargetURL
 		return
 	}
 	//不存在，开始生成
@@ -181,7 +181,7 @@ func generateUrls(urls []string, length int) (result map[string]string) {
 		var alreadyShort []Short
 		DB.Where("source_url_md5 IN ?", md5Urls).Select([]string{"source_url", "target_url"}).Find(&alreadyShort)
 		for i := 0; i < len(alreadyShort); i++ {
-			result[alreadyShort[i].SourceUrl] = alreadyShort[i].TargetUrl
+			result[alreadyShort[i].SourceURL] = alreadyShort[i].TargetURL
 		}
 	}
 

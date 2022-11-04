@@ -71,7 +71,6 @@ let tabs={
 }
 let currentTab=shallowRef(shortURLPage)
 
-
 const isCollapse = ref(false)
 const handleOpen = (key: string, keyPath: string[]) => {
   // console.log(key, keyPath)
@@ -95,7 +94,7 @@ const menuOpen = () => {
   menuWidth.value = '200px'
 }
 const menuClose = () => {
-  menuWidth.value = '63px'
+  menuWidth.value = '64px'
 }
 
 const { proxy } = getCurrentInstance()
@@ -118,10 +117,10 @@ onMounted(() => {
 .tab {
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  border: 1px solid #ccc;
-  padding: 10px;
+  width: 98%;
+  height: 98%;
+  // border: 1px solid #ccc;
+  // padding: 10px;
 }
 .el-aside {
   background-color: #e0f194;

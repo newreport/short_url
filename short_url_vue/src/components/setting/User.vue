@@ -4,7 +4,11 @@
     </el-scrollbar>
   </template>
   
-  <style scoped>
+  <script lang="ts" setup>
+
+</script>
+
+  <style lang="scss" scoped>
   .scrollbar-demo-item {
     display: flex;
     align-items: center;
