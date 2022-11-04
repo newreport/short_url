@@ -15,10 +15,10 @@ type Short struct {
 	SourceUrlMD5 string         `json:"sourceMD5" gorm:"not null"`             //需要跳转url的MD5
 	TargetURL    string         `json:"targetURL" gorm:"not null;uniqueIndex"` //目标URL
 	Remarks      string         //备注
-	FkUser       uint           `json:"fkUser" gorm:"not null"`      //外键关联用户
-	FKShortGroup uint           `json:"fkShortGroup"gorm:"not null"` //外键关联分组
-	IsEnable     bool           `json:"isEnable" gorm:"not null"`    //是否启用
-	ExpireAt     time.Time      `json:"exp"`                         //过期时间
+	FkUser       uint           `json:"fkUser" gorm:"not null"`       //外键关联用户
+	FKShortGroup uint           `json:"fkShortGroup" gorm:"not null"` //外键关联分组
+	IsEnable     bool           `json:"isEnable" gorm:"not null"`     //是否启用
+	ExpireAt     time.Time      `json:"exp"`                          //过期时间
 	CreatedAt    time.Time      `json:"crt"`
 	UpdatedAt    time.Time      `json:"upt"`
 	DeletedAt    gorm.DeletedAt `json:"det" gorm:"index"`
@@ -38,7 +38,7 @@ const URLSTRS = "LMndefNq3~ZaUVWvw4sQRABCY56rHz0DEFJ127KxyX89IbcPhijklmGS-TgtOop
 func CreateShort(short Short, length int) bool {
 	var err error
 	short.Sid = uuid.Must(uuid.NewV4(), err).String()
-	short.TargetUrl = generateUrl(short.TargetURL, length)
+	short.TargetURL = generateUrl(short.TargetURL, length)
 	short.SourceUrlMD5 = common.MD5(short.SourceURL)
 	result := DB.Create(short)
 	if err != nil {

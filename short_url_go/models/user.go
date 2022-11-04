@@ -20,7 +20,7 @@ type User struct { //用户表
 	Password         string         `json:"pwd" gorm:"not null"`            //密码
 	Role             int8           `json:"role" gorm:"not null"`           //角色
 	AuthorURL        string         `json:"authorUrl"`                      //头像地址
-	DefaultUrlLength uint8          `json:"urlLength" gorm:"not null"`      //配置项：url默认长度
+	DefaultURLLength uint8          `json:"urlLength" gorm:"not null"`      //配置项：url默认长度
 	Phone            string         `json:"phone"`                          //手机号
 	Group            string         `json:"group"`                          //分组
 	Remarks          string         `json:"remarks"`                        //备注
@@ -112,7 +112,7 @@ func DeleteUser(id uint) bool {
 
 func UpdateUser(user User) bool {
 	user.Password = uuid.NewV5(U5Seed, user.Password).String()
-	result := DB.Model(&user).Updates(User{Name: user.Name, Nickname: user.Nickname, Password: user.Password, Role: user.Role, DefaultUrlLength: user.DefaultUrlLength})
+	result := DB.Model(&user).Updates(User{Name: user.Name, Nickname: user.Nickname, Password: user.Password, Role: user.Role, DefaultURLLength: user.DefaultURLLength})
 	return result.RowsAffected > 0
 }
 

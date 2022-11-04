@@ -80,7 +80,7 @@
   </el-dialog>
 </template>
 <script lang="ts" setup>
-import { ElContainer, ElHeader, ElRow, ElCol, ElMain } from 'element-plus';
+import { ElContainer, ElHeader, ElRow, ElCol, ElMain, ElMessageBox } from 'element-plus';
 import { defineComponent, ref, reactive } from 'vue'
 import { Check, Close } from '@element-plus/icons-vue'
 
@@ -111,7 +111,7 @@ const handleSizeChange = (val: number) => {
 const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`)
 }
-const dialogVisible = ref(true)
+const dialogVisible = ref(false)
 const currentPage4 = ref(4)
 const pageSize4 = ref(100)
 const tableData = [
@@ -136,6 +136,7 @@ const tableData = [
     address: 'No. 189, Grove St, Los Angeles',
   },
 ]
+
 const input = ref('')
 const onSubmit = () => {
   console.log('submit!')

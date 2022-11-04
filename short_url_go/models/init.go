@@ -55,11 +55,11 @@ func init() {
 		u5 := uuid.Must(uuid.FromString(pwdUUID))
 		fmt.Println("u5:", u5)
 		DB.AutoMigrate(&User{}, &Short{}, &ShortGroup{})
-		userAdmin := User{Name: "admin", Nickname: "admin", Password: uuid.NewV5(u5, "admin").String(), Role: 1, DefaultUrlLength: 9, Remarks: "默认管理员"}
+		userAdmin := User{Name: "admin", Nickname: "admin", Password: uuid.NewV5(u5, "admin").String(), Role: 1, DefaultURLLength: 9, Remarks: "默认管理员"}
 		DB.Create(&userAdmin)
 		fmt.Print("admin:")
 		fmt.Println(userAdmin.Password)
-		userUser1 := User{Name: "user", Nickname: "user", Password: uuid.NewV5(u5, "user").String(), DefaultUrlLength: 9, Role: 1, Remarks: "用户"}
+		userUser1 := User{Name: "user", Nickname: "user", Password: uuid.NewV5(u5, "user").String(), DefaultURLLength: 9, Role: 1, Remarks: "用户"}
 		DB.Create(&userUser1)
 		//https://www.bookstack.cn/read/beego-2.0-zh/quickstart.md
 		//初始化url
