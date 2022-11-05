@@ -14,9 +14,9 @@
         {{ $t("message.hello") }}
       </el-header>
       <el-container>
-        <el-aside ref="hello" :style="{width:menuWidth}">
-          <el-menu :collapse-transition="false" default-active="1-1" :collapse="isCollapse"
-            @open="handleOpen" @close="handleClose">
+        <el-aside ref="hello" :style="{ width: menuWidth }">
+          <el-menu :collapse-transition="false" default-active="1-1" :collapse="isCollapse" @open="handleOpen"
+            @close="handleClose">
             <el-sub-menu index="1">
               <template #title>
                 <el-icon>
@@ -39,7 +39,10 @@
                 <span>{{ $t("menu.menu2") }}</span>
               </template>
               <el-menu-item index="2-1" @click="changePage(userPage)">
-                <el-icon><User /></el-icon>{{ $t("menu.menu2_1") }}</el-menu-item>
+                <el-icon>
+                  <House />
+                </el-icon>{{ $t("menu.menu2_1") }}
+              </el-menu-item>
             </el-sub-menu>
           </el-menu>
         </el-aside>
@@ -55,7 +58,7 @@
 <script lang="ts" setup>
 import shortURLPage from "@components/home/ShortURL.vue";
 import userPage from "@components/setting/User.vue";
-import { getCurrentInstance, ref, onMounted,shallowRef } from 'vue'
+import { getCurrentInstance, ref, onMounted, shallowRef } from 'vue'
 import {
   Document,
   Menu as IconMenu,
@@ -65,11 +68,11 @@ import {
 let menuWidth = ref('200px')
 const hello = ref<any>(null);
 
-let tabs={
+let tabs = {
   shortURLPage,
   userPage
 }
-let currentTab=shallowRef(shortURLPage)
+let currentTab = shallowRef(shortURLPage)
 
 const isCollapse = ref(false)
 const handleOpen = (key: string, keyPath: string[]) => {
@@ -86,8 +89,8 @@ const handleClose = (key: string, keyPath: string[]) => {
   // hello.value.width='200px'
 }
 
-const changePage=(page)=>{
-  currentTab.value=page
+const changePage = (page) => {
+  currentTab.value = page
 }
 
 const menuOpen = () => {
@@ -114,6 +117,7 @@ onMounted(() => {
   // width: 200px;
   min-height: 400px;
 }
+
 .tab {
   top: 0;
   left: 0;
@@ -122,6 +126,7 @@ onMounted(() => {
   // border: 1px solid #ccc;
   // padding: 10px;
 }
+
 .el-aside {
   background-color: #e0f194;
 }

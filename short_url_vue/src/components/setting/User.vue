@@ -1,23 +1,34 @@
 ﻿<template>
-    <el-scrollbar height="400px">
-      <p v-for="item in 20" :key="item" class="scrollbar-demo-item">{{ item }}</p>
-    </el-scrollbar>
-  </template>
+  <el-form inline="true" label-position="left" label-width="68px" :model="form1">
+    <el-form-item label="用户名">
+      <el-input v-model="form1.name" />
+    </el-form-item>
+    <el-form-item label="昵称">
+      <el-input v-model="form1.nickname" />
+    </el-form-item>
+    <el-form-item label="手机号">
+      <el-input v-model="form1.phone" />
+    </el-form-item>
+    <el-form-item>
+      <el-button type="primary" @click="query()">Query</el-button>
+    </el-form-item>
+  </el-form>
+</template>
   
-  <script lang="ts" setup>
+<script lang="ts" setup>
+import { ref, reactive } from 'vue'
+
+const form1 = reactive({
+  name: '',
+  nickname: '',
+  phone: ''
+})
+
+const query = () => {
+}
 
 </script>
 
-  <style lang="scss" scoped>
-  .scrollbar-demo-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 50px;
-    margin: 10px;
-    text-align: center;
-    border-radius: 4px;
-    background: var(--el-color-primary-light-9);
-    color: var(--el-color-primary);
-  }
-  </style>
+<style lang="scss" scoped>
+
+</style>
