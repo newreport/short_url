@@ -1,18 +1,16 @@
 ﻿import { createRouter, createWebHistory } from 'vue-router'
 
-import Login from './components/Login.vue'
-import Index from './components/Index.vue'
 //注册路由
 const routes = [
     {
         path: '/',
-        name: 'login',
-        component: Login
+        name: 'Login',
+        component: ()=>import('@views/Login.vue')
     },
     {
         path: '/index',
-        name: 'index',
-        component: Index
+        name: 'Index',
+        component:()=>import('@views/Index.vue') 
     }
 ];
 const router = createRouter({
@@ -22,5 +20,11 @@ const router = createRouter({
     routes
 });
   
+// router.beforeEach((to, from) => {
+//     if(to.name!='Login')
+//     // ...
+//     // 返回 false 以取消导航
+//     return false
+//   })
 
 export default router;

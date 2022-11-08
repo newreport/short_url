@@ -1,4 +1,5 @@
 ﻿<template>
+  <div>
   <el-form inline="true" label-position="left" label-width="68px" :model="form">
     <el-form-item label="用户名">
       <el-input v-model="form.name" />
@@ -23,6 +24,7 @@
     <el-table-column prop="phone" sortable label="电话" />
     <el-table-column prop="remarks" sortable label="备注" />
   </el-table>
+</div>
 </template>
   
 <script lang="ts" setup>

@@ -1,19 +1,4 @@
-﻿//1.加密解密方法使用：
-
-import { whenMouse } from "element-plus/es/utils";
-
-//1.加密
-// var str = '124中文内容';
-// var base = new Base64();
-// var result = base.encode(str);
-// //document.write(result);
-
-// //2.解密
-// var result2 = base.decode(result);
-// document.write(result2);
-// //2.加密、解密算法封装：
-
-function Base64() {
+﻿function Base64() {
   // private property
   var _keyStr =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";

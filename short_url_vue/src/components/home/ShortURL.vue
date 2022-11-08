@@ -1,4 +1,5 @@
 ﻿<template>
+  <div>
   <el-form inline="true" label-position="left" label-width="68px" :model="form">
     <el-form-item label="源链接">
       <el-input v-model="form.sourceURL" />
@@ -78,6 +79,7 @@
       </el-form-item>
     </el-form>
   </el-dialog>
+</div>
 </template>
 <script lang="ts" setup>
 import { ElContainer, ElHeader, ElRow, ElCol, ElMain, ElMessageBox } from 'element-plus';
