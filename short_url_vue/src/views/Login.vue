@@ -3,14 +3,12 @@ import router from '@/router'
 import { defineComponent, getCurrentInstance, h, reactive, ref, computed } from 'vue'
 import { ElMessage, ElButton, ElCard, ElCol, ElContainer, ElFooter, ElForm, ElFormItem, ElHeader, ElImage, ElInput, ElMain, ElNotification, ElRow } from 'element-plus'
 import { UserService } from '../api/api'
-// import $store from '@store/index'
 
 const { appContext } = getCurrentInstance();
 const base64 = appContext.config.globalProperties.$base64;
 
 const name = ref('')
 const pwd = ref('')
-// console.log($store.state.count) // -> 1
 
 // console.log('open1 VITE_APP_TITLE:' + import.meta.env.VITE_API_DOMAIN);
 

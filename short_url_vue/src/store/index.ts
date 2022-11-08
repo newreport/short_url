@@ -1,15 +1,15 @@
-﻿// import { createStore } from 'vuex'
+﻿import { createStore } from 'vuex'
 
-// const store = createStore({
-//   state () {
-//     return {
-//       count: 5
-//     }
-//   },
-//   mutations: {
-//     increment (state) {
-//       state.count++
-//     }
-//   }
-// })
-// export default store
+const store = createStore({
+  state () {
+    return {
+      count: 5
+    }
+  },
+  mutations: {
+    increment (state) {
+      state.count++
+    }
+  }
+})
+export default store
