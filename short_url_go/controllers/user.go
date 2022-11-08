@@ -50,12 +50,12 @@ func (u *UserController) Register() {
 	var user models.User
 	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
 	user.Role = 0
-	user.DefaultUrlLength = 6
+	user.DefaultURLLength = 6
 	u.Data["json"] = models.CreateUser(user)
 	u.ServeJSON()
 }
 
-// @Title Login
+// @Title Login``
 // @Description logs.Info user into the system
 // @Summary 登录
 // @Param	body		body 	models.User	true		"The username for login"
@@ -72,7 +72,7 @@ func (u *UserController) Login() {
 		u.Data["json"] = generateRefreshJWT(user.ID)
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(401)
-		u.Data["json"] = "user not exist"
+		u.Data["json"] = "没有找到用户"
 	}
 	u.ServeJSON()
 }
@@ -102,10 +102,11 @@ func (u *UserController) RefreshTocken() {
 }
 
 type AccountClaims struct {
-	ID       uint   `json:"id"`
-	Name     string `json:"name"`
-	Nickname string `json:"nickname"`
-	Role     int8   `json:"role"`
+	ID               uint   `json:"id"`
+	Name             string `json:"name"`
+	Nickname         string `json:"nickname"`
+	Role             int8   `json:"role"`
+	DefaultURLLength uint8  `json:"urlLength"`
 	jwt.RegisteredClaims
 }
 
@@ -136,6 +137,7 @@ func generateAccountJWT(user models.User) string {
 		user.Name,
 		user.Nickname,
 		user.Role,
+		user.DefaultURLLength,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(10 * time.Minute)), //10分组刷新一次
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

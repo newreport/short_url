@@ -98,7 +98,7 @@ paths:
       description: |-
         logs.Info user into the system
         <br>
-      operationId: UserController.Login
+      operationId: UserController.Login``
       parameters:
       - in: body
         name: body
@@ -184,23 +184,29 @@ definitions:
     title: User
     type: object
     properties:
-      author_url:
+      ID:
+        description: id
+        type: integer
+        format: int32
+      authorUrl:
         description: 头像地址
         type: string
-      create_at:
+      autoInsertSpace:
+        description: 盘古之白
+        type: boolean
+      crt:
         description: 创建时间
         type: string
         format: datetime
-      delete_at:
+      det:
         $ref: '#/definitions/gorm.DeletedAt'
         description: 软删除时间
       group:
         description: 分组
         type: string
-      id:
-        description: id
-        type: integer
-        format: int32
+      i18n:
+        description: 国际化
+        type: string
       name:
         description: 用户名，登录名称
         type: string
@@ -220,11 +226,11 @@ definitions:
         description: 角色
         type: integer
         format: int32
-      update_at:
+      upt:
         description: 最后更新时间
         type: string
         format: datetime
-      url_length:
+      urlLength:
         description: 配置项：url默认长度
         type: integer
         format: int32

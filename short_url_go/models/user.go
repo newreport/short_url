@@ -25,7 +25,7 @@ type User struct { //用户表
 	Group            string         `json:"group"`                          //分组
 	Remarks          string         `json:"remarks"`                        //备注
 	I18n             string         `json:"i18n"`                           //国际化
-	AutoInsertSpace  bool           `json:"autoInsertSpace"`                //中文自动留白，类似于盘古之白
+	AutoInsertSpace  bool           `json:"autoInsertSpace"`                //盘古之白
 }
 
 type UserOrderBy int

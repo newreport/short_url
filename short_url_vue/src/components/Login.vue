@@ -1,30 +1,39 @@
 ﻿<script lang="ts" setup>
 import router from '../router'
-import { defineComponent, h, reactive, ref,computed  } from 'vue'
-import { ElButton, ElCard, ElCol, ElContainer, ElFooter, ElForm, ElFormItem, ElHeader, ElImage, ElInput, ElMain, ElNotification, ElRow } from 'element-plus'
+import {defineComponent,getCurrentInstance , h, reactive, ref, computed } from 'vue'
+import { ElMessage, ElButton, ElCard, ElCol, ElContainer, ElFooter, ElForm, ElFormItem, ElHeader, ElImage, ElInput, ElMain, ElNotification, ElRow } from 'element-plus'
 import { UserService } from '../api/api'
 
+
+const { appContext } = getCurrentInstance();
+const base64 = appContext.config.globalProperties.$base64;
 const name = ref('')
 const pwd = ref('')
 
 // console.log('open1 VITE_APP_TITLE:' + import.meta.env.VITE_API_DOMAIN);
 
 const login = () => {
-  router.push({ path:'/index'})
-  // const login = async () => {
-  //   const loginParams = {
-  //     name: name.value,
-  //     pwd: pwd.value,
-  //   }
-  //   UserService.login(loginParams)
-  // .then(res_login=>{
-  //   if(res_login.status==200){
-  //     console.log("res:")
-  //     console.log(res_login)
-  //   }
-  //   })
-  // }
-  // login()
+  console.log(base64.encode('中午'))  // 5Lit5Y2ICg==
+  console.log(base64.decode('5Lit5Y2I'))  // 潘高
+  const login = async () => {
+    const loginParams = {
+      name: name.value,
+      pwd: pwd.value,
+    }
+    UserService.login(loginParams)
+      .then(resLogin => {
+        console.log("ressss:")
+        console.log(resLogin)
+        if (resLogin?.status == 200) {
+          localStorage.setItem("refreshToken", resLogin.data)
+          router.push({ path: '/index' })
+        }
+      }).catch(err => {
+        localStorage.clear()//清空本地存储
+        ElMessage.error(err)
+      })
+  }
+  login()
 }
 
 
@@ -39,20 +48,21 @@ const login = () => {
       </el-header>
       <el-main>
         <el-row :gutter="24">
-          <el-col class="hidden-xs-only" :xl="{span: 15, offset: 1}" :lg="{span: 14, offset: 1}" :md="{span: 14}" :sm="13" :xs="24">
+          <el-col class="hidden-xs-only" :xl="{ span: 15, offset: 1 }" :lg="{ span: 14, offset: 1 }" :md="{ span: 14 }"
+            :sm="13" :xs="24">
             <el-image src="https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg">
             </el-image>
           </el-col>
-          <el-col :xl="{span: 7}"  :lg="{span: 8}" :md="{span: 10}"  :sm="11" :xs="{span: 20, offset: 2}">
+          <el-col :xl="{ span: 7 }" :lg="{ span: 8 }" :md="{ span: 10 }" :sm="11" :xs="{ span: 20, offset: 2 }">
             <el-card class="box-card"><template #header>
-                <div class="card-header"><span>    {{ $t("message.hello") }}</span></div>
+                <div class="card-header"><span> {{ $t("message.hello") }}</span></div>
               </template>
-              <el-form class="demo-ruleForm" ref="ruleFormRef" status-icon >
+              <el-form class="demo-ruleForm" ref="ruleFormRef" status-icon>
                 <el-form-item label="Name">
                   <el-input v-model="name"></el-input>
                 </el-form-item>
                 <el-form-item label="Password" prop="pass">
-                  <el-input v-model="pwd" type="password" autocomplete="off"></el-input>
+                  <el-input v-model="pwd" type="password" @keyup.enter.native="login" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item>
                   <el-button type="primary" @click="login">Submit</el-button>

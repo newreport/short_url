@@ -18,7 +18,8 @@ export default defineConfig({
       "@images": path.resolve(__dirname, "src/assets/images"),
       "@views": path.resolve(__dirname, "src/views"),
       "@store": path.resolve(__dirname, "src/store"),
-      "@plugins": path.resolve(__dirname, "src/plugins")
+      "@plugins": path.resolve(__dirname, "src/plugins"),
+      "@utils": path.resolve(__dirname, "src/utils")
     },
   },
   plugins: [

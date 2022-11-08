@@ -1,4 +1,6 @@
-﻿export const showMessage = (status:number|string) : string => {
+﻿import { ElMessage } from 'element-plus'  // 引入el 提示框，这个项目里用什么组件库这里引什么
+
+export const showMessage = (status:number|string) : string => {
     let message:string = "";
     switch (status) {
         case 400:

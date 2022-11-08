@@ -39,9 +39,7 @@
                 <span>{{ $t("menu.menu2") }}</span>
               </template>
               <el-menu-item index="2-1" @click="changePage(userPage)">
-                <el-icon>
-                  <House />
-                </el-icon>{{ $t("menu.menu2_1") }}
+                <el-icon><UserFilled /></el-icon>{{ $t("menu.menu2_1") }}
               </el-menu-item>
             </el-sub-menu>
           </el-menu>

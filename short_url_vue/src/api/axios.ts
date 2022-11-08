@@ -32,6 +32,8 @@ axios.interceptors.response.use(
   response => {
     // console.log("response拦截器：")
     // console.log(response)
+    console.log("进入拦截器response拦截器：:")
+    console.log(response)
     return response;
   },
   error => {
@@ -40,6 +42,8 @@ axios.interceptors.response.use(
     // console.log(error)
     if (response) {
       // 请求已发出，但是不在2xx的范围
+      console.log("进入拦截器error:")
+      console.log(error)
       showMessage(response.status);           // 传入响应码，匹配响应码对应信息
       return Promise.reject(response.data);
     } else {
@@ -53,20 +57,20 @@ export function request(url='',params={},type='POST'){
 //设置 url params type 的默认值
 return new Promise((resolve:(value:AxiosResponse<any,any>)=>void,reject)=>{
   console.log(type)
-  let promise=axios({
-    method:'get',
-    url:url,
-    params:params
-  })
+  console.log(url)
+  let promise
   if( type.toUpperCase()==='GET' ){
+  console.log('请求了get')
     promise = axios({
       method:'get',
       url:url,
       params:params
     })
   }else if( type.toUpperCase()=== 'POST' ){
+    console.log(params)
+    console.log('请求了post'+url+params)
     promise = axios({
-      method:'POST',
+      method:'post',
       url:url,
       data:params
     })
