@@ -13,7 +13,6 @@ const pwd = ref('')
 // console.log('open1 VITE_APP_TITLE:' + import.meta.env.VITE_API_DOMAIN);
 
 const login = () => {
-  console.log(base64.decode('5Lit5Y2I'))  // 
   const login = async () => {
     const loginParams = {
       name: name.value,
