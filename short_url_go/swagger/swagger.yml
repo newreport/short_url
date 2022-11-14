@@ -12,6 +12,54 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
+  /short/:
+    post:
+      tags:
+      - short
+      summary: 新增一个短链接
+      description: |-
+        add one short url
+        <br>
+      operationId: ShortController.create short
+      parameters:
+      - in: body
+        name: short
+        description: body for short
+        schema:
+          $ref: '#/definitions/models.Short'
+      responses:
+        "200":
+          description: '{bool} add success'
+  /short/page/{page}/rows/{rows}:
+    get:
+      tags:
+      - short
+      summary: 分頁查詢
+      operationId: ShortController.get shorts by page
+      parameters:
+      - in: path
+        name: page
+        description: 頁
+        required: true
+        type: integer
+        format: int64
+      - in: path
+        name: rows
+        description: 行
+        required: true
+        type: integer
+        format: int64
+      - in: query
+        name: sourceURL
+        description: 源url
+        type: string
+      - in: query
+        name: targetURL
+        description: 目标url（短链接）
+        type: string
+      responses:
+        "200":
+          description: bool
   /user/:
     put:
       tags:
@@ -20,7 +68,6 @@ paths:
       description: |-
         update the user
         <br>
-      operationId: UserController.update
       parameters:
       - in: body
         name: user
@@ -98,7 +145,7 @@ paths:
       description: |-
         logs.Info user into the system
         <br>
-      operationId: UserController.Login``
+      operationId: UserController.Login
       parameters:
       - in: body
         name: body
@@ -180,6 +227,49 @@ definitions:
   gorm.DeletedAt:
     title: DeletedAt
     type: object
+  http:
+    title: http
+    type: object
+  models.Short:
+    title: Short
+    type: object
+    properties:
+      Remarks:
+        type: string
+      crt:
+        type: string
+        format: datetime
+      det:
+        $ref: '#/definitions/gorm.DeletedAt'
+      exp:
+        description: 过期时间
+        type: string
+        format: datetime
+      fkUser:
+        description: 外键关联用户
+        type: integer
+        format: int32
+      isEnable:
+        description: 是否启用
+        type: boolean
+      shortGroup:
+        description: 外键关联分组
+        type: string
+      sid:
+        description: 主键uuid
+        type: string
+      sourceMD5:
+        description: 需要跳转url的MD5
+        type: string
+      sourceUrl:
+        description: 需要跳转的url
+        type: string
+      targetURL:
+        description: 目标URL
+        type: string
+      upt:
+        type: string
+        format: datetime
   models.User:
     title: User
     type: object

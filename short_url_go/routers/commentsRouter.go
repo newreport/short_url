@@ -7,6 +7,24 @@ import (
 
 func init() {
 
+    beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
+        beego.ControllerComments{
+            Method: "CreateShort",
+            Router: `/`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
+        beego.ControllerComments{
+            Method: "GetShortsByPage",
+            Router: `/page/:page/rows/:rows`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
         beego.ControllerComments{
             Method: "CreateUser",

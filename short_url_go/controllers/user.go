@@ -90,13 +90,17 @@ func (u *UserController) RefreshTocken() {
 		key, _ := common.INIconf.String("JWT::RefreshTokenKey")
 		return []byte(key), nil
 	})
+	if err != nil {
+		panic(err)
+	}
 
 	if claims, ok := token.Claims.(*RefreshClaims); ok && token.Valid {
 		fmt.Println(claims.ID)
 		user := models.QueryUserById(claims.ID)
 		u.Data["json"] = generateAccountJWT(user)
 	} else {
-		fmt.Println(err)
+		u.Ctx.ResponseWriter.WriteHeader(401)
+		u.Data["json"] = "refresh token 失效"
 	}
 	u.ServeJSON()
 }

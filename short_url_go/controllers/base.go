@@ -35,7 +35,11 @@ func (b *BaseController) JsonData() map[string]interface{} {
 	return b.decodeRawRequestBodyJson()
 }
 
-func analysisAccountClaims(b *BaseController) (result AccountClaims) {
+// @Title analysisAccountClaims
+// @Description 從 http head 中解析 Account Token
+// @Param b beego.Controller	http 上下文
+// @Return result  controllers.AccountClaims
+func (b *BaseController) analysisAccountClaims() (result AccountClaims) {
 	tokenString := b.Ctx.Input.Header("Authorization")
 	tokenString = strings.Split(tokenString, "")[1]
 	token, _ := jwt.ParseWithClaims(tokenString, &AccountClaims{}, func(token *jwt.Token) (interface{}, error) {

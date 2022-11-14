@@ -136,6 +136,62 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 	return
 }
 
+//https://www.cnblogs.com/liuhui5599/p/14081524.html
+
+// @Title	QueryPageShort
+// @Auth	sfhj
+// @Date	2022-11-14
+// @Param	isEnable	int	是否启用，-1：全部;1：启用;0：不启用
+// @Param	isExp	int	是否过期，-1：全部;1：过期;0：未过期
+// @Param	fkUser	uint	外键，用户id
+// @Param	startAt	string 创建时间start
+// @Param	endAt	string 创建时间end
+// @Param	sourceURL	string	源url模糊查询
+// @Param	targetURL	string	目标url模糊查询
+// @Param	group	string	分组，精准查询
+// @Param	page	models.Page	分页查询
+// @Return	result	[]models.Shorts
+func QueryPageShort(isEnable int, isExp int, fkUser uint, startAt string, endAt string, sourceURL string, targetURL string, group string, page Page) (result []Short) {
+	express := DB.Model(&Short{})
+	if isEnable > -1 {
+		express = express.Where("is_enable = ?", isEnable == 1)
+	}
+	if isExp > -1 {
+		if isExp == 1 {
+			express = express.Where("expire_at >= ?", time.Now)
+		} else {
+			express = express.Where("expire_at < ?", time.Now)
+		}
+	}
+	if fkUser > 0 {
+		express = express.Where("fk_user = ?", fkUser)
+	}
+	if len(startAt) > 0 {
+		express = express.Where("created_at > ?", startAt)
+	}
+	if len(endAt) > 0 {
+		express = express.Where("created_at < ?", endAt)
+	}
+	if len(sourceURL) > 0 {
+		express = express.Where("source_url LIKE % ? % ", sourceURL)
+	}
+	if len(targetURL) > 0 {
+		express = express.Where("target_url LIKE % ? %", targetURL)
+	}
+	if len(group) > 0 {
+		express = express.Where("short_group = ? ", group)
+	}
+	express = express.Limit(page.PageSize).Offset((page.PageNum - 1) * page.PageSize)
+	if page.Desc {
+		express = express.Order(page.Keyword + " desc")
+
+	} else {
+		express = express.Order(page.Keyword)
+	}
+	express.Find(&result)
+	return
+}
+
 // @Title DeletedShortUrlById
 // @Description	根據id刪除url
 func DeletedShortUrlById(id string) bool {
