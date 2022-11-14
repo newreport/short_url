@@ -55,7 +55,7 @@ func (u *UserController) Register() {
 	u.ServeJSON()
 }
 
-// @Title Login``
+// @Title Login
 // @Description logs.Info user into the system
 // @Summary 登录
 // @Param	body		body 	models.User	true		"The username for login"
@@ -208,7 +208,6 @@ func (u *UserController) DeleteUser() {
 	u.ServeJSON()
 }
 
-// @Title update
 // @Summary 修改一个用户
 // @Description update the user
 // @Param	user	body 	models.User true	"body for user"

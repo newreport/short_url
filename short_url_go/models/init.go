@@ -20,20 +20,26 @@ type Page struct {
 	Desc     bool   `form:"desc"`
 }
 
+var U5Seed uuid.UUID
+
 func init() {
 	var err error
 	common.INIconf, err = config.NewConfig("ini", "conf/secret.conf")
-
 	if err != nil {
-		panic(err)
+		checkErr(err)
 	}
+	pwdUUID, err := common.INIconf.String("UUID::UserPwd")
+	if err != nil {
+		checkErr(err)
+	}
+	U5Seed = uuid.Must(uuid.FromString(pwdUUID))
 
 	//1.创建data文件夹，用于存放数据
 	_path := "./data"
 	existDic, err := common.PathExists(_path)
 	if err != nil {
 		fmt.Printf("get dir error![%v]\n", err)
-		panic(err)
+		checkErr(err)
 	}
 	if !existDic {
 		os.Mkdir(_path, os.ModePerm)
@@ -45,26 +51,12 @@ func init() {
 		if err != nil {
 			panic("failed to connect database")
 		}
-
-		//迁移数据表(初始化)
-		pwdUUID, err := common.INIconf.String("UUID::UserPwd")
-		if err != nil {
-			panic(err)
-		}
-		//uuid v5加密
-		u5 := uuid.Must(uuid.FromString(pwdUUID))
-		fmt.Println("u5:", u5)
-		DB.AutoMigrate(&User{}, &Short{}, &ShortGroup{})
-		userAdmin := User{Name: "admin", Nickname: "admin", Password: uuid.NewV5(u5, "admin").String(), Role: 1, DefaultURLLength: 9, Remarks: "默认管理员"}
-		DB.Create(&userAdmin)
-		fmt.Print("admin:")
-		fmt.Println(userAdmin.Password)
-		userUser1 := User{Name: "user", Nickname: "user", Password: uuid.NewV5(u5, "user").String(), DefaultURLLength: 9, Role: 1, Remarks: "用户"}
-		DB.Create(&userUser1)
 		//https://www.bookstack.cn/read/beego-2.0-zh/quickstart.md
-		//初始化url
-		// urlOne := Short{Si}
-
+		DB.AutoMigrate(&User{}, &Short{})
+		userAdmin := User{Name: "admin", Nickname: "admin", Password: uuid.NewV5(U5Seed, "admin").String(), Role: 1, DefaultURLLength: 6, Remarks: "默认管理员"}
+		DB.Create(&userAdmin)
+		userUser1 := User{Name: "user", Nickname: "user", Password: uuid.NewV5(U5Seed, "user").String(), DefaultURLLength: 9, Role: 0}
+		DB.Create(&userUser1)
 	} else {
 		DB, err = gorm.Open(sqlite.Open(_path), &gorm.Config{})
 		if err != nil {
