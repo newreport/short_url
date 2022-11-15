@@ -3,8 +3,6 @@
 import (
 	"encoding/json"
 	"short_url_go/models"
-
-	"github.com/beego/beego/v2/core/logs"
 )
 
 // Operations about Shorts
@@ -31,24 +29,32 @@ func (s *ShortController) CreateShort() {
 // @Summary	分頁查詢
 // @Date	2022-11-14
 // @Auth	sfhj
-// @Param	page	path	int	true	"頁"
-// @Param	rows	path	int true	"行"
-// @Param	sourceURL	query	string	false	"源url"
-// @Param	targetURL	query	string false	"目标url（短链接）"
-// @Param	isEnable	query	int	false	"是否启用"
-// @Param	isExp	query	int	false	"是否过期"
-// @Param	startAt	query	string	false	"创建时间start"
-// @Param	endAt	query	string	false	"创建时间end"
-// @Param	group	query	string flase	"分组名称"
-// @Param	page	query	models.Page	"分页查询"
+// @Param	page	query	models.Page	true	分页
+// @Param	query	query	string	false	查询参数
 // @Success 200 bool
-// @router /page/:page/rows/:rows [get]
+// @router / [get]
 func (s *ShortController) GetShortsByPage() {
-	// accInfo := s.analysisAccountClaims()
-	logs.Info("page: ", s.GetString(":page"))
-	logs.Info("rows: ", s.GetString(":rows"))
-	logs.Info("sourceURL: ", s.GetString("sourceURL"))
-	s.Data["json"] = models.QueryPageShort()
+	accInfo := s.analysisAccountClaims()
+	var err error
+	var page models.Page
+	page.Offset, err = s.GetInt("offset")
+	page.Lmit, err = s.GetInt("limit")
+	page.Sort = analysisOrderBy(s.GetString("sort"))
+	var query models.ShortPageQuery
+	query.SourceURL = s.GetString("source_url")
+	query.TargetURL = s.GetString("target_url")
+	query.FKUser = accInfo.ID
+	query.ShortGroup = s.GetString("group")
+	query.IsEnable = s.GetString("is_enable")
+	query.ExpireAt = s.GetString("exp")
+	query.CreatedAt = s.GetString("crt")
+	query.UpdatedAt = s.GetString("upt")
+	query.DeletedAt = s.GetString("del")
+	s.Data["json"] = models.QueryPageShort(query)
+	if err != nil {
+		s.Ctx.ResponseWriter.WriteHeader(401)
+		s.Data["json"] = "参数类型错误"
+	}
 	s.ServeJSON()
 	// logs.Info(accInfo)
 }

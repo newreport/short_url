@@ -17,7 +17,7 @@ type Short struct {
 	SourceURL    string         `json:"sourceUrl" gorm:"not null"`             //需要跳转的url
 	SourceUrlMD5 string         `json:"sourceMD5" gorm:"not null"`             //需要跳转url的MD5
 	TargetURL    string         `json:"targetURL" gorm:"not null;uniqueIndex"` //目标URL
-	FkUser       uint           `json:"fkUser" gorm:"not null"`                //外键关联用户
+	FKUser       uint           `json:"fkUser" gorm:"not null"`                //外键关联用户
 	ShortGroup   string         `json:"shortGroup" gorm:"not null"`            //外键关联分组
 	IsEnable     bool           `json:"isEnable" gorm:"not null"`              //是否启用
 	ExpireAt     time.Time      `json:"exp"`                                   //过期时间
@@ -25,6 +25,19 @@ type Short struct {
 	UpdatedAt    time.Time      `json:"upt"`
 	DeletedAt    gorm.DeletedAt `json:"det" gorm:"index"`
 	Remarks      string         //备注
+}
+
+type ShortPageQuery struct {
+	ShortID    string `json:"short_id"`
+	SourceURL  string `json:"source_url"`
+	TargetURL  string `json:"target_url"`
+	FKUser     uint   `json:"-`
+	ShortGroup string `json:"group"`
+	IsEnable   string `json:"is_enable"`
+	ExpireAt   string `json:"exp"`
+	CreatedAt  string `json:"crt"`
+	UpdatedAt  string `json:"upt"`
+	DeletedAt  string `json:"det"`
 }
 
 // URL种子，即浏览器支持的非转义字符，这里只取了64个
@@ -91,8 +104,8 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 	}
 	var count int64
 	var fkUserID uint
-	if len(shorts) > 0 && shorts[0].FkUser != 0 {
-		fkUserID = shorts[0].FkUser
+	if len(shorts) > 0 && shorts[0].FKUser != 0 {
+		fkUserID = shorts[0].FKUser
 		DB.Model(&Short{}).Where("( target_url IN ? OR source_url_md5 IN ? ) AND fk_user = ?", targetStrs, sourceUrlMD5s, fkUserID).Count(&count)
 	} else {
 		DB.Model(&Short{}).Where("target_url IN ? OR source_url_md5 IN ?", targetStrs, sourceUrlMD5s).Count(&count)
@@ -108,9 +121,9 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 	if count > 0 { //已存在
 		sourceExpress := DB.Where(" source_url_md5 IN ? ", sourceUrlMD5s)
 		tagetExpress := DB.Where(" target_url IN ? ", targetStrs)
-		if len(shorts) > 0 && shorts[0].FkUser != 0 { //查詢用戶外鍵關聯
-			sourceExpress = sourceExpress.Where("fk_user = ?", shorts[0].FkUser)
-			tagetExpress = tagetExpress.Where("fk_user = ?", shorts[0].FkUser)
+		if len(shorts) > 0 && shorts[0].FKUser != 0 { //查詢用戶外鍵關聯
+			sourceExpress = sourceExpress.Where("fk_user = ?", shorts[0].FKUser)
+			tagetExpress = tagetExpress.Where("fk_user = ?", shorts[0].FKUser)
 		}
 		sourceExpress.Select("source_url").Find(&existSouceShorts)
 		tagetExpress.Select("source_url").Find(&existTargetShorts)
@@ -141,53 +154,24 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 // @Title	QueryPageShort
 // @Auth	sfhj
 // @Date	2022-11-14
-// @Param	isEnable	int	是否启用，-1：全部;1：启用;0：不启用
-// @Param	isExp	int	是否过期，-1：全部;1：过期;0：未过期
-// @Param	fkUser	uint	外键，用户id
-// @Param	startAt	string 创建时间start
-// @Param	endAt	string 创建时间end
-// @Param	sourceURL	string	源url模糊查询
-// @Param	targetURL	string	目标url模糊查询
-// @Param	group	string	分组，精准查询
+// @Param	query	models.ShortPageQuery	查询参数
 // @Param	page	models.Page	分页查询
 // @Return	result	[]models.Shorts
-func QueryPageShort(isEnable int, isExp int, fkUser uint, startAt string, endAt string, sourceURL string, targetURL string, group string, page Page) (result []Short) {
+func QueryPageShort(query ShortPageQuery, page Page) (result []Short) {
 	express := DB.Model(&Short{})
-	if isEnable > -1 {
-		express = express.Where("is_enable = ?", isEnable == 1)
+	analysisRestfulRHS(express, "source_url", query.SourceURL)
+	analysisRestfulRHS(express, "target_url", query.TargetURL)
+	analysisRestfulRHS(express, "short_group", query.ShortGroup)
+	analysisRestfulRHS(express, "is_enable", query.IsEnable)
+	analysisRestfulRHS(express, "expire_at", query.ExpireAt)
+	analysisRestfulRHS(express, "created_at", query.CreatedAt)
+	analysisRestfulRHS(express, "updated_at", query.UpdatedAt)
+	analysisRestfulRHS(express, "deleted_at", query.DeletedAt)
+	if query.FKUser > 0 {
+		express = express.Where("fk_user = ?", query.FKUser)
 	}
-	if isExp > -1 {
-		if isExp == 1 {
-			express = express.Where("expire_at >= ?", time.Now)
-		} else {
-			express = express.Where("expire_at < ?", time.Now)
-		}
-	}
-	if fkUser > 0 {
-		express = express.Where("fk_user = ?", fkUser)
-	}
-	if len(startAt) > 0 {
-		express = express.Where("created_at > ?", startAt)
-	}
-	if len(endAt) > 0 {
-		express = express.Where("created_at < ?", endAt)
-	}
-	if len(sourceURL) > 0 {
-		express = express.Where("source_url LIKE % ? % ", sourceURL)
-	}
-	if len(targetURL) > 0 {
-		express = express.Where("target_url LIKE % ? %", targetURL)
-	}
-	if len(group) > 0 {
-		express = express.Where("short_group = ? ", group)
-	}
-	express = express.Limit(page.PageSize).Offset((page.PageNum - 1) * page.PageSize)
-	if page.Desc {
-		express = express.Order(page.Keyword + " desc")
+	express = express.Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit).Order(page.Sort)
 
-	} else {
-		express = express.Order(page.Keyword)
-	}
 	express.Find(&result)
 	return
 }

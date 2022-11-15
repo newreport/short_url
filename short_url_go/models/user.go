@@ -129,12 +129,7 @@ func QueryPageUsers(name string, nicknmae string, group string, role uint, page 
 	if len(group) > 0 {
 		express = express.Where("group = ? ", group)
 	}
-	express = express.Limit(page.PageSize).Offset((page.PageNum - 1) * page.PageSize)
-	if page.Desc {
-		express = express.Order(page.Keyword + " desc")
-	} else {
-		express = express.Order(page.Keyword)
-	}
+	express = express.Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
 	var result []User
 	express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "remarks").Find(&result)
 	return result

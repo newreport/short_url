@@ -31,6 +31,7 @@ func (b *BaseController) decodeRawRequestBodyJson() map[string]interface{} {
 	}
 	return requestBody
 }
+
 func (b *BaseController) JsonData() map[string]interface{} {
 	return b.decodeRawRequestBodyJson()
 }
@@ -50,4 +51,12 @@ func (b *BaseController) analysisAccountClaims() (result AccountClaims) {
 		result = *claims
 	}
 	return
+}
+
+// @Title analysisOrderBy
+// @Description 计算orderby
+func analysisOrderBy(str string) string {
+	str = strings.Replace(str, "+", " asc", -1)
+	str = strings.Replace(str, "-", " desc", -1)
+	return str
 }

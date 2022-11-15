@@ -61,12 +61,12 @@ func init() {
 		// AllowCredentials: true,
 	}))
 	ns := beego.NewNamespace("/v1",
-		beego.NSNamespace("/user",
+		beego.NSNamespace("/users",
 			beego.NSInclude(
 				&controllers.UserController{},
 			),
 		),
-		beego.NSNamespace("/short",
+		beego.NSNamespace("/shorts",
 			beego.NSInclude(
 				&controllers.ShortController{},
 			),
