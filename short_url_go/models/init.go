@@ -68,13 +68,19 @@ func init() {
 
 // @Title analysisRestfulRHS
 // @Description	解析api参数
-func analysisRestfulRHS(db *gorm.DB, field string, str string) bool {
-	if len(str) > 0 {
-		params := strings.Split(str, ",")
-		for i := 0; i < len(params); i++ {
-			if len(params[i]) > 2 {
-				lhs := params[i][:2]
-				param := params[i][2:]
+// @Param	db	dbContent上下文
+// @Param field	數據庫字段名
+// @Param	queryRule	查詢條件
+// @Return	bool	值是否正確，即前端隻的解析是否正確
+func analysisRestfulRHS(db *gorm.DB, field string, queryRule string) bool {
+	//RHS式查詢，將查詢條件開放給前端，自由度更大,權限通過token在controller控制，不通過查詢參數
+	//SQL注入：https://gorm.io/zh_CN/docs/security.html#%E5%86%85%E8%81%94%E6%9D%A1%E4%BB%B6
+	if len(queryRule) > 0 {
+		rhsBrackets := strings.Split(queryRule, ",")
+		for i := 0; i < len(rhsBrackets); i++ {
+			if len(rhsBrackets[i]) > 2 {
+				lhs := rhsBrackets[i][:2]
+				param := rhsBrackets[i][2:]
 				switch lhs {
 				case "lt": //less than 小於
 					db = db.Where(field+" < ? ", param)

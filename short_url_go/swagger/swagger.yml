@@ -12,10 +12,29 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
-  /short/:
+  /shorts/:
+    get:
+      tags:
+      - shorts
+      summary: 分頁查詢
+      operationId: ShortController.get shorts by page
+      parameters:
+      - in: query
+        name: page
+        description: 分页
+        required: true
+        schema:
+          $ref: '#/definitions/models.Page'
+      - in: query
+        name: query
+        description: 查询参数
+        type: string
+      responses:
+        "200":
+          description: bool
     post:
       tags:
-      - short
+      - shorts
       summary: 新增一个短链接
       description: |-
         add one short url
@@ -30,40 +49,10 @@ paths:
       responses:
         "200":
           description: '{bool} add success'
-  /short/page/{page}/rows/{rows}:
-    get:
-      tags:
-      - short
-      summary: 分頁查詢
-      operationId: ShortController.get shorts by page
-      parameters:
-      - in: path
-        name: page
-        description: 頁
-        required: true
-        type: integer
-        format: int64
-      - in: path
-        name: rows
-        description: 行
-        required: true
-        type: integer
-        format: int64
-      - in: query
-        name: sourceURL
-        description: 源url
-        type: string
-      - in: query
-        name: targetURL
-        description: 目标url（短链接）
-        type: string
-      responses:
-        "200":
-          description: bool
-  /user/:
+  /users/:
     put:
       tags:
-      - user
+      - users
       summary: 修改一个用户
       description: |-
         update the user
@@ -82,7 +71,7 @@ paths:
           description: Insufficient user permissions
     post:
       tags:
-      - user
+      - users
       summary: 新增一个用户
       description: |-
         logs.Info user into the system
@@ -100,10 +89,10 @@ paths:
           description: '{bool} Create success'
         "401":
           description: Insufficient user permissions
-  /user/{uid}:
+  /users/{uid}:
     delete:
       tags:
-      - user
+      - users
       summary: 删除一个用户
       description: |-
         delete the user
@@ -121,10 +110,10 @@ paths:
           description: '{string} delete success!'
         "403":
           description: The uid is empty
-  /user/all:
+  /users/all:
     get:
       tags:
-      - user
+      - users
       summary: 获取所有用户
       description: |-
         logs.Info user into the system
@@ -137,10 +126,10 @@ paths:
             $ref: '#/definitions/models.User'
         "403":
           description: User not exist
-  /user/login:
+  /users/login:
     post:
       tags:
-      - user
+      - users
       summary: 登录
       description: |-
         logs.Info user into the system
@@ -158,10 +147,10 @@ paths:
           description: '{models.User} Login success'
         "401":
           description: The user does not exist.
-  /user/pwd/{uid}:
+  /users/pwd/{uid}:
     patch:
       tags:
-      - user
+      - users
       summary: 修改一个用户的密码
       description: |-
         update the user's password
@@ -180,10 +169,10 @@ paths:
           description: '{bool} update password success!'
         "401":
           description: Insufficient user permissions
-  /user/register:
+  /users/register:
     post:
       tags:
-      - user
+      - users
       summary: 注册
       description: |-
         logs.Info user into the system
@@ -201,10 +190,10 @@ paths:
           description: '{bool} register success'
         "403":
           description: Prohibiting the registration
-  /user/tocken/account:
+  /users/tocken/account:
     post:
       tags:
-      - user
+      - users
       summary: 刷新 account tocken
       description: |-
         logs.Info user into the system
@@ -230,6 +219,21 @@ definitions:
   http:
     title: http
     type: object
+  models.Page:
+    title: Page
+    type: object
+    properties:
+      limit:
+        description: 指定返回记录的数量
+        type: integer
+        format: int64
+      offset:
+        description: 偏移量
+        type: integer
+        format: int64
+      sort:
+        description: 排序 RHS 例:id+,create_at- ——> id asc,create_at desc
+        type: string
   models.Short:
     title: Short
     type: object
@@ -328,9 +332,9 @@ definitions:
     title: unit
     type: object
 tags:
-- name: user
+- name: users
   description: |
     Operations about Users
-- name: short
+- name: shorts
   description: |
     Operations about Shorts

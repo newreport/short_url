@@ -19,7 +19,7 @@ func init() {
     beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
         beego.ControllerComments{
             Method: "GetShortsByPage",
-            Router: `/page/:page/rows/:rows`,
+            Router: `/`,
             AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,

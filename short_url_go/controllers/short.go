@@ -20,7 +20,7 @@ func (s *ShortController) CreateShort() {
 	var short models.Short
 	accInfo := s.analysisAccountClaims()
 	json.Unmarshal(s.Ctx.Input.RequestBody, &short)
-	short.FkUser = accInfo.ID
+	short.FKUser = accInfo.ID
 	s.Data["json"] = models.CreateShort(short, 6)
 	s.ServeJSON()
 }
@@ -50,7 +50,7 @@ func (s *ShortController) GetShortsByPage() {
 	query.CreatedAt = s.GetString("crt")
 	query.UpdatedAt = s.GetString("upt")
 	query.DeletedAt = s.GetString("del")
-	s.Data["json"] = models.QueryPageShort(query)
+	s.Data["json"], err = models.QueryPageShort(query, page)
 	if err != nil {
 		s.Ctx.ResponseWriter.WriteHeader(401)
 		s.Data["json"] = "参数类型错误"

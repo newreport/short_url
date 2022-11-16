@@ -1,6 +1,7 @@
 ﻿package models
 
 import (
+	"errors"
 	"fmt"
 	"short_url_go/common"
 	"strconv"
@@ -31,7 +32,7 @@ type ShortPageQuery struct {
 	ShortID    string `json:"short_id"`
 	SourceURL  string `json:"source_url"`
 	TargetURL  string `json:"target_url"`
-	FKUser     uint   `json:"-`
+	FKUser     uint   `json:"-"`
 	ShortGroup string `json:"group"`
 	IsEnable   string `json:"is_enable"`
 	ExpireAt   string `json:"exp"`
@@ -157,22 +158,20 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 // @Param	query	models.ShortPageQuery	查询参数
 // @Param	page	models.Page	分页查询
 // @Return	result	[]models.Shorts
-func QueryPageShort(query ShortPageQuery, page Page) (result []Short) {
+func QueryPageShort(query ShortPageQuery, page Page) (result []Short, err error) {
 	express := DB.Model(&Short{})
-	analysisRestfulRHS(express, "source_url", query.SourceURL)
-	analysisRestfulRHS(express, "target_url", query.TargetURL)
-	analysisRestfulRHS(express, "short_group", query.ShortGroup)
-	analysisRestfulRHS(express, "is_enable", query.IsEnable)
-	analysisRestfulRHS(express, "expire_at", query.ExpireAt)
-	analysisRestfulRHS(express, "created_at", query.CreatedAt)
-	analysisRestfulRHS(express, "updated_at", query.UpdatedAt)
-	analysisRestfulRHS(express, "deleted_at", query.DeletedAt)
-	if query.FKUser > 0 {
-		express = express.Where("fk_user = ?", query.FKUser)
-	}
-	express = express.Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit).Order(page.Sort)
-
+	if analysisRestfulRHS(express, "source_url", query.SourceURL) &&
+		analysisRestfulRHS(express, "target_url", query.TargetURL) &&
+		analysisRestfulRHS(express, "short_group", query.ShortGroup) &&
+		analysisRestfulRHS(express, "is_enable", query.IsEnable) &&
+		analysisRestfulRHS(express, "expire_at", query.ExpireAt) &&
+		analysisRestfulRHS(express, "created_at", query.CreatedAt) &&
+		analysisRestfulRHS(express, "updated_at", query.UpdatedAt) &&
+		analysisRestfulRHS(express, "deleted_at", query.DeletedAt) {
 	express.Find(&result)
+	} else {
+		err = errors.New("查詢參數錯誤")
+	}
 	return
 }
 

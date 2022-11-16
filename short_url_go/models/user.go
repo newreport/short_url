@@ -1,6 +1,7 @@
 ﻿package models
 
 import (
+	"errors"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -24,6 +25,16 @@ type User struct { //用户表
 	Remarks          string         `json:"remarks"`                        //备注
 	I18n             string         `json:"i18n"`                           //国际化
 	AutoInsertSpace  bool           `json:"autoInsertSpace"`                //盘古之白
+}
+
+type UserPageQuery struct {
+	Name      string `json:"name"`
+	Nickname  string `json:"nickname"`
+	Group     string `json:"group"`
+	Role      string `json:"role"`
+	CreatedAt string `json:"crt"`
+	UpdatedAt string `json:"upt"`
+	DeletedAt string `json:"det"`
 }
 
 type UserOrderBy int
@@ -108,31 +119,22 @@ func UpdateUser(user User) bool {
 
 // @Title	分页查询
 // @Auth	sfhj
-// @Date	2022-10-25
-// @Param	name	string 用户名
-// @Param	nicknmae	string 昵称
-// @Param	group	string 分组
-// @Param	role	uint	权限
+// @Date	2022-11-15
+// @Param	query	models.UserPageQuery	查询参数
 // @Param	page	models.Page	分页查询struct
-// @Return	users	[]models.User
-func QueryPageUsers(name string, nicknmae string, group string, role uint, page Page) []User {
+// @Return	users	[]models.User,error
+func QueryPageUsers(query UserPageQuery, page Page) (result []User, err error) {
 	express := DB.Model(&User{})
-	if len(name) > 0 {
-		express = express.Where("name LIKE % ? % ", name)
+	if analysisRestfulRHS(express, "name", query.Name) &&
+		analysisRestfulRHS(express, "nickname", query.Nickname) &&
+		analysisRestfulRHS(express, "role", query.Nickname) {
+		express = express.Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
+
+		express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "remarks").Find(&result)
+	} else {
+		err = errors.New("查詢參數錯誤")
 	}
-	if len(nicknmae) > 0 {
-		express = express.Where("nickname LIKE % ? % ", nicknmae)
-	}
-	if role == 0 || role == 1 {
-		express = express.Where("role = ? ", nicknmae)
-	}
-	if len(group) > 0 {
-		express = express.Where("group = ? ", group)
-	}
-	express = express.Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
-	var result []User
-	express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "remarks").Find(&result)
-	return result
+	return
 }
 
 // @Title 根据用户id修改密码
