@@ -105,7 +105,6 @@ func analysisRestfulRHS(db *gorm.DB, field string, queryRule string) bool {
 				}
 			}
 		}
-
 	}
 	return true
 }

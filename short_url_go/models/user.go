@@ -27,6 +27,7 @@ type User struct { //用户表
 	AutoInsertSpace  bool           `json:"autoInsertSpace"`                //盘古之白
 }
 
+// 分页查询
 type UserPageQuery struct {
 	Name      string `json:"name"`
 	Nickname  string `json:"nickname"`
@@ -35,38 +36,6 @@ type UserPageQuery struct {
 	CreatedAt string `json:"crt"`
 	UpdatedAt string `json:"upt"`
 	DeletedAt string `json:"det"`
-}
-
-type UserOrderBy int
-
-const (
-	Id UserOrderBy = iota
-	Name
-	Nickname
-	CreatedAt
-	UpdatedAt
-	UrlLength
-	Group
-)
-
-func (field UserOrderBy) String() (res string) {
-	switch field {
-	case 0:
-		res = "id"
-	case 1:
-		res = "name"
-	case 2:
-		res = "nickname"
-	case 3:
-		res = "create_at"
-	case 4:
-		res = "update_at"
-	case 5:
-		res = "default_url_length"
-	case 6:
-		res = "group"
-	}
-	return
 }
 
 // @Title 获取所有用户
@@ -81,13 +50,6 @@ func Login(username, password string) User {
 	var user User
 	password = uuid.NewV5(U5Seed, password).String()
 	DB.Model(&User{}).Where(&User{Name: username, Password: password}).First(&user)
-	return user
-}
-
-// @Title 根据id查询用户
-func QueryUserById(id uint) User {
-	var user User
-	DB.First(&user, id)
 	return user
 }
 
@@ -128,13 +90,19 @@ func QueryPageUsers(query UserPageQuery, page Page) (result []User, err error) {
 	if analysisRestfulRHS(express, "name", query.Name) &&
 		analysisRestfulRHS(express, "nickname", query.Nickname) &&
 		analysisRestfulRHS(express, "role", query.Nickname) {
-		express = express.Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
-
+		express = express.Order(page.Sort).Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
 		express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "remarks").Find(&result)
 	} else {
 		err = errors.New("查詢參數錯誤")
 	}
 	return
+}
+
+// @Title 根据id查询用户
+func QueryUserById(id uint) User {
+	var user User
+	DB.First(&user, id)
+	return user
 }
 
 // @Title 根据用户id修改密码
@@ -144,7 +112,7 @@ func UpdatePassword(id uint, pwd string) bool {
 	return result.RowsAffected > 0
 }
 
-// @Title 根据用户id删除用户
+// @Title 根据用户id集合删除用户
 func DeleteUsers(ids []uint) bool {
 	var count int64
 	DB.Model(Short{}).Where("fk_user IN ?", ids).Count(&count)

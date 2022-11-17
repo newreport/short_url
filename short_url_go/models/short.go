@@ -14,7 +14,7 @@ import (
 )
 
 type Short struct {
-	ShortID      string         `json:"sid" gorm:"primaryKey,size:50;"`        //主键uuid
+	ID           string         `json:"id" gorm:"primaryKey,size:50;"`         //主键uuid
 	SourceURL    string         `json:"sourceUrl" gorm:"not null"`             //需要跳转的url
 	SourceUrlMD5 string         `json:"sourceMD5" gorm:"not null"`             //需要跳转url的MD5
 	TargetURL    string         `json:"targetURL" gorm:"not null;uniqueIndex"` //目标URL
@@ -29,7 +29,7 @@ type Short struct {
 }
 
 type ShortPageQuery struct {
-	ShortID    string `json:"short_id"`
+	ID         string `json:"id"`
 	SourceURL  string `json:"source_url"`
 	TargetURL  string `json:"target_url"`
 	FKUser     uint   `json:"-"`
@@ -54,7 +54,7 @@ const URLSTRS = "LMndefNq3~ZaUVWvw4sQRABCY56rHz0DEFJ127KxyX89IbcPhijklmGS-TgtOop
 // @Return			result		bool			"操作是否成功"
 func CreateShort(short Short, length int) bool {
 	var err error
-	short.ShortID = uuid.Must(uuid.NewV4(), err).String()
+	short.ID = uuid.Must(uuid.NewV4(), err).String()
 	short.TargetURL = generateUrl(short.TargetURL, length)
 	short.SourceUrlMD5 = common.MD5(short.SourceURL)
 	result := DB.Create(short)
@@ -72,7 +72,7 @@ func CreateShort(short Short, length int) bool {
 // @Return			result		string			"是否成功"
 func CreateShortCustom(short Short) bool {
 	var err error
-	short.ShortID = uuid.Must(uuid.NewV4(), err).String()
+	short.ID = uuid.Must(uuid.NewV4(), err).String()
 	short.SourceUrlMD5 = common.MD5(short.SourceURL)
 	var count int64
 	DB.Model(&Short{}).Where("target_url = ?", short.TargetURL).Count(&count)
@@ -98,7 +98,7 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 	var targetStrs []string
 	var sourceUrlMD5s []string
 	for _, v := range shorts {
-		v.ShortID = uuid.Must(uuid.NewV4(), err).String()
+		v.ID = uuid.Must(uuid.NewV4(), err).String()
 		v.SourceUrlMD5 = common.MD5(v.SourceURL)
 		targetStrs = append(targetStrs, v.TargetURL)
 		sourceUrlMD5s = append(sourceUrlMD5s, v.SourceUrlMD5)
@@ -158,7 +158,7 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 // @Param	query	models.ShortPageQuery	查询参数
 // @Param	page	models.Page	分页查询
 // @Return	result	[]models.Shorts
-func QueryPageShort(query ShortPageQuery, page Page) (result []Short, err error) {
+func QueryPageShort(query ShortPageQuery, page Page) (result []Short, count int64, err error) {
 	express := DB.Model(&Short{})
 	if analysisRestfulRHS(express, "source_url", query.SourceURL) &&
 		analysisRestfulRHS(express, "target_url", query.TargetURL) &&
@@ -168,7 +168,8 @@ func QueryPageShort(query ShortPageQuery, page Page) (result []Short, err error)
 		analysisRestfulRHS(express, "created_at", query.CreatedAt) &&
 		analysisRestfulRHS(express, "updated_at", query.UpdatedAt) &&
 		analysisRestfulRHS(express, "deleted_at", query.DeletedAt) {
-	express.Find(&result)
+		express.Count(&count)
+		express.Order(page.Sort).Select("id,source_url,source_url_md5,target_url,fk_user,short_group,is_enable,expire_at,create_at,remarks").Find(&result)
 	} else {
 		err = errors.New("查詢參數錯誤")
 	}
@@ -185,7 +186,7 @@ func DeletedShortUrlById(id string) bool {
 // @Title DeletedShortUrlByIds
 // @Description 根據多個id刪除url
 func DeletedShortUrlByIds(ids []string) bool {
-	result := DB.Delete(&Short{}, "sid IN ?", ids)
+	result := DB.Delete(&Short{}, "id IN ?", ids)
 	return result.RowsAffected > 0
 }
 

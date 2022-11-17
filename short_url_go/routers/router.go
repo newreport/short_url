@@ -21,19 +21,22 @@ import (
 // 过滤器all
 var FilterToken = func(ctx *context.Context) {
 	logs.Info("current router path is ", ctx.Request.RequestURI)
-	if ctx.Request.RequestURI != "/v1/user/all" && ctx.Request.RequestURI != "/v1/user/login" && ctx.Request.RequestURI != "/v1/user/register" && ctx.Input.Header("Authorization") == "" {
-		logs.Error("without token, unauthorized !!")
-		ctx.ResponseWriter.WriteHeader(401)
-		ctx.ResponseWriter.Write([]byte("no permission"))
-	}
-	if ctx.Request.RequestURI != "/v1/user/all" && ctx.Request.RequestURI != "/v1/user/login" && ctx.Request.RequestURI != "/v1/user/register" && ctx.Input.Header("Authorization") != "" {
-		token := ctx.Input.Header("Authorization")
-		token = strings.Split(token, "")[1]
-		logs.Info("curernttoken: ", token)
-		ok := controllers.AuthenticationJWT(token)
-		if !ok {
+	if ctx.Request.RequestURI != "/v1/user/all" && ctx.Request.RequestURI != "/v1/user/login" && ctx.Request.RequestURI != "/v1/user/register" {
+		//没有token
+		if ctx.Input.Header("Authorization") == "" {
+			logs.Error("without token, unauthorized !!")
 			ctx.ResponseWriter.WriteHeader(401)
-			ctx.ResponseWriter.Write([]byte("no permission"))
+			ctx.ResponseWriter.Write([]byte("no permission")) //没有权限
+		} else {
+			//accessToken错误
+			token := ctx.Input.Header("Authorization")
+			token = strings.Split(token, "")[1]
+			logs.Info("curernttoken: ", token)
+			ok := controllers.AuthenticationJWT(token)
+			if !ok {
+				ctx.ResponseWriter.WriteHeader(401)
+				ctx.ResponseWriter.Write([]byte("no permission"))
+			}
 		}
 	}
 }
