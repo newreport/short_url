@@ -14,16 +14,19 @@ type ShortController struct {
 // @Summary	新增一个短链接
 // @Description add one short url
 // @Param	short		body 	models.Short		"body for short"
-// @Success 200 {bool} add success
-// @Success 401 string 	Insufficient user permissions
+// @Success 200	{string}	add success
+// @Success 401	{string} 	Insufficient user permissions
 // @router / [post]
 func (s *ShortController) CreateShort() {
 	var short models.Short
 	accInfo := s.analysisAccountClaims()
 	json.Unmarshal(s.Ctx.Input.RequestBody, &short)
 	short.FKUser = accInfo.ID
-	s.Data["json"] = models.CreateShort(short, 6)
-	s.ServeJSON()
+	if models.CreateShort(short, 6) {
+		s.Ctx.WriteString("创建成功")
+	} else {
+		s.Ctx.WriteString("创建失败")
+	}
 }
 
 // @Title	get shorts by page
@@ -41,12 +44,12 @@ func (s *ShortController) GetShortsByPage() {
 	page.Offset, err = s.GetInt("offset")
 	if err != nil {
 		s.Ctx.ResponseWriter.WriteHeader(400)
-		s.Data["json"] = "请求参数类型错误"
+		s.Ctx.WriteString("请求参数类型错误")
 	}
 	page.Lmit, err = s.GetInt("limit")
 	if err != nil {
 		s.Ctx.ResponseWriter.WriteHeader(400)
-		s.Data["json"] = "请求参数类型错误"
+		s.Ctx.WriteString("请求参数类型错误")
 	}
 	page.Sort = analysisOrderBy(s.GetString("sort"))
 	var query models.ShortPageQuery
@@ -60,13 +63,14 @@ func (s *ShortController) GetShortsByPage() {
 	query.UpdatedAt = s.GetString("upt")
 	query.DeletedAt = s.GetString("del")
 	result, count, err := models.QueryPageShorts(query, page)
-	s.Data["json"] = map[string]interface{}{
-		"count": count,
-		"data":  result,
-	}
 	if err != nil {
 		s.Ctx.ResponseWriter.WriteHeader(400)
-		s.Data["json"] = "请求参数错误"
+		s.Ctx.WriteString("请求参数错误")
+	} else {
+		s.Data["json"] = map[string]interface{}{
+			"count": count,
+			"data":  result,
+		}
+		s.ServeJSON()
 	}
-	s.ServeJSON()
 }

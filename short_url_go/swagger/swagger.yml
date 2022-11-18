@@ -49,9 +49,9 @@ paths:
           $ref: '#/definitions/models.Short'
       responses:
         "200":
-          description: '{bool} add success'
+          description: "{string}\tadd success"
         "401":
-          description: "string \tInsufficient user permissions"
+          description: "{string} \tInsufficient user permissions"
   /users/:
     get:
       tags:
@@ -74,7 +74,7 @@ paths:
         "200":
           description: ""
         "403":
-          description: Insufficient user permissions
+          description: "{string}\tInsufficient user permissions"
     put:
       tags:
       - users
@@ -91,9 +91,9 @@ paths:
           $ref: '#/definitions/models.User'
       responses:
         "200":
-          description: '{bool} update success!'
+          description: '{string} update success!'
         "403":
-          description: Insufficient user permissions
+          description: '{string} Insufficient user permissions'
     post:
       tags:
       - users
@@ -111,9 +111,9 @@ paths:
           $ref: '#/definitions/models.User'
       responses:
         "200":
-          description: '{bool} Create success'
+          description: "{string}\tCreate success"
         "403":
-          description: Insufficient user permissions
+          description: "{string}\tInsufficient user permissions"
   /users/{uid}:
     delete:
       tags:
@@ -132,9 +132,9 @@ paths:
           $ref: '#/definitions/unit'
       responses:
         "200":
-          description: '{string} delete success!'
+          description: "{string}\tdelete success!"
         "403":
-          description: Insufficient user permissions
+          description: "{string}\tInsufficient user permissions"
   /users/all:
     get:
       tags:
@@ -169,9 +169,9 @@ paths:
           $ref: '#/definitions/models.User'
       responses:
         "200":
-          description: '{models.User} Login success'
+          description: "{models.User}\tLogin success"
         "401":
-          description: The user does not exist.
+          description: "{string}\tThe user does not exist."
   /users/pwd/{uid}:
     patch:
       tags:
@@ -191,9 +191,9 @@ paths:
         type: string
       responses:
         "200":
-          description: '{bool} update password success!'
+          description: "{string}\tupdate password success!"
         "403":
-          description: Insufficient user permissions
+          description: "{string}\tInsufficient user permissions"
   /users/register:
     post:
       tags:
@@ -212,9 +212,9 @@ paths:
           $ref: '#/definitions/models.User'
       responses:
         "200":
-          description: '{bool} register success'
+          description: "{string}\tregister success"
         "403":
-          description: Prohibiting the registration
+          description: "{string}\tProhibiting the registration"
   /users/tocken/account:
     post:
       tags:
@@ -234,9 +234,9 @@ paths:
         type: string
       responses:
         "200":
-          description: string Refresh success
+          description: "{string}\tRefresh success"
         "401":
-          description: refresh token 失效
+          description: "{string}\trefresh token 失效"
 definitions:
   gorm.DeletedAt:
     title: DeletedAt

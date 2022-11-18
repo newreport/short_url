@@ -1,5 +1,8 @@
 ﻿import { createRouter, createWebHistory } from 'vue-router'
+import { useStore } from 'vuex' // 引入useStore 方法
 
+
+const store = useStore()  // 该方法用于返回store 实例
 //注册路由
 const routes = [
     {
@@ -20,11 +23,11 @@ const router = createRouter({
     routes
 });
   
-// router.beforeEach((to, from) => {
-//     if(to.name!='Login')
-//     // ...
-//     // 返回 false 以取消导航
-//     return false
-//   })
+router.beforeEach((to, from,next) => {
+    if(to.name!='Login'&&store.state.id==-1){
+        console.log("鉴权失败")
+        // return { name: 'Login' }
+    }
+  })
 
 export default router;

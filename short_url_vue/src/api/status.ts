@@ -4,7 +4,7 @@ export const showMessage = (status:number|string) : string => {
     let message:string = "";
     switch (status) {
         case 400:
-            message = "请求错误(400)";
+            message = "请求错误(400)";//参数错误，RHS/LHS 语法出错
             break;
         case 401:
             message = "未授权，请重新登录(401)";

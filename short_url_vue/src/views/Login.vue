@@ -2,10 +2,12 @@
 import router from '@/router'
 import { defineComponent, getCurrentInstance, h, reactive, ref, computed } from 'vue'
 import { ElMessage, ElButton, ElCard, ElCol, ElContainer, ElFooter, ElForm, ElFormItem, ElHeader, ElImage, ElInput, ElMain, ElNotification, ElRow } from 'element-plus'
-import { UserService } from '../api/api'
+import { UserService } from '@/api/api'
+import { useStore } from 'vuex' // 引入useStore 方法
 
 const { appContext } = getCurrentInstance();
 const base64 = appContext.config.globalProperties.$base64;
+const store = useStore()  // 该方法用于返回store 实例
 
 const name = ref('')
 const pwd = ref('')
@@ -21,12 +23,11 @@ const login = () => {
     UserService.login(loginParams)
       .then(resLogin => {
         if (resLogin?.status == 200) {
-          localStorage.setItem("refreshToken", base64.encode(resLogin.data))
-          console.log("routepush")
+          store.commit('refreshToken',resLogin.data)
           router.push({ path: '/index' })
         }
       }).catch(err => {
-        localStorage.clear()//清空本地存储
+        store.commit('cleanToken')
         ElMessage.error(err)
       })
   }

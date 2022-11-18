@@ -45,6 +45,15 @@ func init() {
 
     beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
         beego.ControllerComments{
+            Method: "GetUsersByPage",
+            Router: `/`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
+        beego.ControllerComments{
             Method: "DeleteUser",
             Router: `/:uid`,
             AllowHTTPMethods: []string{"delete"},

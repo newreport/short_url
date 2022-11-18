@@ -10,10 +10,10 @@ export class UserService {       // 模块一
      * @return {HttpResponse} result
      */
     static async login(params) {   // 接口一
-        return request('/user/login',params, 'post')
+        return request('/users/login',params, 'post')
     }
     static async getall() {   // 接口二
-        return request('/user/all',{},'get')
+        return request('/users/all',{},'get')
     }
  
 }

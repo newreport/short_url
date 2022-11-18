@@ -5,10 +5,12 @@ import router from "@/router";
 import i18n from "@plugins/i18n";
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
 import base64 from '@utils/base64';
+import store from '@store/index'
 
 const app = createApp(App);
 app.use(router);
 app.use(i18n);
+app.use(store)
 
 app.config.globalProperties.$base64=new base64()
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

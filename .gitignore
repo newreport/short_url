@@ -19,6 +19,7 @@ short_url_go/data/main.db
 short_url_go/swagger/*
 short_url_go/swagger.zip
 
+nohup.out
 # Logs
 logs
 *.log

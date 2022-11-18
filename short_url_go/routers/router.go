@@ -18,6 +18,8 @@ import (
 	beego "github.com/beego/beego/v2/server/web"
 )
 
+//https://www.cnblogs.com/zdz8207/p/golang-learn-7.html swagger样式以及auth swagger
+
 // 过滤器all
 var FilterToken = func(ctx *context.Context) {
 	logs.Info("current router path is ", ctx.Request.RequestURI)
