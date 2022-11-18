@@ -61,7 +61,7 @@ func (u *UserController) Register() {
 // @Failure 401 The user does not exist.
 // @router /login [post]
 func (u *UserController) Login() {
-	Infos(u)
+	u.infos()
 	requestBody := u.JsonData()
 	username := requestBody["name"].(string)
 	password := requestBody["pwd"].(string)
@@ -187,6 +187,51 @@ func (u *UserController) UpdateUserPassword() {
 	u.ServeJSON()
 }
 
-func (u *UserController) GetUsersByPage(){
-	
+// @Title	GetUsersByPage
+// @Summary	user分页查询
+// @Date	2022-11-18
+// @Auth	sfhj
+// @Param	page	query	models.Page	true	分页
+// @Param	query	query	models.UserPageQuery	false	查询参数
+// @Success	200
+// @Failure 403 Insufficient user permissions
+// @router / [get]
+func (u *UserController) GetUsersByPage() {
+	accInfo := u.analysisAccountClaims()
+	if accInfo.Role == 0 {
+		u.Ctx.ResponseWriter.WriteHeader(403)
+		u.Data["json"] = "无权查询其他用户"
+	}
+	var err error
+	var page models.Page
+	page.Offset, err = u.GetInt("offset")
+	if err != nil {
+		u.Ctx.ResponseWriter.WriteHeader(400)
+		u.Data["json"] = "请求参数类型错误"
+	}
+	page.Lmit, err = u.GetInt("limit")
+	if err != nil {
+		u.Ctx.ResponseWriter.WriteHeader(400)
+		u.Data["json"] = "请求参数类型错误"
+	}
+	page.Sort = analysisOrderBy(u.GetString("sort"))
+	var query models.UserPageQuery
+	query.Name = u.GetString("name")
+	query.Nickname = u.GetString("nickname")
+	query.Group = u.GetString("group")
+	query.Role = u.GetString("role")
+	query.CreatedAt = u.GetString("crt")
+	query.UpdatedAt = u.GetString("upt")
+	query.DeletedAt = u.GetString("det")
+	result, count, err := models.QueryPageUsers(query, page)
+	u.Data["json"] = map[string]interface{}{
+		"count": count,
+		"data":  result,
+	}
+	if err != nil {
+		u.Ctx.ResponseWriter.WriteHeader(400)
+		u.Data["json"] = "请求参数错误"
+	}
+	u.ServeJSON()
+
 }

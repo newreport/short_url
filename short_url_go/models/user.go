@@ -85,11 +85,12 @@ func UpdateUser(user User) bool {
 // @Param	query	models.UserPageQuery	查询参数
 // @Param	page	models.Page	分页查询struct
 // @Return	users	[]models.User,error
-func QueryPageUsers(query UserPageQuery, page Page) (result []User, err error) {
+func QueryPageUsers(query UserPageQuery, page Page) (result []User, count int64, err error) {
 	express := DB.Model(&User{})
 	if analysisRestfulRHS(express, "name", query.Name) &&
 		analysisRestfulRHS(express, "nickname", query.Nickname) &&
 		analysisRestfulRHS(express, "role", query.Nickname) {
+		express.Count(&count)
 		express = express.Order(page.Sort).Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
 		express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "remarks").Find(&result)
 	} else {

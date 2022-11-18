@@ -31,7 +31,7 @@ func (s *ShortController) CreateShort() {
 // @Date	2022-11-14
 // @Auth	sfhj
 // @Param	page	query	models.Page	true	分页
-// @Param	query	query	string	false	查询参数
+// @Param	query	query	models.ShortPageQuery	false	查询参数
 // @Success 200
 // @router / [get]
 func (s *ShortController) GetShortsByPage() {
@@ -39,10 +39,14 @@ func (s *ShortController) GetShortsByPage() {
 	var err error
 	var page models.Page
 	page.Offset, err = s.GetInt("offset")
+	if err != nil {
+		s.Ctx.ResponseWriter.WriteHeader(400)
+		s.Data["json"] = "请求参数类型错误"
+	}
 	page.Lmit, err = s.GetInt("limit")
 	if err != nil {
 		s.Ctx.ResponseWriter.WriteHeader(400)
-		s.Data["json"] = "请求参数错误"
+		s.Data["json"] = "请求参数类型错误"
 	}
 	page.Sort = analysisOrderBy(s.GetString("sort"))
 	var query models.ShortPageQuery
@@ -55,7 +59,7 @@ func (s *ShortController) GetShortsByPage() {
 	query.CreatedAt = s.GetString("crt")
 	query.UpdatedAt = s.GetString("upt")
 	query.DeletedAt = s.GetString("del")
-	result, count, err := models.QueryPageShort(query, page)
+	result, count, err := models.QueryPageShorts(query, page)
 	s.Data["json"] = map[string]interface{}{
 		"count": count,
 		"data":  result,

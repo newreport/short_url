@@ -152,13 +152,13 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 
 //https://www.cnblogs.com/liuhui5599/p/14081524.html
 
-// @Title	QueryPageShort
+// @Title	QueryPageShorts
 // @Auth	sfhj
 // @Date	2022-11-14
 // @Param	query	models.ShortPageQuery	查询参数
 // @Param	page	models.Page	分页查询
 // @Return	result	[]models.Shorts
-func QueryPageShort(query ShortPageQuery, page Page) (result []Short, count int64, err error) {
+func QueryPageShorts(query ShortPageQuery, page Page) (result []Short, count int64, err error) {
 	express := DB.Model(&Short{})
 	if analysisRestfulRHS(express, "source_url", query.SourceURL) &&
 		analysisRestfulRHS(express, "target_url", query.TargetURL) &&

@@ -36,12 +36,14 @@
                         "in": "query",
                         "name": "query",
                         "description": "查询参数",
-                        "type": "string"
+                        "schema": {
+                            "$ref": "#/definitions/models.ShortPageQuery"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "bool"
+                        "description": ""
                     }
                 }
             },
@@ -65,11 +67,48 @@
                 "responses": {
                     "200": {
                         "description": "{bool} add success"
+                    },
+                    "401": {
+                        "description": "string \tInsufficient user permissions"
                     }
                 }
             }
         },
         "/users/": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "user分页查询",
+                "operationId": "UserController.GetUsersByPage",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "分页",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Page"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "查询参数",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserPageQuery"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": "Insufficient user permissions"
+                    }
+                }
+            },
             "put": {
                 "tags": [
                     "users"
@@ -91,7 +130,7 @@
                     "200": {
                         "description": "{bool} update success!"
                     },
-                    "401": {
+                    "403": {
                         "description": "Insufficient user permissions"
                     }
                 }
@@ -118,7 +157,7 @@
                     "200": {
                         "description": "{bool} Create success"
                     },
-                    "401": {
+                    "403": {
                         "description": "Insufficient user permissions"
                     }
                 }
@@ -198,7 +237,7 @@
                     "200": {
                         "description": "{bool} update password success!"
                     },
-                    "401": {
+                    "403": {
                         "description": "Insufficient user permissions"
                     }
                 }
@@ -258,7 +297,7 @@
                         "description": "string Refresh success"
                     },
                     "401": {
-                        "description": "The user does not exist."
+                        "description": "refresh token 失效"
                     }
                 }
             }
@@ -287,7 +326,7 @@
                         "description": "{string} delete success!"
                     },
                     "403": {
-                        "description": "The uid is empty"
+                        "description": "Insufficient user permissions"
                     }
                 }
             }
@@ -346,16 +385,16 @@
                     "type": "integer",
                     "format": "int32"
                 },
+                "id": {
+                    "description": "主键uuid",
+                    "type": "string"
+                },
                 "isEnable": {
                     "description": "是否启用",
                     "type": "boolean"
                 },
                 "shortGroup": {
                     "description": "外键关联分组",
-                    "type": "string"
-                },
-                "sid": {
-                    "description": "主键uuid",
                     "type": "string"
                 },
                 "sourceMD5": {
@@ -373,6 +412,39 @@
                 "upt": {
                     "type": "string",
                     "format": "datetime"
+                }
+            }
+        },
+        "models.ShortPageQuery": {
+            "title": "ShortPageQuery",
+            "type": "object",
+            "properties": {
+                "crt": {
+                    "type": "string"
+                },
+                "det": {
+                    "type": "string"
+                },
+                "exp": {
+                    "type": "string"
+                },
+                "group": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_enable": {
+                    "type": "string"
+                },
+                "source_url": {
+                    "type": "string"
+                },
+                "target_url": {
+                    "type": "string"
+                },
+                "upt": {
+                    "type": "string"
                 }
             }
         },
@@ -444,6 +516,33 @@
                     "description": "配置项：url默认长度",
                     "type": "integer",
                     "format": "int32"
+                }
+            }
+        },
+        "models.UserPageQuery": {
+            "title": "UserPageQuery",
+            "type": "object",
+            "properties": {
+                "crt": {
+                    "type": "string"
+                },
+                "det": {
+                    "type": "string"
+                },
+                "group": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "upt": {
+                    "type": "string"
                 }
             }
         },
