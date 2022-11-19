@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"short_url_go/common"
 	"short_url_go/models"
-	"strconv"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -52,18 +51,18 @@ func (u *UserController) Register() {
 	user.Role = 0
 	user.DefaultURLLength = 6
 	if models.CreateUser(user) > 0 {
-		u.Ctx.WriteString("创建成功")
+		u.Ctx.WriteString("注册成功")
 	} else {
-		u.Ctx.WriteString("创建失败")
+		u.Ctx.WriteString("注册失败")
 	}
 }
 
 // @Title Login
 // @Description logs.Info user into the system
 // @Summary 登录
-// @Param	body		body 	models.User	true		"The username for login"
+// @Param	body		body 	controllers.Login	true		"The username for login"
 // @Success 200 {models.User}	Login success
-// @Failure 401 {string}	The user does not exist.
+// @Failure 401 string	The user does not exist.
 // @router /login [post]
 func (u *UserController) Login() {
 	u.infos()
@@ -77,6 +76,11 @@ func (u *UserController) Login() {
 		u.Ctx.ResponseWriter.WriteHeader(401)
 		u.Ctx.WriteString("没有找到用户")
 	}
+}
+
+type Login struct {
+	Name     string `json:"name"`
+	Password string `json:"pwd"`
 }
 
 // @Title account tocken
@@ -180,16 +184,20 @@ func (u *UserController) UpdateUser() {
 // @Title Update password
 // @Summary 修改一个用户的密码
 // @Description update the user's password
+// @Param	uid	path 	int true "用户id"
 // @Param	body	body 	string true "body for password"
 // @Success 200	{string}	update password success!
 // @Failure 403	{string}	Insufficient user permissions
-// @router /pwd/:uid [patch]
+// @router /:uid/pwd [patch]
 func (u *UserController) UpdateUserPassword() {
-	uid := u.GetString(":uid")
-	id, _ := strconv.ParseUint(uid, 10, 64)
+	id, err := u.GetUint64(":uid")
+	if err != nil {
+		u.Ctx.ResponseWriter.WriteHeader(400)
+		u.Ctx.WriteString("参数类型错误")
+	}
 	var pwd string
 	accInfo := u.analysisAccountClaims()
-	if uint(id) == accInfo.ID {
+	if uint(id) == accInfo.ID || accInfo.Role == 1 {
 		json.Unmarshal(u.Ctx.Input.RequestBody, &pwd)
 		if models.UpdatePassword(uint(id), pwd) {
 			u.Ctx.WriteString("修改成功")
@@ -198,7 +206,7 @@ func (u *UserController) UpdateUserPassword() {
 		}
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(403)
-		u.Ctx.WriteString("无权修改密码")
+		u.Ctx.WriteString("无权修改他人密码")
 	}
 }
 
@@ -206,8 +214,16 @@ func (u *UserController) UpdateUserPassword() {
 // @Summary	user分页查询
 // @Date	2022-11-18
 // @Auth	sfhj
-// @Param	page	query	models.Page	true	分页
-// @Param	query	query	models.UserPageQuery	false	查询参数
+// @Param	offset	query	int	true	偏移量
+// @Param	limit	query	int	true	指定返回记录的数量
+// @Param	sort	query	string	true	排序
+// @Param	name	query	string	false	账号
+// @Param	nickname	query	string	false	昵称
+// @Param	group	query	string	false	分组
+// @Param	role	query	string	false	权限
+// @Param	crt	query	string	false	创建时间
+// @Param	upt	query	string	false	修改时间
+// @Param	det	query	string	false	删除时间
 // @Success	200
 // @Failure 403	{string}	Insufficient user permissions
 // @router / [get]
@@ -230,15 +246,7 @@ func (u *UserController) GetUsersByPage() {
 		u.Ctx.WriteString("请求参数类型错误")
 	}
 	page.Sort = analysisOrderBy(u.GetString("sort"))
-	var query models.UserPageQuery
-	query.Name = u.GetString("name")
-	query.Nickname = u.GetString("nickname")
-	query.Group = u.GetString("group")
-	query.Role = u.GetString("role")
-	query.CreatedAt = u.GetString("crt")
-	query.UpdatedAt = u.GetString("upt")
-	query.DeletedAt = u.GetString("det")
-	result, count, err := models.QueryPageUsers(query, page)
+	result, count, err := models.QueryUsersPage(page, u.GetString("name"), u.GetString("nickname"), u.GetString("role"), u.GetString("group"))
 	if err != nil {
 		u.Ctx.ResponseWriter.WriteHeader(400)
 		u.Ctx.WriteString("请求参数错误")

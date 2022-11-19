@@ -27,22 +27,18 @@ type User struct { //用户表
 	AutoInsertSpace  bool           `json:"autoInsertSpace"`                //盘古之白
 }
 
-// 分页查询
-type UserPageQuery struct {
-	Name      string `json:"name"`
-	Nickname  string `json:"nickname"`
-	Group     string `json:"group"`
-	Role      string `json:"role"`
-	CreatedAt string `json:"crt"`
-	UpdatedAt string `json:"upt"`
-	DeletedAt string `json:"det"`
-}
-
 // @Title 获取所有用户
 func GetAllUsers() []User {
 	var users []User
 	DB.Order("created_at desc").Find(&users)
 	return users
+}
+
+// @Title 创建用户
+func CreateUser(user User) uint {
+	user.Password = uuid.NewV5(U5Seed, user.Password).String()
+	DB.Create(&user)
+	return user.ID
 }
 
 // @Title 登录
@@ -51,13 +47,6 @@ func Login(username, password string) User {
 	password = uuid.NewV5(U5Seed, password).String()
 	DB.Model(&User{}).Where(&User{Name: username, Password: password}).First(&user)
 	return user
-}
-
-// @Title 创建用户
-func CreateUser(user User) uint {
-	user.Password = uuid.NewV5(U5Seed, user.Password).String()
-	DB.Create(&user)
-	return user.ID
 }
 
 // @Title 根据id删除用户
@@ -82,14 +71,15 @@ func UpdateUser(user User) bool {
 // @Title	分页查询
 // @Auth	sfhj
 // @Date	2022-11-15
-// @Param	query	models.UserPageQuery	查询参数
+// @Param	query	models.UserQueryUsersPage	查询参数
 // @Param	page	models.Page	分页查询struct
 // @Return	users	[]models.User,error
-func QueryPageUsers(query UserPageQuery, page Page) (result []User, count int64, err error) {
+func QueryUsersPage(page Page, name string, nickname string, role string, group string) (result []User, count int64, err error) {
 	express := DB.Model(&User{})
-	if analysisRestfulRHS(express, "name", query.Name) &&
-		analysisRestfulRHS(express, "nickname", query.Nickname) &&
-		analysisRestfulRHS(express, "role", query.Nickname) {
+	if analysisRestfulRHS(express, "name", name) &&
+		analysisRestfulRHS(express, "nickname", group) &&
+		analysisRestfulRHS(express, "role", role) &&
+		analysisRestfulRHS(express, "group", group) {
 		express.Count(&count)
 		express = express.Order(page.Sort).Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
 		express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "remarks").Find(&result)

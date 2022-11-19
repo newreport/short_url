@@ -17,22 +17,61 @@ paths:
       tags:
       - shorts
       summary: 分頁查詢
-      operationId: ShortController.get shorts by page
+      operationId: ShortController.getShortsPage
       parameters:
       - in: query
-        name: page
-        description: 分页
+        name: offset
+        description: 偏移量
         required: true
-        schema:
-          $ref: '#/definitions/models.Page'
+        type: integer
+        format: int64
       - in: query
-        name: query
-        description: 查询参数
-        schema:
-          $ref: '#/definitions/models.ShortPageQuery'
+        name: limit
+        description: 指定返回记录的数量
+        required: true
+        type: integer
+        format: int64
+      - in: query
+        name: sort
+        description: 排序
+        required: true
+        type: string
+      - in: query
+        name: source_url
+        description: 源url
+        type: string
+      - in: query
+        name: target_url
+        description: 目标url
+        type: string
+      - in: query
+        name: group
+        description: 分组
+        type: string
+      - in: query
+        name: is_enable
+        description: 是否启用
+        type: string
+      - in: query
+        name: exp
+        description: 过期时间
+        type: string
+      - in: query
+        name: crt
+        description: 创建时间
+        type: string
+      - in: query
+        name: upt
+        description: 修改时间
+        type: string
+      - in: query
+        name: det
+        description: 删除时间
+        type: string
       responses:
         "200":
           description: ""
+  /shorts/default_length/{len}:
     post:
       tags:
       - shorts
@@ -42,16 +81,22 @@ paths:
         <br>
       operationId: ShortController.create short
       parameters:
+      - in: path
+        name: len
+        description: 默认长度
+        schema:
+          $ref: '#/definitions/len'
       - in: body
-        name: short
-        description: body for short
+        name: body
+        description: 链接
+        required: true
         schema:
           $ref: '#/definitions/models.Short'
       responses:
         "200":
-          description: "{string}\tadd success"
+          description: "{string}\t\"add success\""
         "401":
-          description: "{string} \tInsufficient user permissions"
+          description: "{string} \t\"Insufficient user permissions\""
   /users/:
     get:
       tags:
@@ -60,16 +105,50 @@ paths:
       operationId: UserController.GetUsersByPage
       parameters:
       - in: query
-        name: page
-        description: 分页
+        name: offset
+        description: 偏移量
         required: true
-        schema:
-          $ref: '#/definitions/models.Page'
+        type: integer
+        format: int64
       - in: query
-        name: query
-        description: 查询参数
-        schema:
-          $ref: '#/definitions/models.UserPageQuery'
+        name: limit
+        description: 指定返回记录的数量
+        required: true
+        type: integer
+        format: int64
+      - in: query
+        name: sort
+        description: 排序
+        required: true
+        type: string
+      - in: query
+        name: name
+        description: 账号
+        type: string
+      - in: query
+        name: nickname
+        description: 昵称
+        type: string
+      - in: query
+        name: group
+        description: 分组
+        type: string
+      - in: query
+        name: role
+        description: 权限
+        type: string
+      - in: query
+        name: crt
+        description: 创建时间
+        type: string
+      - in: query
+        name: upt
+        description: 修改时间
+        type: string
+      - in: query
+        name: det
+        description: 删除时间
+        type: string
       responses:
         "200":
           description: ""
@@ -135,6 +214,34 @@ paths:
           description: "{string}\tdelete success!"
         "403":
           description: "{string}\tInsufficient user permissions"
+  /users/{uid}/pwd:
+    patch:
+      tags:
+      - users
+      summary: 修改一个用户的密码
+      description: |-
+        update the user's password
+        <br>
+      operationId: UserController.Update password
+      parameters:
+      - in: path
+        name: uid
+        description: 用户id
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        description: body for password
+        required: true
+        schema:
+          type: string
+        type: string
+      responses:
+        "200":
+          description: "{string}\tupdate password success!"
+        "403":
+          description: "{string}\tInsufficient user permissions"
   /users/all:
     get:
       tags:
@@ -166,34 +273,12 @@ paths:
         description: The username for login
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/controllers.Login'
       responses:
         "200":
           description: "{models.User}\tLogin success"
         "401":
-          description: "{string}\tThe user does not exist."
-  /users/pwd/{uid}:
-    patch:
-      tags:
-      - users
-      summary: 修改一个用户的密码
-      description: |-
-        update the user's password
-        <br>
-      operationId: UserController.Update password
-      parameters:
-      - in: body
-        name: body
-        description: body for password
-        required: true
-        schema:
-          type: string
-        type: string
-      responses:
-        "200":
-          description: "{string}\tupdate password success!"
-        "403":
-          description: "{string}\tInsufficient user permissions"
+          description: "string\tThe user does not exist."
   /users/register:
     post:
       tags:
@@ -238,27 +323,23 @@ paths:
         "401":
           description: "{string}\trefresh token 失效"
 definitions:
+  controllers.Login:
+    title: Login
+    type: object
+    properties:
+      name:
+        type: string
+      pwd:
+        type: string
   gorm.DeletedAt:
     title: DeletedAt
     type: object
   http:
     title: http
     type: object
-  models.Page:
-    title: Page
+  len:
+    title: len
     type: object
-    properties:
-      limit:
-        description: 指定返回记录的数量
-        type: integer
-        format: int64
-      offset:
-        description: 偏移量
-        type: integer
-        format: int64
-      sort:
-        description: 排序 RHS 例:id+,create_at- ——> id asc,create_at desc
-        type: string
   models.Short:
     title: Short
     type: object
@@ -299,28 +380,6 @@ definitions:
       upt:
         type: string
         format: datetime
-  models.ShortPageQuery:
-    title: ShortPageQuery
-    type: object
-    properties:
-      crt:
-        type: string
-      det:
-        type: string
-      exp:
-        type: string
-      group:
-        type: string
-      id:
-        type: string
-      is_enable:
-        type: string
-      source_url:
-        type: string
-      target_url:
-        type: string
-      upt:
-        type: string
   models.User:
     title: User
     type: object
@@ -375,24 +434,6 @@ definitions:
         description: 配置项：url默认长度
         type: integer
         format: int32
-  models.UserPageQuery:
-    title: UserPageQuery
-    type: object
-    properties:
-      crt:
-        type: string
-      det:
-        type: string
-      group:
-        type: string
-      name:
-        type: string
-      nickname:
-        type: string
-      role:
-        type: string
-      upt:
-        type: string
   unit:
     title: unit
     type: object

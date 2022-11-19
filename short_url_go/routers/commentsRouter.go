@@ -9,18 +9,18 @@ func init() {
 
     beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
         beego.ControllerComments{
-            Method: "CreateShort",
+            Method: "GetShortsPage",
             Router: `/`,
-            AllowHTTPMethods: []string{"post"},
+            AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})
 
     beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
         beego.ControllerComments{
-            Method: "GetShortsByPage",
-            Router: `/`,
-            AllowHTTPMethods: []string{"get"},
+            Method: "CreateShort",
+            Router: `/default_length/:len`,
+            AllowHTTPMethods: []string{"post"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})
@@ -63,6 +63,15 @@ func init() {
 
     beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
         beego.ControllerComments{
+            Method: "UpdateUserPassword",
+            Router: `/:uid/pwd`,
+            AllowHTTPMethods: []string{"patch"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
+        beego.ControllerComments{
             Method: "GetAllUsers",
             Router: `/all`,
             AllowHTTPMethods: []string{"get"},
@@ -75,15 +84,6 @@ func init() {
             Method: "Login",
             Router: `/login`,
             AllowHTTPMethods: []string{"post"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
-        beego.ControllerComments{
-            Method: "UpdateUserPassword",
-            Router: `/pwd/:uid`,
-            AllowHTTPMethods: []string{"patch"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})

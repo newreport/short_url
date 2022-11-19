@@ -28,7 +28,7 @@ type Short struct {
 	Remarks      string         //备注
 }
 
-type ShortPageQuery struct {
+type ShortQueryParams struct {
 	ID         string `json:"id"`
 	SourceURL  string `json:"source_url"`
 	TargetURL  string `json:"target_url"`
@@ -152,22 +152,23 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 
 //https://www.cnblogs.com/liuhui5599/p/14081524.html
 
-// @Title	QueryPageShorts
+// @Title	QueryShortsPage
 // @Auth	sfhj
 // @Date	2022-11-14
-// @Param	query	models.ShortPageQuery	查询参数
+// @Param	query	models.ShortQueryParams	查询参数
 // @Param	page	models.Page	分页查询
-// @Return	result	[]models.Shorts
-func QueryPageShorts(query ShortPageQuery, page Page) (result []Short, count int64, err error) {
+// @Return	result
+func QueryShortsPage(page Page, fkUser string, sourceURL string, targetURL string, shortGroup string, isEnable string, exp string, crt string, upt string, del string) (result []Short, count int64, err error) {
 	express := DB.Model(&Short{})
-	if analysisRestfulRHS(express, "source_url", query.SourceURL) &&
-		analysisRestfulRHS(express, "target_url", query.TargetURL) &&
-		analysisRestfulRHS(express, "short_group", query.ShortGroup) &&
-		analysisRestfulRHS(express, "is_enable", query.IsEnable) &&
-		analysisRestfulRHS(express, "expire_at", query.ExpireAt) &&
-		analysisRestfulRHS(express, "created_at", query.CreatedAt) &&
-		analysisRestfulRHS(express, "updated_at", query.UpdatedAt) &&
-		analysisRestfulRHS(express, "deleted_at", query.DeletedAt) {
+	if analysisRestfulRHS(express, "fk_user", fkUser) &&
+		analysisRestfulRHS(express, "source_url", sourceURL) &&
+		analysisRestfulRHS(express, "target_url", targetURL) &&
+		analysisRestfulRHS(express, "short_group", shortGroup) &&
+		analysisRestfulRHS(express, "is_enable", isEnable) &&
+		analysisRestfulRHS(express, "expire_at", exp) &&
+		analysisRestfulRHS(express, "created_at", crt) &&
+		analysisRestfulRHS(express, "updated_at", upt) &&
+		analysisRestfulRHS(express, "deleted_at", del) {
 		express.Count(&count)
 		express.Order(page.Sort).Select("id,source_url,source_url_md5,target_url,fk_user,short_group,is_enable,expire_at,create_at,remarks").Find(&result)
 	} else {
