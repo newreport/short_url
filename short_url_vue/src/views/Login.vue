@@ -14,6 +14,8 @@ const pwd = ref('')
 
 // console.log('open1 VITE_APP_TITLE:' + import.meta.env.VITE_API_DOMAIN);
 
+console.log("test")
+
 const login = () => {
   const login = async () => {
     const loginParams = {
