@@ -177,6 +177,12 @@ func QueryShortsPage(page Page, fkUser string, sourceURL string, targetURL strin
 	return
 }
 
+func QueryShortByID(id string) Short {
+	var one Short
+	DB.Model(&Short{}).Where("id = ?", id).First(&one)
+	return one
+}
+
 // @Title DeletedShortUrlById
 // @Description	根據id刪除url
 func DeletedShortUrlById(id string) bool {

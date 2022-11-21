@@ -37,6 +37,28 @@ func (s *ShortController) CreateShort() {
 	}
 }
 
+// @Title	DeleteShort
+// @Summary	根据id删除一个短链接
+// @Param	sid	path	string true	"链接id"
+// @Success	200	{string}	"delete success!"
+// @Failure	403	{string}	"无权删除"
+// @router	/:sid	[delete]
+func (s *ShortController) DeleteShort() {
+	sid := s.GetString(":sid")
+	accInfo := s.analysisAccountClaims()
+	short := models.QueryShortByID(sid)
+	if accInfo.ID != short.FKUser {
+		s.Ctx.ResponseWriter.WriteHeader(403)
+		s.Ctx.WriteString("无权删除其他用户的链接")
+	} else {
+		if models.DeletedShortUrlById(sid) {
+			s.Ctx.WriteString("delete success!")
+		} else {
+			s.Ctx.WriteString("delete fail!")
+		}
+	}
+}
+
 // @Title	getShortsPage
 // @Summary	分頁查詢
 // @Date	2022-11-14
