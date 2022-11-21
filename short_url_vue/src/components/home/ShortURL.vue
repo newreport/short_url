@@ -12,7 +12,7 @@
         start-placeholder="Start date" end-placeholder="End date" />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="onSubmit">Query</el-button>
+      <el-button type="primary" @click="getShortsPage">Query</el-button>
     </el-form-item>
   </el-form>
 
@@ -96,17 +96,23 @@ const form = reactive({
   isExp: false
 })
 
-const getPage=()=>{
-  const getPage=async()=>{
-    const getPageParams={
+const getShortsPage=()=>{
+  console.log("form内容：")
+  console.log(form)
+  console.log(form.sourceURL)
+  const getShortsPage=async()=>{
+    const getShortsPageParams={
       offset:0,
-      limit:0,
-      source_url:form.sourceURL?"":"lk"+form.sourceURL,
-      target_url:form.shortURL?"":"lk"+form.shortURL,
-      group:form.group,
-      crt:form.createdAt?"":"",
+      limit:50,
+      sort:"",
+      source_url:form.sourceURL.length==0?"":"lk"+form.sourceURL,
+      target_url:form.shortURL.length==0?"2":"lk"+form.shortURL,
     }
+    ShortService.getShortsPage(getShortsPageParams).then(result=>{
+      console.log(result)
+    })
   }
+  getShortsPage()
 }
 
 
@@ -166,7 +172,7 @@ const tableData = [
 ]
 
 const input = ref('')
-const onSubmit = () => {
+const queryPage = () => {
   console.log('submit!')
 }
 

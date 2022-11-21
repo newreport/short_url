@@ -23,7 +23,10 @@ import (
 // 过滤器all
 var FilterToken = func(ctx *context.Context) {
 	logs.Info("current router path is ", ctx.Request.RequestURI)
-	if ctx.Request.RequestURI != "/v1/user/all" && ctx.Request.RequestURI != "/v1/user/login" && ctx.Request.RequestURI != "/v1/user/register" {
+	if ctx.Request.RequestURI != "/v1/users/all" &&
+		ctx.Request.RequestURI != "/v1/users/login" &&
+		ctx.Request.RequestURI != "/v1/users/register" &&
+		ctx.Request.RequestURI != "/v1/users/tocken/account" {
 		//没有token
 		if ctx.Input.Header("Authorization") == "" {
 			logs.Error("without token, unauthorized !!")
@@ -32,7 +35,7 @@ var FilterToken = func(ctx *context.Context) {
 		} else {
 			//accessToken错误
 			token := ctx.Input.Header("Authorization")
-			token = strings.Split(token, "")[1]
+			token = strings.Split(token, " ")[1]
 			logs.Info("curernttoken: ", token)
 			ok := controllers.AuthenticationJWT(token)
 			if !ok {
@@ -45,7 +48,7 @@ var FilterToken = func(ctx *context.Context) {
 
 // https://beego.gocn.vip/
 func init() {
-	// beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
+	beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
 	// beego.InsertFilter("/*", beego.BeforeRouter, cors.Allow(&cors.Options{
 	// 	// 允许访问所有源
 	// 	AllowAllOrigins: true,
@@ -60,9 +63,10 @@ func init() {
 	// }))
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
-		// AllowOrigins:    []string{"*"},
-		// AllowMethods:    []string{"*"},
-		// AllowHeaders:    []string{"*"},
+	     //其中Options跨域复杂请求预检
+		 AllowMethods:   []string{"*"},
+		 //指的是允许的Header的种类
+		 AllowHeaders:   []string{"*"},
 		// AllowCredentials: true,
 	}))
 	ns := beego.NewNamespace("/v1",

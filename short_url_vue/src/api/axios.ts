@@ -26,6 +26,8 @@ axios.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.log("请求error:");
+    console.log(error);
     return Promise.reject(error);
   }
 );
@@ -33,14 +35,22 @@ axios.interceptors.request.use(
 // http response 拦截器
 axios.interceptors.response.use(
   (response) => {
+    console.log("响应response:");
+    console.log(response);
     return response;
   },
   (error) => {
+    console.log("响应error:");
+    console.log(error);
+    console.log("响应errorResponse:");
+    console.log(error.response);
     const { response } = error;
+
     if (response) {
       showMessage(response.status); // 传入响应码，匹配响应码对应信息
       return Promise.reject(response.data);
     } else {
+      console.log("进入异常");
       ElMessage.warning("网络连接异常,请稍后再试!");
     }
   }
@@ -64,14 +74,17 @@ export function request(url = "", params = {}, type = "POST") {
           data: params,
         });
       } else if (type.toUpperCase() == "PUT") {
-
       }
       //处理返回
       promise
         .then((res) => {
+          console.log("promiseRES：");
+          console.log(res);
           resolve(res);
         })
         .catch((err) => {
+          console.log("promiseERR：");
+          console.log(err);
           reject(err);
         });
     }

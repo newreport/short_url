@@ -15,7 +15,7 @@ import (
 
 type Short struct {
 	ID           string         `json:"id" gorm:"primaryKey,size:50;"`         //主键uuid
-	SourceURL    string         `json:"sourceUrl" gorm:"not null"`             //需要跳转的url
+	SourceURL    string         `json:"sourceURL" gorm:"not null"`             //需要跳转的url
 	SourceUrlMD5 string         `json:"sourceMD5" gorm:"not null"`             //需要跳转url的MD5
 	TargetURL    string         `json:"targetURL" gorm:"not null;uniqueIndex"` //目标URL
 	FKUser       uint           `json:"fkUser" gorm:"not null"`                //外键关联用户
@@ -25,7 +25,7 @@ type Short struct {
 	CreatedAt    time.Time      `json:"crt"`
 	UpdatedAt    time.Time      `json:"upt"`
 	DeletedAt    gorm.DeletedAt `json:"det" gorm:"index"`
-	Remarks      string         //备注
+	Remarks      string         `json:"remarks"` //备注
 }
 
 type ShortQueryParams struct {
@@ -57,7 +57,7 @@ func CreateShort(short Short, length int) bool {
 	short.ID = uuid.Must(uuid.NewV4(), err).String()
 	short.TargetURL = generateUrl(short.TargetURL, length)
 	short.SourceUrlMD5 = common.MD5(short.SourceURL)
-	result := DB.Create(short)
+	result := DB.Create(&short)
 	if err != nil {
 		panic("failed to add one assign length short url")
 	}
@@ -79,7 +79,7 @@ func CreateShortCustom(short Short) bool {
 	if count > 0 { //已存在
 		return false
 	}
-	result := DB.Create(short)
+	result := DB.Create(&short)
 	if err != nil {
 		panic("failed to add one assign length short url")
 	}
@@ -143,7 +143,7 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 			return !lo.Contains[string](existTargetURLs, s.SourceURL)
 		}).ToSlice(&shorts)
 	}
-	DB.Create(shorts)
+	DB.Create(&shorts)
 	if err != nil {
 		panic("failed to add one assign length short url")
 	}
@@ -215,10 +215,10 @@ func generateUrl(url string, length int) (result string) {
 		// fmt.Print("num:", num)
 		by := common.UInt32ToBytes(uint32(num))
 		//将数据密度提升至16个字节，即短url支持4~16长度，有(4*5*6*....*15*16)^64种可能性
-		by = append(by, by[0]&by[1])
-		by = append(by, by[1]|by[2])
-		by = append(by, by[2]^by[3])
-		by = append(by, by[3]&^by[0])
+		by = append(by, by[0]&by[1])  //与
+		by = append(by, by[1]|by[2])  //非
+		by = append(by, by[2]^by[3])  //或
+		by = append(by, by[3]&^by[0]) //异或
 
 		by = append(by, by[0]&by[2])
 		by = append(by, by[1]|by[3])
@@ -230,7 +230,6 @@ func generateUrl(url string, length int) (result string) {
 		by = append(by, by[2]^by[1])
 		by = append(by, by[3]&^by[2])
 
-		// fmt.Println("   ;smbit：", by)
 		for j := 0; j < length; j++ {
 			urlNum := by[j] % 64
 			result += string(URLSTRS[urlNum])

@@ -29,19 +29,25 @@ router.beforeEach((to, from) => {
     //F5进入页面
     //重新读取token
     let base = new base64();
-    let refreshToken = base.decode(localStorage.getItem("refreshToken"));
-    let accessToken = base.decode(localStorage.getItem("accessToken"));
+    let refreshToken = localStorage.getItem("refreshToken");
+    let accessToken = localStorage.getItem("accessToken");
     if (refreshToken) {
+      refreshToken = base.decode(refreshToken);
       store.commit("refreshToken", refreshToken);
       if (accessToken) {
+        accessToken = base.decode(accessToken);
         store.commit("accessToken", accessToken);
       }
     } else {
       store.commit("cleanToken");
-      return { name: "Login" };
     }
-    if(to.name == 'Login'){//登录了但是又返回登录页面
+    if (to.name == "Login"&&store.state.token.id >0) {
+      //登录了但是又返回登录页面
+      console.log("quIndex")
       return { name: "Index" };
+    }else if (to.name != "Login"&&store.state.token.id == -1){
+      console.log("去Login")
+      return {name:"Login"}
     }
   }
 });

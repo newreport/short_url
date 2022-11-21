@@ -344,8 +344,6 @@ definitions:
     title: Short
     type: object
     properties:
-      Remarks:
-        type: string
       crt:
         type: string
         format: datetime
@@ -365,13 +363,16 @@ definitions:
       isEnable:
         description: 是否启用
         type: boolean
+      remarks:
+        description: 备注
+        type: string
       shortGroup:
         description: 外键关联分组
         type: string
       sourceMD5:
         description: 需要跳转url的MD5
         type: string
-      sourceUrl:
+      sourceURL:
         description: 需要跳转的url
         type: string
       targetURL:
@@ -388,7 +389,7 @@ definitions:
         description: id
         type: integer
         format: int32
-      authorUrl:
+      authorURL:
         description: 头像地址
         type: string
       autoInsertSpace:

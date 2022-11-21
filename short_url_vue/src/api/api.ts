@@ -47,14 +47,15 @@ export class ShortService{
     }
     /**
      * @description 新增一个短链接
-     * @param   {bool} is_enable   //是否启用
-     * @param   {string}    short_group //分组
-     * @param   {string}    source_url  //源链接
-     * @param   {string}    target_url  //目标url
+     * @param   {string}    shortGroup //分组
+     * @param   {string}    sourceURL  //源链接
+     * @param   {bool}  isEnable   //是否启用
+     * @param   {string}    targetURL  //目标url
      * @param   {int}   length  //默认长度
+     * @param   {string}    remarks //备注
      */
     static async createShort(data){
-        return  request('/shorts',data,'post')
+        return  request('/shorts/default_length/'+data.length,data,'post')
     }
 
 }

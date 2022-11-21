@@ -29,13 +29,15 @@ type RefreshClaims struct {
 // @Return result  controllers.AccountClaims
 func (b *BaseController) analysisAccountClaims() (result AccountClaims) {
 	tokenString := b.Ctx.Input.Header("Authorization")
-	tokenString = strings.Split(tokenString, "")[1]
-	token, _ := jwt.ParseWithClaims(tokenString, &AccountClaims{}, func(token *jwt.Token) (interface{}, error) {
-		key, _ := common.INIconf.String("JWT::AccessTokenKey")
-		return []byte(key), nil
-	})
-	if claims, ok := token.Claims.(*AccountClaims); ok && token.Valid {
-		result = *claims
+	if len(tokenString) > 0 {
+		tokenString = strings.Split(tokenString, " ")[1]
+		token, _ := jwt.ParseWithClaims(tokenString, &AccountClaims{}, func(token *jwt.Token) (interface{}, error) {
+			key, _ := common.INIconf.String("JWT::AccessTokenKey")
+			return []byte(key), nil
+		})
+		if claims, ok := token.Claims.(*AccountClaims); ok && token.Valid {
+			result = *claims
+		}
 	}
 	return
 }

@@ -19,7 +19,7 @@ type User struct { //用户表
 	Password         string         `json:"pwd" gorm:"not null"`            //密码
 	Role             int8           `json:"role" gorm:"not null"`           //角色
 	DefaultURLLength uint8          `json:"urlLength" gorm:"not null"`      //配置项：url默认长度
-	AuthorURL        string         `json:"authorUrl"`                      //头像地址
+	AuthorURL        string         `json:"authorURL"`                      //头像地址
 	Phone            string         `json:"phone"`                          //手机号
 	Group            string         `json:"group"`                          //分组
 	Remarks          string         `json:"remarks"`                        //备注
