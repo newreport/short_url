@@ -26,9 +26,9 @@ func (s *ShortController) CreateShort() {
 	short.FKUser = accInfo.ID
 	var result bool
 	if len(short.TargetURL) > 0 {
-		result = models.CreateShort(short, 6)
-	} else {
 		result = models.CreateShortCustom(short)
+	} else {
+		result = models.CreateShort(short, 6)
 	}
 	if result {
 		s.Ctx.WriteString("创建成功")

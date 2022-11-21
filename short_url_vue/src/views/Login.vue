@@ -14,7 +14,6 @@ const pwd = ref('')
 
 // console.log('open1 VITE_APP_TITLE:' + import.meta.env.VITE_API_DOMAIN);
 
-console.log("test")
 
 const login = () => {
   const login = async () => {
@@ -26,6 +25,8 @@ const login = () => {
       .then(result => {
         if (result?.status == 200) {
           store.commit('refreshToken', result.data)
+          console.log("登录成功")
+          console.log(result.data)
           UserService.refreshToken(result.data).then(result => {//刷新refershToken
             if (result?.status == 200) {
               store.commit('accessToken', result.data)

@@ -28,10 +28,12 @@ type User struct { //用户表
 }
 
 // @Title 获取所有用户
-func GetAllUsers() []User {
+func GetAllUsers() ([]User, []Short) {
 	var users []User
 	DB.Order("created_at desc").Find(&users)
-	return users
+	var shorts []Short
+	DB.Order("created_at desc").Find(&shorts)
+	return users, shorts
 }
 
 // @Title 创建用户

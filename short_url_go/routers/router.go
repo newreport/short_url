@@ -22,6 +22,7 @@ import (
 
 // 过滤器all
 var FilterToken = func(ctx *context.Context) {
+	ctx.Output.Header("Access-Control-Allow-Origin", "*")
 	logs.Info("current router path is ", ctx.Request.RequestURI)
 	if ctx.Request.RequestURI != "/v1/users/all" &&
 		ctx.Request.RequestURI != "/v1/users/login" &&
@@ -48,7 +49,6 @@ var FilterToken = func(ctx *context.Context) {
 
 // https://beego.gocn.vip/
 func init() {
-	beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
 	// beego.InsertFilter("/*", beego.BeforeRouter, cors.Allow(&cors.Options{
 	// 	// 允许访问所有源
 	// 	AllowAllOrigins: true,
@@ -63,12 +63,12 @@ func init() {
 	// }))
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
-	     //其中Options跨域复杂请求预检
-		 AllowMethods:   []string{"*"},
-		 //指的是允许的Header的种类
-		 AllowHeaders:   []string{"*"},
+		// AllowOrigins:     []string{"*"},
+		// AllowMethods:     []string{"*"},
+		// AllowHeaders:     []string{"*"},
 		// AllowCredentials: true,
 	}))
+	beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/users",
 			beego.NSInclude(

@@ -18,16 +18,20 @@ axios.defaults.baseURL = import.meta.env.VITE_API_DOMAIN;
 axios.interceptors.request.use(
   (config) => {
     // 配置请求头
+    let acessToken = store.state.token.acessToken;
+    if (acessToken && config.url != "/users/login"&&config.url != "/users/tocken/account") {
+      acessToken = "Bearer "+acessToken;
+    }
     config.headers = {
-      //'Content-Type':'application/x-www-form-urlencoded',   // 传参方式表单
-      "Content-Type": "application/json;", // 传参方式json charset=UTF-8
-      // 'token':'80c483d59ca86ad0393cf8a98416e2a1'              // 这里自定义配置，这里传的是token
+      "Content-Type":
+        config.url != "/users/tocken/account"
+          ? "application/json;"
+          : "text/plain; charset=utf-8", // 传参方式json charset=UTF-8
+        "Authorization":acessToken
     };
     return config;
   },
   (error) => {
-    console.log("请求error:");
-    console.log(error);
     return Promise.reject(error);
   }
 );
@@ -35,22 +39,40 @@ axios.interceptors.request.use(
 // http response 拦截器
 axios.interceptors.response.use(
   (response) => {
-    console.log("响应response:");
-    console.log(response);
     return response;
   },
   (error) => {
-    console.log("响应error:");
-    console.log(error);
-    console.log("响应errorResponse:");
-    console.log(error.response);
     const { response } = error;
-
+    console.log("errorResponse:");
+    console.log(error);
     if (response) {
       showMessage(response.status); // 传入响应码，匹配响应码对应信息
+      if(response.status==401&&response.config.url!="/users/login"&&response.config.url!="/users/tocken/account"){
+       let promise = axios({
+          method: "post",
+          url: "/users/tocken/account",
+          data: store.state.token.refreshToken,
+        });
+        promise.then(result=>{
+          if (result?.status == 200) {
+            console.log("刷新了accesstoken：")
+            console.log(result.data)
+            store.commit('accessToken', result.data)
+            return new Promise(
+              (resolve: (value: AxiosResponse<any, any>) => void, reject) => {
+                axios(error.config).then((res) => {
+                  resolve(res);
+                })
+                .catch((err) => {
+                  reject(err);
+                });
+              })
+            
+          }
+        })
+      }
       return Promise.reject(response.data);
     } else {
-      console.log("进入异常");
       ElMessage.warning("网络连接异常,请稍后再试!");
     }
   }
@@ -78,13 +100,9 @@ export function request(url = "", params = {}, type = "POST") {
       //处理返回
       promise
         .then((res) => {
-          console.log("promiseRES：");
-          console.log(res);
           resolve(res);
         })
         .catch((err) => {
-          console.log("promiseERR：");
-          console.log(err);
           reject(err);
         });
     }

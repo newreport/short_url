@@ -17,20 +17,20 @@
   </el-form>
 
 
-  <el-table :data="tableData" border style="width: 100%" :default-sort="{ prop: 'date', order: 'descending' }"
+  <el-table :data="tableData" border style="width: 100%" :default-sort="{ prop: 'sourceURL', order: 'descending' }"
     @selection-change="handleSelectionChange">
     <el-table-column type="selection" width="55" />
-    <el-table-column prop="date" sortable label="源链接" />
-    <el-table-column prop="name" sortable label="短链接" />
-    <el-table-column prop="name" sortable label="创建时间" />
-    <el-table-column prop="name" sortable label="修改时间" />
-    <el-table-column prop="name" sortable label="分组" />
-    <el-table-column label="过期时间"></el-table-column>
-    <el-table-column label="启用">
+    <el-table-column prop="sourceURL" sortable label="源链接" />
+    <el-table-column prop="targetURL" sortable label="短链接" />
+    <el-table-column prop="crt" sortable label="创建时间" />
+    <el-table-column prop="upt" sortable label="修改时间" />
+    <el-table-column prop="shortGroup" sortable label="分组" />
+    <el-table-column prop="det" label="过期时间"></el-table-column>
+    <!-- <el-table-column prop="isEnable" label="启用">
       <el-switch inline-prompt active-text="是" inactive-text="否" />
-    </el-table-column>
+    </el-table-column> -->
 
-    <el-table-column prop="name" label="备注" />
+    <el-table-column prop="remarks" label="备注" />
     <el-table-column fixed="right" width="193">
       <template #header>
         <el-button size="small" @click="dialogVisible = true">新增</el-button>
@@ -46,9 +46,9 @@
   </el-table>
 
 
-  <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="1000"
-    :page-sizes="[100, 200, 300, 400]" v-model:currentPage="currentPage4" v-model:page-size="pageSize4"
-    @size-change="handleSizeChange" @current-change="handleCurrentChange" hide-on-single-page="true" />
+  <!-- <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="page.count"
+    :page-sizes="[100, 200, 300, 400]" v-model:currentPage="page.currentPage" v-model:page-size="page.pageSize"
+    @size-change="handleSizeChange" @current-change="handleCurrentChange" hide-on-single-page="true" /> -->
 
 
   <el-dialog v-model="dialogVisible" title="新增链接" :before-close="handleClose">
@@ -96,25 +96,44 @@ const form = reactive({
   isExp: false
 })
 
+const page =reactive({
+  currentPage:0,
+  pageSize:100,
+  count:10
+})
+
+
+let tableData =ref()
+
 const getShortsPage=()=>{
   console.log("form内容：")
   console.log(form)
   console.log(form.sourceURL)
   const getShortsPage=async()=>{
     const getShortsPageParams={
-      offset:0,
-      limit:50,
+      offset:page.currentPage,
+      limit:page.pageSize,
       sort:"",
       source_url:form.sourceURL.length==0?"":"lk"+form.sourceURL,
-      target_url:form.shortURL.length==0?"2":"lk"+form.shortURL,
+      target_url:form.shortURL.length==0?"":"lk"+form.shortURL,
     }
     ShortService.getShortsPage(getShortsPageParams).then(result=>{
-      console.log(result)
+      if(result?.status==200){
+        page.count=result.data.count
+        console.log(result.data.data)
+        tableData.value=result.data.data
+        console.log("tableData:")
+        console.log(tableData)
+
+      }
     })
   }
   getShortsPage()
 }
 
+
+
+const dialogVisible = ref(false)
 
 
 
@@ -145,36 +164,9 @@ const handleSizeChange = (val: number) => {
 const handleCurrentChange = (val: number) => {
   console.log(`current page: ${val}`)
 }
-const dialogVisible = ref(false)
-const currentPage4 = ref(4)
-const pageSize4 = ref(100)
-const tableData = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-]
 
-const input = ref('')
-const queryPage = () => {
-  console.log('submit!')
-}
+
+
 
 const formAdd = reactive({
   sourceURL: '',

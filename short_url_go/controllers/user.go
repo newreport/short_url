@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"short_url_go/common"
 	"short_url_go/models"
+	"strings"
 
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -25,7 +27,11 @@ type UserController struct {
 // @Failure 403 User not exist
 // @router /all [get]
 func (u *UserController) GetAllUsers() {
-	u.Data["json"] = models.GetAllUsers()
+	r1, r2 := models.GetAllUsers()
+	u.Data["json"] = map[string]interface{}{
+		"r1": r1,
+		"r2": r2,
+	}
 	// var num uint
 	// var num2 int
 	// var num3 int8
@@ -92,21 +98,24 @@ type Login struct {
 // @router /tocken/account [post]
 func (u *UserController) RefreshTocken() {
 	tokenString := string(u.Ctx.Input.RequestBody)
-	token, err := jwt.ParseWithClaims(tokenString, &RefreshClaims{}, func(token *jwt.Token) (interface{}, error) {
-		key, _ := common.INIconf.String("JWT::RefreshTokenKey")
-		return []byte(key), nil
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	if claims, ok := token.Claims.(*RefreshClaims); ok && token.Valid {
-		fmt.Println(claims.ID)
-		user := models.QueryUserById(claims.ID)
-		u.Ctx.WriteString(generateAccountJWT(user))
-	} else {
-		u.Ctx.ResponseWriter.WriteHeader(401)
-		u.Ctx.WriteString("refresh token 失效，请重新登录")
+	tokenString = strings.Trim(tokenString, "\"")
+	logs.Info(tokenString)
+	if len(tokenString) > 0 {
+		token, err := jwt.ParseWithClaims(tokenString, &RefreshClaims{}, func(token *jwt.Token) (interface{}, error) {
+			key, _ := common.INIconf.String("JWT::RefreshTokenKey")
+			return []byte(key), nil
+		})
+		if err != nil {
+			panic(err)
+		}
+		if claims, ok := token.Claims.(*RefreshClaims); ok && token.Valid {
+			fmt.Println(claims.ID)
+			user := models.QueryUserById(claims.ID)
+			u.Ctx.WriteString(generateAccountJWT(user))
+		} else {
+			u.Ctx.ResponseWriter.WriteHeader(401)
+			u.Ctx.WriteString("refresh token 失效，请重新登录")
+		}
 	}
 }
 
