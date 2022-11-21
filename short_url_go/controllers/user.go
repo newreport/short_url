@@ -21,7 +21,7 @@ type UserController struct {
 //https://cloud.tencent.com/developer/article/1557075
 
 // @Title users
-// @Summary 获取所有用户
+// @Summary 获取所有用户和链接
 // @Description logs.Info user into the system
 // @Success 200 {object} models.User
 // @Failure 403 User not exist
