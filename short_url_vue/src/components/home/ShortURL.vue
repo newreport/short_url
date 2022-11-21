@@ -26,9 +26,9 @@
     <el-table-column prop="upt" sortable label="修改时间" />
     <el-table-column prop="shortGroup" sortable label="分组" />
     <el-table-column prop="det" label="过期时间"></el-table-column>
-    <!-- <el-table-column prop="isEnable" label="启用">
+    <el-table-column prop="isEnable" label="启用">
       <el-switch inline-prompt active-text="是" inactive-text="否" />
-    </el-table-column> -->
+    </el-table-column>
 
     <el-table-column prop="remarks" label="备注" />
     <el-table-column fixed="right" width="193">
@@ -46,9 +46,9 @@
   </el-table>
 
 
-  <!-- <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="page.count"
+  <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="page.count"
     :page-sizes="[100, 200, 300, 400]" v-model:currentPage="page.currentPage" v-model:page-size="page.pageSize"
-    @size-change="handleSizeChange" @current-change="handleCurrentChange" hide-on-single-page="true" /> -->
+    @size-change="handleSizeChange" @current-change="handleCurrentChange" hide-on-single-page="true" />
 
 
   <el-dialog v-model="dialogVisible" title="新增链接" :before-close="handleClose">
@@ -104,11 +104,7 @@ const page =reactive({
 
 
 let tableData =ref()
-
 const getShortsPage=()=>{
-  console.log("form内容：")
-  console.log(form)
-  console.log(form.sourceURL)
   const getShortsPage=async()=>{
     const getShortsPageParams={
       offset:page.currentPage,
@@ -120,11 +116,7 @@ const getShortsPage=()=>{
     ShortService.getShortsPage(getShortsPageParams).then(result=>{
       if(result?.status==200){
         page.count=result.data.count
-        console.log(result.data.data)
         tableData.value=result.data.data
-        console.log("tableData:")
-        console.log(tableData)
-
       }
     })
   }
