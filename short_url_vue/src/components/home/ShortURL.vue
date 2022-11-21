@@ -85,6 +85,32 @@
 import { ElContainer, ElHeader, ElRow, ElCol, ElMain, ElMessageBox } from 'element-plus';
 import { defineComponent, ref, reactive } from 'vue'
 import { Check, Close } from '@element-plus/icons-vue'
+import { ShortService } from '@/api/api'
+
+const form = reactive({
+  sourceURL: '',
+  shortURL: '',
+  createdAt: '',
+  group: '',
+  isEnable: true,
+  isExp: false
+})
+
+const getPage=()=>{
+  const getPage=async()=>{
+    const getPageParams={
+      offset:0,
+      limit:0,
+      source_url:form.sourceURL?"":"lk"+form.sourceURL,
+      target_url:form.shortURL?"":"lk"+form.shortURL,
+      group:form.group,
+      crt:form.createdAt?"":"",
+    }
+  }
+}
+
+
+
 
 const addURL = () => {
   console.log(formAdd)
@@ -154,14 +180,7 @@ const formAdd = reactive({
   expAt: ''
 })
 
-const form = reactive({
-  sourceURL: '',
-  shortURL: '',
-  createdAt: '',
-  group: '',
-  isEnable: true,
-  isExp: false
-})
+
 </script>
 
 <style  lang="scss" scoped>

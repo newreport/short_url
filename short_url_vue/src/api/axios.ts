@@ -1,7 +1,10 @@
 ﻿import axios, { AxiosResponse } from "axios";
 import { showMessage } from "./status"; // 引入状态码文件
 import { ElMessage } from "element-plus"; // 引入el 提示框，这个项目里用什么组件库这里引什么
+import myStore from "@store/index"; // 引入useStore 方法
 import qs from "qs";
+
+const store = myStore;
 
 //https://cloud.tencent.com/developer/article/1916167
 // 设置接口超时时间
@@ -30,20 +33,11 @@ axios.interceptors.request.use(
 // http response 拦截器
 axios.interceptors.response.use(
   (response) => {
-    // console.log("response拦截器：")
-    // console.log(response)
-    console.log("进入拦截器response拦截器：:");
-    console.log(response);
     return response;
   },
   (error) => {
     const { response } = error;
-    // console.log("error拦截器：")
-    // console.log(error)
     if (response) {
-      // 请求已发出，但是不在2xx的范围
-      console.log("进入拦截器error:");
-      console.log(error);
       showMessage(response.status); // 传入响应码，匹配响应码对应信息
       return Promise.reject(response.data);
     } else {
@@ -54,22 +48,23 @@ axios.interceptors.response.use(
 
 // 封装 GET POST 请求并导出
 export function request(url = "", params = {}, type = "POST") {
-  //设置 url params type 的默认值
   return new Promise(
     (resolve: (value: AxiosResponse<any, any>) => void, reject) => {
       let promise;
-      if (type.toUpperCase() === "GET") {
+      if (type.toUpperCase() == "GET") {
         promise = axios({
           method: "get",
           url: url,
           params: params,
         });
-      } else if (type.toUpperCase() === "POST") {
+      } else if (type.toUpperCase() == "POST") {
         promise = axios({
           method: "post",
           url: url,
           data: params,
         });
+      } else if (type.toUpperCase() == "PUT") {
+
       }
       //处理返回
       promise

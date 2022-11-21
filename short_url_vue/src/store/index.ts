@@ -34,6 +34,7 @@ const store = createStore({
       state.token.userInfo.nickname = info.nickname;
       state.token.userInfo.role = info.role;
       state.token.userInfo.urlLength = info.urlLength;
+      localStorage.setItem("accessToken", new base64().encode(accessToken));
     },
     cleanToken(state) {
       localStorage.clear(); //清空本地存储

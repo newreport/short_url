@@ -20,10 +20,15 @@ const login = () => {
       name: name.value,
       pwd: pwd.value,
     }
-    UserService.login(loginParams)
-      .then(resLogin => {
-        if (resLogin?.status == 200) {
-          store.commit('refreshToken',resLogin.data)
+    UserService.login(loginParams)//登录
+      .then(result => {
+        if (result?.status == 200) {
+          store.commit('refreshToken', result.data)
+          UserService.refreshToken(result.data).then(result => {//刷新refershToken
+            if (result?.status == 200) {
+              store.commit('accessToken', result.data)
+            }
+          })
           router.push({ path: '/index' })
         }
       }).catch(err => {
