@@ -18,7 +18,7 @@
 
 
   <el-table :data="tableData" border style="width: 100%" :default-sort="{ prop: 'sourceURL', order: 'descending' }"
-    @selection-change="handleSelectionChange">
+    @selection-change="handleSelectionChange" row-key="id">
     <el-table-column type="selection" width="55" />
     <el-table-column prop="sourceURL" sortable label="源链接" />
     <el-table-column prop="targetURL" sortable label="短链接" />
@@ -26,8 +26,10 @@
     <el-table-column prop="upt" sortable label="修改时间" />
     <el-table-column prop="shortGroup" sortable label="分组" />
     <el-table-column prop="det" label="过期时间"></el-table-column>
-    <el-table-column prop="isEnable" label="启用">
-      <el-switch inline-prompt active-text="是" inactive-text="否" />
+    <el-table-column  label="启用">
+     <template #default="scope">
+      <el-switch v-model="scope.row.isEnable"  inline-prompt active-text="是" inactive-text="否" />
+    </template>
     </el-table-column>
 
     <el-table-column prop="remarks" label="备注" />
@@ -59,10 +61,13 @@
       </el-form-item>
       <el-form-item label="自动生成">
         <el-switch v-model="formAdd.isAutoGenerate" class="mt-2" style="margin-left: 24px" inline-prompt
-          :active-icon="Check" :inactive-icon="Close" @click="testClick()" />
+          :active-icon="Check" :inactive-icon="Close" />
       </el-form-item>
       <el-form-item label="源链接">
         <el-input v-model="formAdd.sourceURL" />
+      </el-form-item>
+      <el-form-item label="分组">
+        <el-input v-model="formAdd.group" />
       </el-form-item>
       <el-form-item label="短链接" v-if="!formAdd.isAutoGenerate">
         <el-input v-model="formAdd.sourceURL" />
@@ -73,16 +78,19 @@
       <el-form-item label="过期时间">
         <el-date-picker v-model="formAdd.expAt" type="datetime" placeholder="Select date and time" />
       </el-form-item>
+      <el-form-item label="备注">
+        <el-input v-model="formAdd.remarks" />
+      </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="addURL()">Submit</el-button>
-        <el-button>Reset</el-button>
+        <el-button type="primary" @click="addShort()">Submit</el-button>
+        <el-button @click="cleanAddShort()">Reset</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
 </div>
 </template>
 <script lang="ts" setup>
-import { ElContainer, ElHeader, ElRow, ElCol, ElMain, ElMessageBox } from 'element-plus';
+import { ElContainer, ElHeader, ElRow, ElCol, ElMain, ElMessageBox,ElMessage } from 'element-plus';
 import { defineComponent, ref, reactive } from 'vue'
 import { Check, Close } from '@element-plus/icons-vue'
 import { ShortService } from '@/api/api'
@@ -101,7 +109,6 @@ const page =reactive({
   pageSize:100,
   count:10
 })
-
 
 let tableData =ref()
 const getShortsPage=()=>{
@@ -128,14 +135,53 @@ const getShortsPage=()=>{
 const dialogVisible = ref(false)
 
 
+const formAdd = reactive({
+  sourceURL: '',
+  isAutoGenerate: true,
+  targetURL: '',
+  remarks: '',
+  urlLength: 6,
+  isEnable: true,
+  expAt: '',
+  group:''
+})
 
-const addURL = () => {
-  console.log(formAdd)
+
+const addShort = () => {
+  const addShort =async()=>{
+    const addShortParams={
+      shortGroup:formAdd.group,
+      sourceURL:formAdd.sourceURL,
+      isEnable:formAdd.isEnable,
+      length:formAdd.urlLength,
+      remarks:formAdd.remarks,
+      targetURL:formAdd.isAutoGenerate?'':formAdd.targetURL
+    }
+    ShortService.createShort(addShortParams).
+    then(result=>{
+      if(result?.status==200){
+        ElMessage.success(result.data)
+        dialogVisible.value=false
+        cleanAddShort()
+      }
+    })
+  }
+  addShort()
 }
 
-const testClick = () => {
-  console.log(formAdd.isAutoGenerate)
+const cleanAddShort=()=>{
+  formAdd.sourceURL = ''
+  formAdd.isAutoGenerate =true
+  formAdd.targetURL = ''
+  formAdd.remarks = ''
+  formAdd.urlLength = 6
+  formAdd.isEnable =true
+  formAdd.expAt = ''
+  formAdd.group = ''
 }
+
+
+
 
 const handleSelectionChange = (val) => {
   console.log(val)
@@ -160,15 +206,6 @@ const handleCurrentChange = (val: number) => {
 
 
 
-const formAdd = reactive({
-  sourceURL: '',
-  isAutoGenerate: true,
-  targetURL: '',
-  remarks: '',
-  urlLength: 6,
-  isEnable: true,
-  expAt: ''
-})
 
 
 </script>
