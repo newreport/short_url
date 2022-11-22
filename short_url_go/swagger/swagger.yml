@@ -71,6 +71,23 @@ paths:
       responses:
         "200":
           description: ""
+  "/shorts/{sid\t[delete]}":
+    get:
+      tags:
+      - shorts
+      summary: 根据id删除一个短链接
+      operationId: ShortController.DeleteShort
+      parameters:
+      - in: path
+        name: sid
+        description: 链接id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: "{string}\t\"delete success!\""
+        "403":
+          description: "{string}\t\"无权删除\""
   /shorts/default_length/{len}:
     post:
       tags:
@@ -94,9 +111,7 @@ paths:
           $ref: '#/definitions/models.Short'
       responses:
         "200":
-          description: "{string}\t\"add success\""
-        "401":
-          description: "{string} \t\"Insufficient user permissions\""
+          description: "{string} \t\"add fail\""
   /users/:
     get:
       tags:
@@ -161,6 +176,7 @@ paths:
       description: |-
         update the user
         <br>
+      operationId: UserController.UpdateUser
       parameters:
       - in: body
         name: user
@@ -170,9 +186,9 @@ paths:
           $ref: '#/definitions/models.User'
       responses:
         "200":
-          description: '{string} update success!'
+          description: '{string} "update success!"'
         "403":
-          description: '{string} Insufficient user permissions'
+          description: '{string} "Insufficient user permissions"'
     post:
       tags:
       - users
@@ -246,7 +262,7 @@ paths:
     get:
       tags:
       - users
-      summary: 获取所有用户
+      summary: 获取所有用户和链接
       description: |-
         logs.Info user into the system
         <br>

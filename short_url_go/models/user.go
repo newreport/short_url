@@ -39,6 +39,10 @@ func GetAllUsers() ([]User, []Short) {
 // @Title 创建用户
 func CreateUser(user User) uint {
 	user.Password = uuid.NewV5(U5Seed, user.Password).String()
+	var existUser User
+	if DB.Where("name = ?", user.Name).First(&existUser).RowsAffected > 0 {
+		return 0
+	}
 	DB.Create(&user)
 	return user.ID
 }
@@ -66,6 +70,10 @@ func DeleteUser(id uint) bool {
 // @Title 更新用户信息，除了id
 func UpdateUser(user User) bool {
 	user.Password = uuid.NewV5(U5Seed, user.Password).String()
+	var existUser User
+	if DB.Where("name = ? ", user.Name).First(&existUser).RowsAffected > 0 {
+		return false
+	}
 	result := DB.Model(&user).Updates(User{Name: user.Name, Nickname: user.Nickname, Password: user.Password, Role: user.Role, AuthorURL: user.AuthorURL, Phone: user.Phone, Group: user.Group, I18n: user.I18n, AutoInsertSpace: user.AutoInsertSpace, Remarks: user.Remarks, DefaultURLLength: user.DefaultURLLength})
 	return result.RowsAffected > 0
 }
@@ -84,7 +92,7 @@ func QueryUsersPage(page Page, name string, nickname string, role string, group 
 		analysisRestfulRHS(express, "group", group) {
 		express.Count(&count)
 		express = express.Order(page.Sort).Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
-		express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "remarks").Find(&result)
+		express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "i18n", "auto_insert_space", "remarks").Find(&result)
 	} else {
 		err = errors.New("查詢參數錯誤")
 	}
@@ -95,6 +103,13 @@ func QueryUsersPage(page Page, name string, nickname string, role string, group 
 func QueryUserById(id uint) User {
 	var user User
 	DB.First(&user, id)
+	return user
+}
+
+// @Title 根据账号查询用户
+func QueryUserByName(name string) User {
+	var user User
+	DB.Where("name = ? ", name).First(&user)
 	return user
 }
 

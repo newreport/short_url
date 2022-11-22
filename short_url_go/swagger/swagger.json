@@ -131,10 +131,33 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "{string}\t\"add success\""
+                        "description": "{string} \t\"add fail\""
+                    }
+                }
+            }
+        },
+        "/shorts/{sid\t[delete]}": {
+            "get": {
+                "tags": [
+                    "shorts"
+                ],
+                "summary": "根据id删除一个短链接",
+                "operationId": "ShortController.DeleteShort",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "sid",
+                        "description": "链接id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string}\t\"delete success!\""
                     },
-                    "401": {
-                        "description": "{string} \t\"Insufficient user permissions\""
+                    "403": {
+                        "description": "{string}\t\"无权删除\""
                     }
                 }
             }
@@ -228,6 +251,7 @@
                 ],
                 "summary": "修改一个用户",
                 "description": "update the user\n\u003cbr\u003e",
+                "operationId": "UserController.UpdateUser",
                 "parameters": [
                     {
                         "in": "body",
@@ -241,10 +265,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "{string} update success!"
+                        "description": "{string} \"update success!\""
                     },
                     "403": {
-                        "description": "{string} Insufficient user permissions"
+                        "description": "{string} \"Insufficient user permissions\""
                     }
                 }
             },
@@ -281,7 +305,7 @@
                 "tags": [
                     "users"
                 ],
-                "summary": "获取所有用户",
+                "summary": "获取所有用户和链接",
                 "description": "logs.Info user into the system\n\u003cbr\u003e",
                 "operationId": "UserController.users",
                 "responses": {

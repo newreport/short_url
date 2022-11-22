@@ -52,16 +52,20 @@ const URLSTRS = "LMndefNq3~ZaUVWvw4sQRABCY56rHz0DEFJ127KxyX89IbcPhijklmGS-TgtOop
 // @Param     		short		models.Short	"需要生成短链接的url"
 // @Param     		length		int				"短链接长度"
 // @Return			result		bool			"操作是否成功"
-func CreateShort(short Short, length int) bool {
+func CreateShort(short Short, length int) error {
 	var err error
-	short.ID = uuid.Must(uuid.NewV4(), err).String()
 	short.TargetURL = generateUrl(short.TargetURL, length)
+	var existShort Short
+	if DB.Where("target_url = ? ", short.TargetURL).First(&existShort).RowsAffected > 0 {
+		return errors.New("已存在短链接")
+	}
+	short.ID = uuid.Must(uuid.NewV4(), err).String()
 	short.SourceUrlMD5 = common.MD5(short.SourceURL)
 	result := DB.Create(&short)
-	if err != nil {
-		panic("failed to add one assign length short url")
+	if result.RowsAffected == 0 {
+		return errors.New("创建失败")
 	}
-	return result.RowsAffected > 0
+	return nil
 }
 
 // @Title			CreateShortCustom
@@ -70,20 +74,20 @@ func CreateShort(short Short, length int) bool {
 // @Date			2022-10-23
 // @Param     		short		models.Short	"需要生成短链接的url"
 // @Return			result		string			"是否成功"
-func CreateShortCustom(short Short) bool {
+func CreateShortCustom(short Short) error {
 	var err error
 	short.ID = uuid.Must(uuid.NewV4(), err).String()
 	short.SourceUrlMD5 = common.MD5(short.SourceURL)
 	var count int64
 	DB.Model(&Short{}).Where("target_url = ?", short.TargetURL).Count(&count)
 	if count > 0 { //已存在
-		return false
+		return errors.New("已存在短链接")
 	}
 	result := DB.Create(&short)
-	if err != nil {
-		panic("failed to add one assign length short url")
+	if result.RowsAffected == 0 {
+		return errors.New("创建失败")
 	}
-	return result.RowsAffected > 0
+	return nil
 }
 
 // @Title			CreateShortsCustom
@@ -148,6 +152,31 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 		panic("failed to add one assign length short url")
 	}
 	return
+}
+
+func UpdateShort(short Short) error {
+	var existShort Short
+	result := DB.Where("id = ? ", short.ID).First(&existShort)
+	if result.RowsAffected > 0 {
+		var count int64
+		DB.Model(&Short{}).Where("target_url = ?", short.TargetURL).Count(&count)
+		if count > 0 {
+			return errors.New("短链接重复")
+		}
+		existShort.TargetURL = short.TargetURL
+		existShort.ShortGroup = short.ShortGroup
+		existShort.IsEnable = short.IsEnable
+		existShort.Remarks = short.Remarks
+		existShort.ExpireAt = short.ExpireAt
+		result := DB.Save(&existShort)
+		if result.RowsAffected > 0 {
+			return nil
+		}
+		return errors.New("修改失败")
+	} else {
+		return errors.New("没有查询到该链接")
+	}
+
 }
 
 //https://www.cnblogs.com/liuhui5599/p/14081524.html

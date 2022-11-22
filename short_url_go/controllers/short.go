@@ -17,23 +17,25 @@ type ShortController struct {
 // @Param	len	path	len	"默认长度"
 // @Param	body	body	models.Short	true	"链接"
 // @Success 200	{string}	"add success"
-// @Success 401	{string} 	"Insufficient user permissions"
+// @Failure 200	{string} 	"add fail"
 // @router /default_length/:len [post]
 func (s *ShortController) CreateShort() {
 	var short models.Short
 	accInfo := s.analysisAccountClaims()
 	json.Unmarshal(s.Ctx.Input.RequestBody, &short)
-	short.FKUser = accInfo.ID
-	var result bool
-	if len(short.TargetURL) > 0 {
-		result = models.CreateShortCustom(short)
-	} else {
-		result = models.CreateShort(short, 6)
+	length, err := s.GetInt64(":len")
+	if err != nil || (len(short.TargetURL) == 0 && (length < 4 || length > 16)) {
+		s.Ctx.WriteString("创建失败，参数错误")
+		return
 	}
-	if result {
-		s.Ctx.WriteString("创建成功")
+	short.FKUser = accInfo.ID
+	if len(short.TargetURL) > 0 {
+		err = models.CreateShortCustom(short)
 	} else {
-		s.Ctx.WriteString("创建失败")
+		err = models.CreateShort(short, int(length))
+	}
+	if err != nil {
+		s.Ctx.WriteString(err.Error())
 	}
 }
 
@@ -50,12 +52,12 @@ func (s *ShortController) DeleteShort() {
 	if accInfo.ID != short.FKUser {
 		s.Ctx.ResponseWriter.WriteHeader(403)
 		s.Ctx.WriteString("无权删除其他用户的链接")
+		return
+	}
+	if models.DeletedShortUrlById(sid) {
+		s.Ctx.WriteString("delete success!")
 	} else {
-		if models.DeletedShortUrlById(sid) {
-			s.Ctx.WriteString("delete success!")
-		} else {
-			s.Ctx.WriteString("delete fail!")
-		}
+		s.Ctx.WriteString("delete fail!")
 	}
 }
 
@@ -84,11 +86,13 @@ func (s *ShortController) GetShortsPage() {
 	if err != nil {
 		s.Ctx.ResponseWriter.WriteHeader(400)
 		s.Ctx.WriteString("请求参数类型错误")
+		return
 	}
 	page.Lmit, err = s.GetInt("limit")
 	if err != nil {
 		s.Ctx.ResponseWriter.WriteHeader(400)
 		s.Ctx.WriteString("请求参数类型错误")
+		return
 	}
 	page.Sort = analysisOrderBy(s.GetString("sort"))
 	fkUser := strconv.FormatUint(uint64(accInfo.ID), 10)
@@ -103,12 +107,32 @@ func (s *ShortController) GetShortsPage() {
 	result, count, err := models.QueryShortsPage(page, fkUser, sourceURL, targetURL, shortGroup, isEnable, exp, crt, upt, del)
 	if err != nil {
 		s.Ctx.ResponseWriter.WriteHeader(400)
-		s.Ctx.WriteString("请求参数错误")
-	} else {
-		s.Data["json"] = map[string]interface{}{
-			"count": count,
-			"data":  result,
+		s.Ctx.WriteString(err.Error())
+		return
+	}
+	s.Data["json"] = map[string]interface{}{
+		"count": count,
+		"data":  result,
+	}
+	s.ServeJSON()
+}
+
+// @Title	UpdateUser
+// @Summary	修改一个短链接
+// @Param	short	body	models.Short	true	"body for short"
+// @Success	200	{string}	"update success"
+// @Failure	403	{string}	"Insufficient user permissions"
+func (s *ShortController) UpdateShort() {
+	var short models.Short
+	json.Unmarshal(s.Ctx.Input.RequestBody, &short)
+	accInfo := s.analysisAccountClaims()
+	if accInfo.Role == 1 || accInfo.ID == short.FKUser {
+		err := models.UpdateShort(short)
+		if err != nil {
+			s.Ctx.WriteString(err.Error())
 		}
-		s.ServeJSON()
+	} else {
+		s.Ctx.ResponseWriter.WriteHeader(403)
+		s.Ctx.WriteString("无权修改其他用户的链接")
 	}
 }

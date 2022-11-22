@@ -59,7 +59,7 @@ func (u *UserController) Register() {
 	if models.CreateUser(user) > 0 {
 		u.Ctx.WriteString("注册成功")
 	} else {
-		u.Ctx.WriteString("注册失败")
+		u.Ctx.WriteString("注册失败,用户名重复")
 	}
 }
 
@@ -80,7 +80,7 @@ func (u *UserController) Login() {
 		u.Ctx.WriteString(generateRefreshJWT(user.ID))
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(401)
-		u.Ctx.WriteString("没有找到用户")
+		u.Ctx.WriteString("用户名或密码错误")
 	}
 }
 
@@ -132,9 +132,9 @@ func (u *UserController) CreateUser() {
 	accInfo := u.analysisAccountClaims()
 	if accInfo.Role == 1 || accInfo.ID == user.ID {
 		if models.CreateUser(user) > 0 {
-			u.Ctx.WriteString("create user success!")
+			u.Ctx.WriteString("创建成功")
 		} else {
-			u.Ctx.WriteString("create user fail!")
+			u.Ctx.WriteString("创建失败，用户名重复")
 		}
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(403)
@@ -159,7 +159,7 @@ func (u *UserController) DeleteUser() {
 		if models.DeleteUser(uint(uid)) {
 			u.Ctx.WriteString("delete success!")
 		} else {
-			u.Ctx.WriteString("delete fail!")
+			u.Ctx.WriteString("删除失败，该用户存在url链接")
 		}
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(403)
@@ -167,11 +167,12 @@ func (u *UserController) DeleteUser() {
 	}
 }
 
+// @Title	UpdateUser
 // @Summary 修改一个用户
 // @Description update the user
 // @Param	user	body 	models.User true	"body for user"
-// @Success 200 {string} update success!
-// @Failure 403 {string} Insufficient user permissions
+// @Success 200 {string} "update success!"
+// @Failure 403 {string} "Insufficient user permissions"
 // @router / [put]
 func (u *UserController) UpdateUser() {
 	var user models.User
@@ -181,7 +182,7 @@ func (u *UserController) UpdateUser() {
 		if models.UpdateUser(user) {
 			u.Ctx.WriteString("修改成功")
 		} else {
-			u.Ctx.WriteString("修改失败")
+			u.Ctx.WriteString("修改失败,账号名重复")
 		}
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(403)
@@ -241,6 +242,7 @@ func (u *UserController) GetUsersByPage() {
 	if accInfo.Role == 0 {
 		u.Ctx.ResponseWriter.WriteHeader(403)
 		u.Ctx.WriteString("无权查询其他用户")
+		return
 	}
 	var err error
 	var page models.Page
@@ -248,22 +250,24 @@ func (u *UserController) GetUsersByPage() {
 	if err != nil {
 		u.Ctx.ResponseWriter.WriteHeader(400)
 		u.Ctx.WriteString("请求参数类型错误")
+		return
 	}
 	page.Lmit, err = u.GetInt("limit")
 	if err != nil {
 		u.Ctx.ResponseWriter.WriteHeader(400)
 		u.Ctx.WriteString("请求参数类型错误")
+		return
 	}
 	page.Sort = analysisOrderBy(u.GetString("sort"))
 	result, count, err := models.QueryUsersPage(page, u.GetString("name"), u.GetString("nickname"), u.GetString("role"), u.GetString("group"))
 	if err != nil {
 		u.Ctx.ResponseWriter.WriteHeader(400)
 		u.Ctx.WriteString("请求参数错误")
-	} else {
-		u.Data["json"] = map[string]interface{}{
-			"count": count,
-			"data":  result,
-		}
-		u.ServeJSON()
+		return
 	}
+	u.Data["json"] = map[string]interface{}{
+		"count": count,
+		"data":  result,
+	}
+	u.ServeJSON()
 }
