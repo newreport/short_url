@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/beego/beego/v2/core/logs"
+
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
@@ -32,8 +34,14 @@ func GetAllUsers() ([]User, []Short) {
 	var users []User
 	DB.Order("created_at desc").Find(&users)
 	var shorts []Short
-	DB.Order("created_at desc").Find(&shorts)
+	DB.Unscoped().Order("created_at desc").Find(&shorts)
 	return users, shorts
+}
+
+func Clean() bool {
+	result := DB.Unscoped().Where(" 1 = 1").Delete(&Short{}) //必须要有where条件
+	logs.Info(result.Error)
+	return result.RowsAffected > 0
 }
 
 // @Title 创建用户

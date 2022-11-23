@@ -27,7 +27,8 @@ var FilterToken = func(ctx *context.Context) {
 	if ctx.Request.RequestURI != "/v1/users/all" &&
 		ctx.Request.RequestURI != "/v1/users/login" &&
 		ctx.Request.RequestURI != "/v1/users/register" &&
-		ctx.Request.RequestURI != "/v1/users/tocken/account" {
+		ctx.Request.RequestURI != "/v1/users/tocken/account"&&
+		ctx.Request.RequestURI != "/v1/users/delete"  {
 		//没有token
 		if ctx.Input.Header("Authorization") == "" {
 			logs.Error("without token, unauthorized !!")
@@ -63,6 +64,7 @@ func init() {
 	// }))
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
+		AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		// AllowOrigins:     []string{"*"},
 		// AllowMethods:     []string{"*"},
 		// AllowHeaders:     []string{"*"},

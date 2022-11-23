@@ -1,99 +1,115 @@
 ﻿<template>
   <div>
-  <el-form inline="true" label-position="left" label-width="68px" :model="form">
-    <el-form-item label="源链接">
-      <el-input v-model="form.sourceURL" />
-    </el-form-item>
-    <el-form-item label="短链接">
-      <el-input v-model="form.shortURL" />
-    </el-form-item>
-    <el-form-item label="创建时间">
-      <el-date-picker v-model="form.createdAt" type="daterange" unlink-panels range-separator="To"
-        start-placeholder="Start date" end-placeholder="End date" />
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary" @click="getShortsPage">Query</el-button>
-    </el-form-item>
-  </el-form>
-
-
-  <el-table :data="tableData" border style="width: 100%" :default-sort="{ prop: 'sourceURL', order: 'descending' }"
-    @selection-change="handleSelectionChange" row-key="id">
-    <el-table-column type="selection" width="55" />
-    <el-table-column prop="sourceURL" sortable label="源链接" />
-    <el-table-column prop="targetURL" sortable label="短链接" />
-    <el-table-column prop="crt" sortable label="创建时间" />
-    <el-table-column prop="upt" sortable label="修改时间" />
-    <el-table-column prop="shortGroup" sortable label="分组" />
-    <el-table-column prop="det" label="过期时间"></el-table-column>
-    <el-table-column  label="启用">
-     <template #default="scope">
-      <el-switch v-model="scope.row.isEnable"  inline-prompt active-text="是" inactive-text="否" />
-    </template>
-    </el-table-column>
-
-    <el-table-column prop="remarks" label="备注" />
-    <el-table-column fixed="right" width="193">
-      <template #header>
-        <el-button size="small" @click="dialogVisible = true">新增</el-button>
-        <el-button size="small">导入</el-button>
-        <el-button size="small">删除</el-button>
-      </template>
-      <template #default>
-        <el-button link type="primary" size="small">Detail</el-button>
-        <el-button link type="primary" size="small">Edit</el-button>
-        <el-button link type="primary" size="small">Delete</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
-
-
-  <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="page.count"
-    :page-sizes="[100, 200, 300, 400]" v-model:currentPage="page.currentPage" v-model:page-size="page.pageSize"
-    @size-change="handleSizeChange" @current-change="handleCurrentChange" hide-on-single-page="true" />
-
-
-  <el-dialog v-model="dialogVisible" title="新增链接" :before-close="handleClose">
-    <el-form label-position="left" label-width="79px">
-      <el-form-item label="启用">
-        <el-switch v-model="formAdd.isEnable" class="mt-2" style="margin-left: 24px" inline-prompt :active-icon="Check"
-          :inactive-icon="Close" />
-      </el-form-item>
-      <el-form-item label="自动生成">
-        <el-switch v-model="formAdd.isAutoGenerate" class="mt-2" style="margin-left: 24px" inline-prompt
-          :active-icon="Check" :inactive-icon="Close" />
-      </el-form-item>
+    <el-form inline="true" label-position="left" label-width="68px" :model="form">
       <el-form-item label="源链接">
-        <el-input v-model="formAdd.sourceURL" />
+        <el-input v-model="form.sourceURL" />
       </el-form-item>
-      <el-form-item label="分组">
-        <el-input v-model="formAdd.group" />
+      <el-form-item label="短链接">
+        <el-input v-model="form.shortURL" />
       </el-form-item>
-      <el-form-item label="短链接" v-if="!formAdd.isAutoGenerate">
-        <el-input v-model="formAdd.sourceURL" />
-      </el-form-item>
-      <el-form-item label="URL长度" v-if="formAdd.isAutoGenerate">
-        <el-input-number v-model="formAdd.urlLength" :min="4" :max="16" />
-      </el-form-item>
-      <el-form-item label="过期时间">
-        <el-date-picker v-model="formAdd.expAt" type="datetime" placeholder="Select date and time" />
-      </el-form-item>
-      <el-form-item label="备注">
-        <el-input v-model="formAdd.remarks" />
+      <el-form-item label="创建时间">
+        <el-date-picker v-model="form.createdAt" type="daterange" unlink-panels range-separator="To"
+          start-placeholder="Start date" end-placeholder="End date" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="addShort()">Submit</el-button>
-        <el-button @click="cleanAddShort()">Reset</el-button>
+        <el-button type="primary" @click="getShortsPage">Query</el-button>
       </el-form-item>
     </el-form>
-  </el-dialog>
-</div>
+
+
+    <el-table :data="tableData" border style="width: 100%" :default-sort="{ prop: 'sourceURL', order: 'descending' }"
+      @selection-change="handleSelectionChange" row-key="id">
+      <el-table-column type="selection" width="55" />
+      <el-table-column prop="sourceURL" sortable label="源链接" />
+      <el-table-column prop="targetURL" sortable label="短链接" />
+      <el-table-column sortable label="创建时间">
+        <template #default="scope">
+          {{ scope.row.crt == "0001-01-01T00:00:00Z" ? "" : moment(scope.row.crt).format("YYYY-MM-DD HH:mm:ss") }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="upt" sortable label="修改时间">
+        <template #default="scope">
+          {{ scope.row.upt == "0001-01-01T00:00:00Z" ? "" : moment(scope.row.upt).format("YYYY-MM-DD HH:mm:ss") }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="shortGroup" sortable label="分组" />
+      <el-table-column label="过期时间">
+        <template #default="scope">
+          {{ scope.row.exp == "0001-01-01T00:00:00Z" ? "" : moment(scope.row.exp).format("YYYY-MM-DD HH:mm:ss") }}
+        </template>
+
+      </el-table-column>
+      <el-table-column label="启用">
+        <template #default="scope">
+          <el-switch v-model="scope.row.isEnable" inline-prompt active-text="是" inactive-text="否" />
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="remarks" label="备注" />
+      <el-table-column fixed="right" width="193">
+        <template #header>
+          <el-button size="small" @click="dialogVisible = true">新增</el-button>
+          <el-button size="small">导入</el-button>
+          <el-button size="small">删除</el-button>
+        </template>
+        <template #default="scope">
+          <el-button link type="primary" size="small">Detail</el-button>
+          <el-button link type="primary" size="small">Edit</el-button>
+          <el-button link type="primary" size="small" @click="deleteShort(scope.row.id)">Delete</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+
+    <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="page.count"
+      :page-sizes="[100, 200, 300, 400]" v-model:currentPage="page.currentPage" v-model:page-size="page.pageSize"
+      @size-change="handleSizeChange" @current-change="handleCurrentChange" hide-on-single-page="true" />
+
+
+    <el-dialog v-model="dialogVisible" title="新增链接" :before-close="handleClose">
+      <el-form label-position="left" label-width="79px">
+        <el-form-item label="启用">
+          <el-switch v-model="formAdd.isEnable" class="mt-2" style="margin-left: 24px" inline-prompt
+            :active-icon="Check" :inactive-icon="Close" />
+        </el-form-item>
+        <el-form-item label="自动生成">
+          <el-switch v-model="formAdd.isAutoGenerate" class="mt-2" style="margin-left: 24px" inline-prompt
+            :active-icon="Check" :inactive-icon="Close" />
+        </el-form-item>
+        <el-form-item label="源链接">
+          <el-input v-model="formAdd.sourceURL" />
+        </el-form-item>
+        <el-form-item label="分组">
+          <el-input v-model="formAdd.group" />
+        </el-form-item>
+        <el-form-item label="短链接" v-if="!formAdd.isAutoGenerate">
+          <el-input v-model="formAdd.sourceURL" />
+        </el-form-item>
+        <el-form-item label="URL长度" v-if="formAdd.isAutoGenerate">
+          <el-input-number v-model="formAdd.urlLength" :min="4" :max="16" />
+        </el-form-item>
+        <el-form-item label="过期时间">
+          <el-date-picker v-model="formAdd.expAt" type="datetime" placeholder="Select date and time" />
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="formAdd.remarks" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="addShort()">Submit</el-button>
+          <el-button @click="cleanAddShort()">Reset</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+  </div>
 </template>
 <script lang="ts" setup>
-import { ElContainer, ElHeader, ElRow, ElCol, ElMain, ElMessageBox,ElMessage } from 'element-plus';
-import { defineComponent, ref, reactive } from 'vue'
+import { ElContainer, ElHeader, ElRow, ElCol, ElMain, ElMessageBox, ElMessage } from 'element-plus';
+import { getCurrentInstance, defineComponent, ref, reactive } from 'vue'
 import { Check, Close } from '@element-plus/icons-vue'
 import { ShortService } from '@/api/api'
+
+const { appContext } = getCurrentInstance();
+const moment = appContext.config.globalProperties.$moment;
 
 const form = reactive({
   sourceURL: '',
@@ -104,26 +120,26 @@ const form = reactive({
   isExp: false
 })
 
-const page =reactive({
-  currentPage:0,
-  pageSize:100,
-  count:10
+const page = reactive({
+  currentPage: 0,
+  pageSize: 100,
+  count: 10
 })
 
-let tableData =ref()
-const getShortsPage=()=>{
-  const getShortsPage=async()=>{
-    const getShortsPageParams={
-      offset:page.currentPage,
-      limit:page.pageSize,
-      sort:"",
-      source_url:form.sourceURL.length==0?"":"lk"+form.sourceURL,
-      target_url:form.shortURL.length==0?"":"lk"+form.shortURL,
+let tableData = ref()
+const getShortsPage = () => {
+  const getShortsPage = async () => {
+    const getShortsPageParams = {
+      offset: page.currentPage,
+      limit: page.pageSize,
+      sort: "",
+      source_url: form.sourceURL.length == 0 ? "" : "lk" + form.sourceURL,
+      target_url: form.shortURL.length == 0 ? "" : "lk" + form.shortURL,
     }
-    ShortService.getShortsPage(getShortsPageParams).then(result=>{
-      if(result?.status==200){
-        page.count=result.data.count
-        tableData.value=result.data.data
+    ShortService.getShortsPage(getShortsPageParams).then(result => {
+      if (result?.status == 200) {
+        page.count = result.data.count
+        tableData.value = result.data.data
       }
     })
   }
@@ -143,39 +159,56 @@ const formAdd = reactive({
   urlLength: 6,
   isEnable: true,
   expAt: '',
-  group:''
+  group: ''
 })
 
 
 const addShort = () => {
-  const addShort =async()=>{
-    const addShortParams={
-      shortGroup:formAdd.group,
-      sourceURL:formAdd.sourceURL,
-      isEnable:formAdd.isEnable,
-      length:formAdd.urlLength,
-      remarks:formAdd.remarks,
-      targetURL:formAdd.isAutoGenerate?'':formAdd.targetURL
+  dialogVisible.value = false
+  const addShort = async () => {
+    const addShortParams = {
+      shortGroup: formAdd.group,
+      sourceURL: formAdd.sourceURL,
+      isEnable: formAdd.isEnable,
+      length: formAdd.urlLength,
+      remarks: formAdd.remarks,
+      targetURL: formAdd.isAutoGenerate ? '' : formAdd.targetURL
     }
     ShortService.createShort(addShortParams).
-    then(result=>{
-      if(result?.status==200){
-        ElMessage.success(result.data)
-        dialogVisible.value=false
-        cleanAddShort()
-      }
-    })
+      then(result => {
+        if (result?.status == 200) {
+          ElMessage.success(result.data)
+          cleanAddShort()
+          getShortsPage()
+        }
+      })
   }
   addShort()
 }
 
-const cleanAddShort=()=>{
+const deleteShort = (id: string) => {
+  const deleteShort = async () => {
+    const deleteShortParams = {
+      sid: id
+    }
+    console.log(deleteShortParams)
+    ShortService.deleteShort(deleteShortParams).then(result => {
+      if (result?.status == 200) {
+        ElMessage.success(result.data)
+        getShortsPage()
+      }
+    })
+  }
+  deleteShort()
+}
+
+const cleanAddShort = () => {
   formAdd.sourceURL = ''
-  formAdd.isAutoGenerate =true
+  formAdd.isAutoGenerate = true
   formAdd.targetURL = ''
   formAdd.remarks = ''
   formAdd.urlLength = 6
-  formAdd.isEnable =true
+  formAdd.isEnable = true
   formAdd.expAt = ''
   formAdd.group = ''
 }

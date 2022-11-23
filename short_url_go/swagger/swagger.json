@@ -136,8 +136,8 @@
                 }
             }
         },
-        "/shorts/{sid\t[delete]}": {
-            "get": {
+        "/shorts/{sid}": {
+            "delete": {
                 "tags": [
                     "shorts"
                 ],
@@ -308,6 +308,26 @@
                 "summary": "获取所有用户和链接",
                 "description": "logs.Info user into the system\n\u003cbr\u003e",
                 "operationId": "UserController.users",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "403": {
+                        "description": "User not exist"
+                    }
+                }
+            }
+        },
+        "/users/delete": {
+            "get": {
+                "tags": [
+                    "users"
+                ],
+                "description": "logs.Info user into the system\n\u003cbr\u003e",
+                "operationId": "UserController.Delete",
                 "responses": {
                     "200": {
                         "description": "",

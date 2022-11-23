@@ -8,6 +8,7 @@ import (
 	"time"
 
 	linq "github.com/ahmetb/go-linq/v3"
+	"github.com/beego/beego/logs"
 	"github.com/samber/lo"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
@@ -54,7 +55,7 @@ const URLSTRS = "LMndefNq3~ZaUVWvw4sQRABCY56rHz0DEFJ127KxyX89IbcPhijklmGS-TgtOop
 // @Return			result		bool			"操作是否成功"
 func CreateShort(short Short, length int) error {
 	var err error
-	short.TargetURL = generateUrl(short.TargetURL, length)
+	short.TargetURL = generateUrl(short.SourceURL, length)
 	var existShort Short
 	if DB.Where("target_url = ? ", short.TargetURL).First(&existShort).RowsAffected > 0 {
 		return errors.New("已存在短链接")
@@ -85,6 +86,7 @@ func CreateShortCustom(short Short) error {
 	}
 	result := DB.Create(&short)
 	if result.RowsAffected == 0 {
+		logs.Info(result.Error)
 		return errors.New("创建失败")
 	}
 	return nil
@@ -215,7 +217,7 @@ func QueryShortByID(id string) Short {
 // @Title DeletedShortUrlById
 // @Description	根據id刪除url
 func DeletedShortUrlById(id string) bool {
-	result := DB.Delete(&Short{}, id)
+	result := DB.Where("id = ?", id).Delete(&Short{})
 	return result.RowsAffected > 0
 }
 
@@ -234,6 +236,7 @@ func DeletedShortUrlByIds(ids []string) bool {
 // @Param     		length       int		"短链接长度"
 // @Return			result		string		"生成后的短链接(查找到的)"
 func generateUrl(url string, length int) (result string) {
+	logs.Info(url)
 	md5Url := common.MD5(url)
 	var count int64
 	DB.Model(&Short{}).Where("source_url_md5 = ? ", md5Url).Count(&count)
@@ -264,7 +267,6 @@ func generateUrl(url string, length int) (result string) {
 		by = append(by, by[1]|by[0])
 		by = append(by, by[2]^by[1])
 		by = append(by, by[3]&^by[2])
-
 		for j := 0; j < length; j++ {
 			urlNum := by[j] % 64
 			result += string(URLSTRS[urlNum])
@@ -273,6 +275,7 @@ func generateUrl(url string, length int) (result string) {
 		if count == 0 {
 			return //不重复，则直接结束循环
 		}
+		result = ""
 	}
 	return
 }

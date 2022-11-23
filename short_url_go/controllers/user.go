@@ -43,6 +43,17 @@ func (u *UserController) GetAllUsers() {
 	u.ServeJSON()
 }
 
+// @Title Delete
+// @Description logs.Info user into the system
+// @Success 200 {object} models.User
+// @Failure 403 User not exist
+// @router /delete [get]
+func (u *UserController) Delete() {
+	r1 := models.Clean()
+	u.Data["json"] = r1
+	u.ServeJSON()
+}
+
 // @Title Register
 // @Summary 注册
 // @Description logs.Info user into the system

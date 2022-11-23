@@ -44,7 +44,7 @@ func (s *ShortController) CreateShort() {
 // @Param	sid	path	string true	"链接id"
 // @Success	200	{string}	"delete success!"
 // @Failure	403	{string}	"无权删除"
-// @router	/:sid	[delete]
+// @router /:sid [delete]
 func (s *ShortController) DeleteShort() {
 	sid := s.GetString(":sid")
 	accInfo := s.analysisAccountClaims()

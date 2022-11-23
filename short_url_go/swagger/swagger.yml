@@ -71,8 +71,8 @@ paths:
       responses:
         "200":
           description: ""
-  "/shorts/{sid\t[delete]}":
-    get:
+  /shorts/{sid}:
+    delete:
       tags:
       - shorts
       summary: 根据id删除一个短链接
@@ -267,6 +267,21 @@ paths:
         logs.Info user into the system
         <br>
       operationId: UserController.users
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.User'
+        "403":
+          description: User not exist
+  /users/delete:
+    get:
+      tags:
+      - users
+      description: |-
+        logs.Info user into the system
+        <br>
+      operationId: UserController.Delete
       responses:
         "200":
           description: ""

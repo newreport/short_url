@@ -58,6 +58,14 @@ export class ShortService{
         return  request('/shorts/default_length/'+data.length,data,'post')
     }
 
+    /**
+     * @description 删除一个短链接
+     * @param   {string}    sid  //短链接id
+     */
+    static async deleteShort(data){
+        return  request('/shorts/'+data.sid,data,'delete')
+    }
+
 }
 
 export class landRelevant {     // 模块二

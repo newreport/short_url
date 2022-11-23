@@ -79,7 +79,7 @@ axios.interceptors.response.use(
 );
 
 // 封装 GET POST 请求并导出
-export function request(url = "", params = {}, type = "POST") {
+export function request(url = "", params, type = "POST") {
   return new Promise(
     (resolve: (value: AxiosResponse<any, any>) => void, reject) => {
       let promise;
@@ -96,7 +96,13 @@ export function request(url = "", params = {}, type = "POST") {
           data: params,
         });
       } else if (type.toUpperCase() == "PUT") {
-      }
+      }else if(type.toUpperCase() == "DELETE") {
+        promise = axios({
+          method: "delete",
+          url: url,
+          // data: {data:params},
+      })
+    }
       //处理返回
       promise
         .then((res) => {

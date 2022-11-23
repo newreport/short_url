@@ -4,6 +4,7 @@ cd golang
 go mod tidy
  #使用swagger运行
 bee generate routers & bee run -gendoc=true -downdoc=true 
+bee generate routers
 bee run -gendoc=true -downdoc=true
 nohup bee run -gendoc=true -downdoc=true  &
 npm i   # 更新node包
