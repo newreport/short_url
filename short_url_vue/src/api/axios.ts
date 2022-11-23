@@ -96,6 +96,17 @@ export function request(url = "", params, type = "POST") {
           data: params,
         });
       } else if (type.toUpperCase() == "PUT") {
+        promise = axios({
+          method: "put",
+          url: url,
+          data: params,
+        });
+      } else if (type.toUpperCase() == "PATCH") {
+        promise = axios({
+          method: "patch",
+          url: url,
+          data: params,
+        });
       }else if(type.toUpperCase() == "DELETE") {
         promise = axios({
           method: "delete",

@@ -100,6 +100,32 @@
                         "description": ""
                     }
                 }
+            },
+            "put": {
+                "tags": [
+                    "shorts"
+                ],
+                "summary": "修改一个短链接",
+                "operationId": "ShortController.UpdateUser",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "short",
+                        "description": "body for short",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Short"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string}\t\"update success\""
+                    },
+                    "403": {
+                        "description": "{string}\t\"Insufficient user permissions\""
+                    }
+                }
             }
         },
         "/shorts/default_length/{len}": {

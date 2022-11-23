@@ -122,6 +122,7 @@ func (s *ShortController) GetShortsPage() {
 // @Param	short	body	models.Short	true	"body for short"
 // @Success	200	{string}	"update success"
 // @Failure	403	{string}	"Insufficient user permissions"
+// @router / [put]
 func (s *ShortController) UpdateShort() {
 	var short models.Short
 	json.Unmarshal(s.Ctx.Input.RequestBody, &short)

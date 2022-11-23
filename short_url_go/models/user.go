@@ -39,7 +39,7 @@ func GetAllUsers() ([]User, []Short) {
 }
 
 func Clean() bool {
-	result := DB.Unscoped().Where(" 1 = 1").Delete(&Short{}) //必须要有where条件
+	result := DB.Unscoped().Where(" 1 = 1").Delete(&Short{}) //必须要有where条件想·
 	logs.Info(result.Error)
 	return result.RowsAffected > 0
 }
