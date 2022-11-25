@@ -139,7 +139,9 @@ func (s *ShortController) UpdateShort() {
 		err := models.UpdateShort(short)
 		if err != nil {
 			s.Ctx.WriteString(err.Error())
+			return
 		}
+		s.Ctx.WriteString("修改成功")
 	} else {
 		s.Ctx.ResponseWriter.WriteHeader(403)
 		s.Ctx.WriteString("无权修改其他用户的链接")

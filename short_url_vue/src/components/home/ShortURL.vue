@@ -206,7 +206,6 @@ const addShort = () => {
 
 const updateShort = () => {
   dialogVisible.value = false
-  let data = tableData.value
   const updateShort = async () => {
     let updateShortParams=tableData.value.find(x=>x.id==formAddEdit.id)
     updateShortParams.targetURL=formAddEdit.targetURL
