@@ -79,7 +79,7 @@ export class ShortService {
 
   /**
    * @description 修改一个短链接(全部信息)
-   * @param   {string}    sid  //短链接id
+   * @param   {string}    id  //短链接id
    * @param   {string}    targetURL   //目标url
    * @param   {string}    shortGroup  //分组
    * @param   {bool}    isEnable    //是否启用
@@ -88,26 +88,26 @@ export class ShortService {
    * @returns {HttpResponse} result
    */
   static async updateShort(data) {
-    return request("/shorts/" + data.sid, data, "put");
+    return request("/shorts/" + data.id, data, "put");
   }
 
   /**
    * @description   修改一个短链接是否启用
-   * @param {string}    sid //短链接id
+   * @param {string}    id //短链接id
    * @param {bool}  isEnable    //是否启用
    * @returns {HttpResponse} result
    * @returns
    */
   static async updateShortIsEnable(data) {
-    return request("/shorts/" + data.sid + "/is_enable", data, "patch");
+    return request("/shorts/" + data.id + "/is_enable", data, "patch");
   }
   /**
    * @description 删除一个短链接
-   * @param   {string}    sid  //短链接id
+   * @param   {string}    id  //短链接id
    * @returns {HttpResponse} result
    */
   static async deleteShort(data) {
-    return request("/shorts/" + data.sid, data, "delete");
+    return request("/shorts/" + data.id, data, "delete");
   }
 }
 

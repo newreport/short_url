@@ -32,7 +32,7 @@
           {{ scope.row.upt == "0001-01-01T00:00:00Z" ? "" : moment(scope.row.upt).format("YYYY-MM-DD HH:mm:ss") }}
         </template>
       </el-table-column>
-      <el-table-column prop="shortGroup" sortable label="分组" />
+      <el-table-column prop="shortshortGroup" sortable label="分组" />
       <el-table-column label="过期时间">
         <template #default="scope">
           {{ scope.row.exp == "0001-01-01T00:00:00Z" ? "" : moment(scope.row.exp).format("YYYY-MM-DD HH:mm:ss") }}
@@ -57,13 +57,13 @@
           <el-button link type="primary" size="small">Detail</el-button>
 
           <el-button link type="primary" size="small" @click="dialogVisible = true;
-formAddEdit.sid = scope.row.id;
+formAddEdit.id = scope.row.id;
 formAddEdit.sourceURL = scope.row.sourceURL;
 formAddEdit.targetURL = scope.row.targetURL;
 formAddEdit.urlLength = scope.row.targetURL.length;
 formAddEdit.isEnable = scope.row.isEnable;
-formAddEdit.expAt = scope.row.exp == '0001-01-01T00:00:00Z' ? null : scope.row.exp;
-formAddEdit.group = scope.row.shortGroup;
+formAddEdit.exp = scope.row.exp == '0001-01-01T00:00:00Z' ? null : scope.row.exp;
+formAddEdit.shortGroup = scope.row.shortshortGroup;
           ">Edit</el-button>
           <el-popconfirm title="确定删除吗?" @confirm="deleteShort(scope.row.id)">
             <template #reference>
@@ -80,7 +80,7 @@ formAddEdit.group = scope.row.shortGroup;
       @size-change="handleSizeChange" @current-change="handleCurrentChange" hide-on-single-page="true" />
 
 
-    <el-dialog v-model="dialogVisible" :title="formAddEdit.sid ? '修改链接' : '新增链接'" :before-close="handleClose">
+    <el-dialog v-model="dialogVisible" :title="formAddEdit.id ? '修改链接' : '新增链接'" :before-close="handleClose">
       <el-form label-position="left" label-width="79px">
         <el-form-item label="启用">
           <el-switch v-model="formAddEdit.isEnable" class="mt-2" style="margin-left: 24px" inline-prompt
@@ -94,7 +94,7 @@ formAddEdit.group = scope.row.shortGroup;
           <el-input v-model="formAddEdit.sourceURL" />
         </el-form-item>
         <el-form-item label="分组">
-          <el-input v-model="formAddEdit.group" />
+          <el-input v-model="formAddEdit.shortGroup" />
         </el-form-item>
         <el-form-item label="短链接" v-if="!formAddEdit.isAutoGenerate">
           <el-input v-model="formAddEdit.sourceURL" />
@@ -103,13 +103,13 @@ formAddEdit.group = scope.row.shortGroup;
           <el-input-number v-model="formAddEdit.urlLength" :min="4" :max="16" />
         </el-form-item>
         <el-form-item label="过期时间">
-          <el-date-picker v-model="formAddEdit.expAt" type="datetime" placeholder="Select date and time" />
+          <el-date-picker v-model="formAddEdit.exp" type="datetime" placeholder="Select date and time" />
         </el-form-item>
         <el-form-item label="备注">
           <el-input v-model="formAddEdit.remarks" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="formAddEdit.sid ? updateShort() : addShort();"> Submit</el-button>
+          <el-button type="primary" @click="formAddEdit.id ? updateShort() : addShort();"> Submit</el-button>
           <el-button @click="cleanAddShort()">Reset</el-button>
         </el-form-item>
       </el-form>
@@ -129,7 +129,7 @@ const form = reactive({
   sourceURL: '',
   shortURL: '',
   createdAt: '',
-  group: '',
+  shortGroup: '',
   isEnable: true,
   isExp: false
 })
@@ -169,15 +169,15 @@ const dialogVisible = ref(false)
 
 
 const formAddEdit = reactive({
-  sid: '',
+  id: '',
   sourceURL: '',
   isAutoGenerate: true,
   targetURL: '',
   remarks: '',
   urlLength: 6,
   isEnable: true,
-  expAt: '',
-  group: ''
+  exp: '',
+  shortGroup: ''
 })
 
 
@@ -185,7 +185,7 @@ const addShort = () => {
   dialogVisible.value = false
   const addShort = async () => {
     const addShortParams = {
-      shortGroup: formAddEdit.group,
+      shortshortGroup: formAddEdit.shortGroup,
       sourceURL: formAddEdit.sourceURL,
       isEnable: formAddEdit.isEnable,
       length: formAddEdit.urlLength,
@@ -207,17 +207,13 @@ const addShort = () => {
 const updateShort = () => {
   dialogVisible.value = false
   let data = tableData.value
-  console.log(data)
-  console.log(formAddEdit)
   const updateShort = async () => {
-    const updateShortParams = {
-      sid: data.id,
-      targetURL: data.targetURL,
-      shortGroup: data.shortGroup,
-      isEnable: data.isEnable,
-      remarks: data.remarks,
-      exp: data.exp
-    }
+    let updateShortParams=tableData.value.find(x=>x.id==formAddEdit.id)
+    updateShortParams.targetURL=formAddEdit.targetURL
+    updateShortParams.shortshortGroup=formAddEdit.shortGroup
+    updateShortParams.isEnable=formAddEdit.isEnable
+    updateShortParams.remarks=formAddEdit.remarks
+    updateShortParams.exp=formAddEdit.exp
     ShortService.updateShort(updateShortParams)
       .then(result => {
         if (result?.status == 200) {
@@ -229,14 +225,13 @@ const updateShort = () => {
 
       })
   }
-  // updateShort()
-
+  updateShort()
 }
 
 const deleteShort = (id: string) => {
   const deleteShort = async () => {
     const deleteShortParams = {
-      sid: id
+      id: id
     }
     console.log(deleteShortParams)
     ShortService.deleteShort(deleteShortParams).then(result => {
@@ -250,15 +245,15 @@ const deleteShort = (id: string) => {
 }
 
 const cleanAddShort = () => {
-  formAddEdit.sid = '',
+  formAddEdit.id = '',
     formAddEdit.sourceURL = ''
   formAddEdit.isAutoGenerate = true
   formAddEdit.targetURL = ''
   formAddEdit.remarks = ''
   formAddEdit.urlLength = 6
   formAddEdit.isEnable = true
-  formAddEdit.expAt = ''
-  formAddEdit.group = ''
+  formAddEdit.exp = ''
+  formAddEdit.shortGroup = ''
 }
 
 
