@@ -161,15 +161,11 @@ func UpdateShort(short Short) error {
 	result := DB.Where("id = ? ", short.ID).First(&existShort)
 	if result.RowsAffected > 0 {
 		var count int64
-		DB.Model(&Short{}).Where("target_url = ?", short.TargetURL).Count(&count)
+		DB.Model(&Short{}).Where("target_url = ? AND fk_user <> ?", short.TargetURL, short.FKUser).Count(&count)
 		if count > 0 {
 			return errors.New("短链接重复")
 		}
-		existShort.TargetURL = short.TargetURL
-		existShort.ShortGroup = short.ShortGroup
-		existShort.IsEnable = short.IsEnable
-		existShort.Remarks = short.Remarks
-		existShort.ExpireAt = short.ExpireAt
+		existShort = short
 		result := DB.Save(&existShort)
 		if result.RowsAffected > 0 {
 			return nil

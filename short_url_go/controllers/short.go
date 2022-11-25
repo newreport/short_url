@@ -119,15 +119,23 @@ func (s *ShortController) GetShortsPage() {
 
 // @Title	UpdateUser
 // @Summary	修改一个短链接
+// @Param	sid		path	models.Short.ID	true	"短链接id"
 // @Param	short	body	models.Short	true	"body for short"
 // @Success	200	{string}	"update success"
 // @Failure	403	{string}	"Insufficient user permissions"
-// @router / [put]
+// @router /:sid [put]
 func (s *ShortController) UpdateShort() {
 	var short models.Short
 	json.Unmarshal(s.Ctx.Input.RequestBody, &short)
+	short.ID = s.GetString(":sid")
 	accInfo := s.analysisAccountClaims()
 	if accInfo.Role == 1 || accInfo.ID == short.FKUser {
+		existShort := models.QueryShortByID(short.ID)
+		existShort.TargetURL = short.TargetURL
+		existShort.ShortGroup = short.ShortGroup
+		existShort.IsEnable = short.IsEnable
+		existShort.Remarks = short.Remarks
+		existShort.ExpireAt = short.ExpireAt
 		err := models.UpdateShort(short)
 		if err != nil {
 			s.Ctx.WriteString(err.Error())

@@ -108,7 +108,7 @@ func QueryUsersPage(page Page, name string, nickname string, role string, group 
 }
 
 // @Title 根据id查询用户
-func QueryUserById(id uint) User {
+func QueryUserByID(id uint) User {
 	var user User
 	DB.First(&user, id)
 	return user
@@ -119,13 +119,6 @@ func QueryUserByName(name string) User {
 	var user User
 	DB.Where("name = ? ", name).First(&user)
 	return user
-}
-
-// @Title 根据用户id修改密码
-func UpdatePassword(id uint, pwd string) bool {
-	pwd = uuid.NewV5(U5Seed, pwd).String()
-	result := DB.Model(&User{}).Where("id = ?", id).Update("password", pwd)
-	return result.RowsAffected > 0
 }
 
 // @Title 根据用户id集合删除用户

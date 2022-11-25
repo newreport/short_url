@@ -121,7 +121,7 @@ func (u *UserController) RefreshTocken() {
 		}
 		if claims, ok := token.Claims.(*RefreshClaims); ok && token.Valid {
 			fmt.Println(claims.ID)
-			user := models.QueryUserById(claims.ID)
+			user := models.QueryUserByID(claims.ID)
 			u.Ctx.WriteString(generateAccountJWT(user))
 		} else {
 			u.Ctx.ResponseWriter.WriteHeader(401)
@@ -190,7 +190,16 @@ func (u *UserController) UpdateUser() {
 	json.Unmarshal(u.Ctx.Input.RequestBody, &user)
 	accInfo := u.analysisAccountClaims()
 	if accInfo.Role == 1 || accInfo.ID == user.ID {
-		if models.UpdateUser(user) {
+		existUser := models.QueryUserByID(user.ID)
+		existUser.Name = user.Name
+		existUser.Nickname = user.Nickname
+		existUser.DefaultURLLength = user.DefaultURLLength
+		existUser.Phone = user.Phone
+		existUser.Group = user.Group
+		existUser.I18n = user.I18n
+		existUser.Remarks = user.Remarks
+		existUser.AutoInsertSpace = user.AutoInsertSpace
+		if models.UpdateUser(existUser) {
 			u.Ctx.WriteString("修改成功")
 		} else {
 			u.Ctx.WriteString("修改失败,账号名重复")
@@ -220,7 +229,9 @@ func (u *UserController) UpdateUserPassword() {
 	accInfo := u.analysisAccountClaims()
 	if uint(id) == accInfo.ID || accInfo.Role == 1 {
 		json.Unmarshal(u.Ctx.Input.RequestBody, &pwd)
-		if models.UpdatePassword(uint(id), pwd) {
+		existUser := models.QueryUserByID(uint(id))
+		existUser.Password = pwd
+		if models.UpdateUser(existUser) {
 			u.Ctx.WriteString("修改成功")
 		} else {
 			u.Ctx.WriteString("修改失败")

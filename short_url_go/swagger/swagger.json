@@ -100,32 +100,6 @@
                         "description": ""
                     }
                 }
-            },
-            "put": {
-                "tags": [
-                    "shorts"
-                ],
-                "summary": "修改一个短链接",
-                "operationId": "ShortController.UpdateUser",
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "short",
-                        "description": "body for short",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Short"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{string}\t\"update success\""
-                    },
-                    "403": {
-                        "description": "{string}\t\"Insufficient user permissions\""
-                    }
-                }
             }
         },
         "/shorts/default_length/{len}": {
@@ -163,6 +137,41 @@
             }
         },
         "/shorts/{sid}": {
+            "put": {
+                "tags": [
+                    "shorts"
+                ],
+                "summary": "修改一个短链接",
+                "operationId": "ShortController.UpdateUser",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "sid",
+                        "description": "短链接id",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Short.ID"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "short",
+                        "description": "body for short",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Short"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string}\t\"update success\""
+                    },
+                    "403": {
+                        "description": "{string}\t\"Insufficient user permissions\""
+                    }
+                }
+            },
             "delete": {
                 "tags": [
                     "shorts"
@@ -602,6 +611,10 @@
                     "format": "datetime"
                 }
             }
+        },
+        "models.Short.ID": {
+            "title": "ID",
+            "type": "object"
         },
         "models.User": {
             "title": "User",

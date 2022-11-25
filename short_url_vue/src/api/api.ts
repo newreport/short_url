@@ -4,7 +4,6 @@
  * @description -封装User类型的接口方法
  */
 export class UserService {
-  // 模块一
   /**
    * @description 用户登录
    * @param {string} name - 用户名
@@ -24,9 +23,24 @@ export class UserService {
     // 刷新token
     return request("/users/tocken/account", refreshToken, "post");
   }
-  static async getall() {
-    // 接口二
-    return request("/users/all", {}, "get");
+  /**
+   * @description 根据id删除用户
+   * @param {number}  uid 用户id
+   * @return {HttpResponse} result
+   */
+  static async deleteUser(uid){
+    return request("/users/"+uid,uid,"delete")
+  }
+  /**
+   * @description 修改用户信息
+   * @param
+   */
+  static async updateUser(){
+
+  }
+
+  static async updateUserPasswd(){
+    
   }
 }
 
@@ -97,13 +111,3 @@ export class ShortService {
   }
 }
 
-export class landRelevant {
-  // 模块二
-  /**
-   * @description 获取地列表
-   * @return {HttpResponse} result
-   */
-  static async landList(params) {
-    return request("/land_list_info", params, "get");
-  }
-}

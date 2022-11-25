@@ -27,6 +27,15 @@ func init() {
 
     beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
         beego.ControllerComments{
+            Method: "UpdateShort",
+            Router: `/:sid`,
+            AllowHTTPMethods: []string{"put"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
+        beego.ControllerComments{
             Method: "CreateShort",
             Router: `/default_length/:len`,
             AllowHTTPMethods: []string{"post"},
