@@ -196,8 +196,8 @@ func QueryShortsPage(page Page, fkUser string, sourceURL string, targetURL strin
 		analysisRestfulRHS(express, "created_at", crt) &&
 		analysisRestfulRHS(express, "updated_at", upt) &&
 		analysisRestfulRHS(express, "deleted_at", del) {
-		express.Count(&count)
-		express.Order(page.Sort).Select("id,source_url,source_url_md5,target_url,fk_user,short_group,is_enable,created_at,updated_at,expire_at,remarks").Find(&result)
+		express.Debug().Count(&count)
+		express.Debug().Order(page.Sort).Select("id,source_url,source_url_md5,target_url,fk_user,short_group,is_enable,created_at,updated_at,expire_at,remarks").Find(&result)
 	} else {
 		err = errors.New("查詢參數錯誤")
 	}

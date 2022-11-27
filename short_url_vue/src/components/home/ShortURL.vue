@@ -32,7 +32,7 @@
           {{ scope.row.upt == "0001-01-01T00:00:00Z" ? "" : moment(scope.row.upt).format("YYYY-MM-DD HH:mm:ss") }}
         </template>
       </el-table-column>
-      <el-table-column prop="shortshortGroup" sortable label="分组" />
+      <el-table-column prop="shortGroup" sortable label="分组" />
       <el-table-column label="过期时间">
         <template #default="scope">
           {{ scope.row.exp == "0001-01-01T00:00:00Z" ? "" : moment(scope.row.exp).format("YYYY-MM-DD HH:mm:ss") }}
@@ -63,7 +63,7 @@ formAddEdit.targetURL = scope.row.targetURL;
 formAddEdit.urlLength = scope.row.targetURL.length;
 formAddEdit.isEnable = scope.row.isEnable;
 formAddEdit.exp = scope.row.exp == '0001-01-01T00:00:00Z' ? null : scope.row.exp;
-formAddEdit.shortGroup = scope.row.shortshortGroup;
+formAddEdit.shortGroup = scope.row.shortGroup;
           ">Edit</el-button>
           <el-popconfirm title="确定删除吗?" @confirm="deleteShort(scope.row.id)">
             <template #reference>
@@ -185,7 +185,7 @@ const addShort = () => {
   dialogVisible.value = false
   const addShort = async () => {
     const addShortParams = {
-      shortshortGroup: formAddEdit.shortGroup,
+      shortGroup: formAddEdit.shortGroup,
       sourceURL: formAddEdit.sourceURL,
       isEnable: formAddEdit.isEnable,
       length: formAddEdit.urlLength,
@@ -209,7 +209,7 @@ const updateShort = () => {
   const updateShort = async () => {
     let updateShortParams=tableData.value.find(x=>x.id==formAddEdit.id)
     updateShortParams.targetURL=formAddEdit.targetURL
-    updateShortParams.shortshortGroup=formAddEdit.shortGroup
+    updateShortParams.shortGroup=formAddEdit.shortGroup
     updateShortParams.isEnable=formAddEdit.isEnable
     updateShortParams.remarks=formAddEdit.remarks
     updateShortParams.exp=formAddEdit.exp

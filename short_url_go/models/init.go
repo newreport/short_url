@@ -95,11 +95,11 @@ func analysisRestfulRHS(db *gorm.DB, field string, queryRule string) bool {
 				case "gt": //greater than 大於
 					db = db.Where(field+" > ? ", param)
 				case "be": //like 模糊查詢頭	*效率低，索引失效
-					db = db.Where(field+" LIKE ?% ", param)
+					db = db.Where(field+" LIKE ? ", param+"%")
 				case "af": //like 模糊查詢結尾	*效率低，索引失效
-					db = db.Where(field+" LIKE %?", param)
+					db = db.Where(field+" LIKE ? ", "%"+param)
 				case "lk": //like 模糊查詢	*效率低，索引失效
-					db = db.Where(field+" LIKE %?% ", param)
+					db = db.Where(field+" LIKE ? ", "%"+param+"%")
 				default: //前端傳遞查詢參數錯誤
 					return false
 				}
