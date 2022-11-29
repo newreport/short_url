@@ -1,4 +1,4 @@
-﻿package common
+﻿package utils
 
 import (
 	"github.com/beego/beego/v2/core/config"

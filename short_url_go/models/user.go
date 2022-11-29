@@ -12,7 +12,7 @@ import (
 
 // 用户表
 type User struct { //用户表
-	ID               uint           `json:"ID" gorm:"primaryKey;<-:create"` //id
+	ID               uint           `json:"id" gorm:"primaryKey;<-:create"` //id
 	CreatedAt        time.Time      `json:"crt" gorm:"<-:create"`           //创建时间
 	UpdatedAt        time.Time      `json:"upt" gorm:"<-"`                  //最后更新时间
 	DeletedAt        gorm.DeletedAt `json:"det" gorm:"index"`               //软删除时间
@@ -27,6 +27,7 @@ type User struct { //用户表
 	Remarks          string         `json:"remarks"`                        //备注
 	I18n             string         `json:"i18n"`                           //国际化
 	AutoInsertSpace  bool           `json:"autoInsertSpace"`                //盘古之白
+	Domain           string         `json:"domainURL"`                      //域名
 }
 
 // @Title 获取所有用户
@@ -92,11 +93,12 @@ func UpdateUser(user User) bool {
 // @Param	query	models.UserQueryUsersPage	查询参数
 // @Param	page	models.Page	分页查询struct
 // @Return	users	[]models.User,error
-func QueryUsersPage(page Page, name string, nickname string, role string, group string) (result []User, count int64, err error) {
+func QueryUsersPage(page Page, name string, nickname string, role string, group string, phone string) (result []User, count int64, err error) {
 	express := DB.Model(&User{})
 	if analysisRestfulRHS(express, "name", name) &&
 		analysisRestfulRHS(express, "nickname", group) &&
 		analysisRestfulRHS(express, "role", role) &&
+		analysisRestfulRHS(express, "phone", phone) &&
 		analysisRestfulRHS(express, "group", group) {
 		express.Count(&count)
 		express = express.Order(page.Sort).Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)

@@ -176,6 +176,10 @@ paths:
         description: 权限
         type: string
       - in: query
+        name: phone
+        description: 手机号
+        type: string
+      - in: query
         name: crt
         description: 创建时间
         type: string
@@ -442,10 +446,6 @@ definitions:
     title: User
     type: object
     properties:
-      ID:
-        description: id
-        type: integer
-        format: int32
       authorURL:
         description: 头像地址
         type: string
@@ -459,12 +459,19 @@ definitions:
       det:
         $ref: '#/definitions/gorm.DeletedAt'
         description: 软删除时间
+      domainURL:
+        description: 域名
+        type: string
       group:
         description: 分组
         type: string
       i18n:
         description: 国际化
         type: string
+      id:
+        description: id
+        type: integer
+        format: int32
       name:
         description: 用户名，登录名称
         type: string

@@ -11,17 +11,18 @@
       <el-input v-model="form.phone" />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="query()">Query</el-button>
+      <el-button type="primary" @click="getUsersPage()">Query</el-button>
     </el-form-item>
   </el-form>
 
-  <el-table :data="table" border style="width: 100%">
+  <el-table :data="tableData" border style="width: 100%">
     <el-table-column type="selection" width="55" />
-    <el-table-column prop="name" sortable label="用户名" />
     <el-table-column prop="group" sortable label="分组" />
+    <el-table-column prop="name" sortable label="用户名" />
     <el-table-column prop="nickname" sortable label="昵称" />
     <el-table-column prop="urlLength" sortable label="默认长度" />
     <el-table-column prop="phone" sortable label="电话" />
+    <el-table-column prop="role" sortable label="权限" />
     <el-table-column prop="remarks" sortable label="备注" />
   </el-table>
 </div>
@@ -29,6 +30,7 @@
   
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
+import { UserService } from '@/api/api'
 
 const form = reactive({
   name: '',
@@ -36,15 +38,32 @@ const form = reactive({
   phone: '',
 })
 
-const table = [{
-  name: 'admin',
-  nickname: 'admin',
-  urlLength: 6,
-  phone: '1234567890',
-  remarks: '管理员'
-}]
+const tableData = ref()
 
-const query = () => {
+const page = reactive({
+  currentPage: 0,
+  pageSize: 100,
+  count: 10
+})
+
+const getUsersPage = () => {
+  const getUsersPage= async ()=>{
+    const getUsersPageParams ={
+      offset: page.currentPage,
+      limit: page.pageSize,
+      sort: "",
+      name:form.name.length==0?"":"lk"+form.name,
+      nickname:form.nickname.length==0?"":"lk"+form.nickname,
+      phone:form.phone.length==0?"":"lk"+form.phone
+    }
+    UserService.getUsersPage(getUsersPageParams).then(result=>{
+      if(result?.status==200){
+        page.count = result.data.count
+        tableData.value = result.data.data
+      }
+    })
+  }
+  getUsersPage()
 }
 
 </script>

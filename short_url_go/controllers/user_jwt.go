@@ -1,7 +1,7 @@
 ﻿package controllers
 
 import (
-	"short_url_go/common"
+	"short_url_go/utils"
 	"short_url_go/models"
 	"strings"
 	"time"
@@ -32,7 +32,7 @@ func (b *BaseController) analysisAccountClaims() (result AccountClaims) {
 	if len(tokenString) > 0 {
 		tokenString = strings.Split(tokenString, " ")[1]
 		token, _ := jwt.ParseWithClaims(tokenString, &AccountClaims{}, func(token *jwt.Token) (interface{}, error) {
-			key, _ := common.INIconf.String("JWT::AccessTokenKey")
+			key, _ := utils.INIconf.String("JWT::AccessTokenKey")
 			return []byte(key), nil
 		})
 		if claims, ok := token.Claims.(*AccountClaims); ok && token.Valid {
@@ -44,7 +44,7 @@ func (b *BaseController) analysisAccountClaims() (result AccountClaims) {
 
 func AuthenticationJWT(tokenString string) bool {
 	token, _ := jwt.ParseWithClaims(tokenString, &AccountClaims{}, func(token *jwt.Token) (interface{}, error) {
-		key, _ := common.INIconf.String("JWT::AccessTokenKey")
+		key, _ := utils.INIconf.String("JWT::AccessTokenKey")
 		return []byte(key), nil
 	})
 	if _, ok := token.Claims.(*AccountClaims); ok && token.Valid {
@@ -75,7 +75,7 @@ func generateAccountJWT(user models.User) string {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	key, _ := common.INIconf.String("JWT::AccessTokenKey")
+	key, _ := utils.INIconf.String("JWT::AccessTokenKey")
 	tokenString, _ := token.SignedString([]byte(key))
 	return tokenString
 }
@@ -98,7 +98,7 @@ func generateRefreshJWT(id uint) string {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	key, _ := common.INIconf.String("JWT::RefreshTokenKey")
+	key, _ := utils.INIconf.String("JWT::RefreshTokenKey")
 	tokenString, _ := token.SignedString([]byte(key))
 	return tokenString
 }

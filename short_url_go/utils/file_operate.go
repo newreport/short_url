@@ -1,5 +1,4 @@
-﻿package common
-
+﻿package utils
 import "os"
 
 // 判断文件夹是否存在

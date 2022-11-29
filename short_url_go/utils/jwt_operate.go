@@ -1,5 +1,4 @@
-﻿package common
-
+﻿package utils
 import (
 	"crypto/rand"
 	"errors"

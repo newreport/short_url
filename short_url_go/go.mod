@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/ahmetb/go-linq/v3 v3.2.0
 	github.com/beego/beego v1.12.11
-	github.com/beego/beego/v2 v2.0.5
+	github.com/beego/beego/v2 v2.0.6
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/samber/lo v1.34.0
 	github.com/satori/go.uuid v1.2.0

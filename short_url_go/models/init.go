@@ -3,7 +3,7 @@
 import (
 	"fmt"
 	"os"
-	"short_url_go/common"
+	"short_url_go/utils"
 	"strings"
 
 	"github.com/beego/beego/v2/core/config"
@@ -24,12 +24,12 @@ var U5Seed uuid.UUID
 
 func init() {
 	var err error
-	common.INIconf, err = config.NewConfig("ini", "conf/secret.conf")
+	utils.INIconf, err = config.NewConfig("ini", "conf/secret.conf")
 	if err != nil {
 		fmt.Println(err)
 		panic(err) //https://zhuanlan.zhihu.com/p/373653492
 	}
-	pwdUUID, err := common.INIconf.String("UUID::UserPwd")
+	pwdUUID, err := utils.INIconf.String("UUID::UserPwd")
 	if err != nil {
 		panic(err)
 	}
@@ -37,7 +37,7 @@ func init() {
 
 	//1.创建data文件夹，用于存放数据
 	_path := "./data"
-	existDic, err := common.PathExists(_path)
+	existDic, err := utils.PathExists(_path)
 	if err != nil {
 		fmt.Printf("get dir error![%v]\n", err)
 		panic(err)
@@ -46,7 +46,7 @@ func init() {
 		os.Mkdir(_path, os.ModePerm)
 	}
 	_path += "/main.db"
-	if existSqlFile, _ := common.PathExists(_path); !existSqlFile {
+	if existSqlFile, _ := utils.PathExists(_path); !existSqlFile {
 		//创建sqlite文件
 		DB, err = gorm.Open(sqlite.Open(_path), &gorm.Config{})
 		if err != nil {

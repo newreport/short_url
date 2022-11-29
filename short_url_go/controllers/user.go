@@ -3,7 +3,7 @@
 import (
 	"encoding/json"
 	"fmt"
-	"short_url_go/common"
+	"short_url_go/utils"
 	"short_url_go/models"
 	"strings"
 
@@ -113,7 +113,7 @@ func (u *UserController) RefreshTocken() {
 	logs.Info(tokenString)
 	if len(tokenString) > 0 {
 		token, err := jwt.ParseWithClaims(tokenString, &RefreshClaims{}, func(token *jwt.Token) (interface{}, error) {
-			key, _ := common.INIconf.String("JWT::RefreshTokenKey")
+			key, _ := utils.INIconf.String("JWT::RefreshTokenKey")
 			return []byte(key), nil
 		})
 		if err != nil {
@@ -253,6 +253,7 @@ func (u *UserController) UpdateUserPassword() {
 // @Param	nickname	query	string	false	昵称
 // @Param	group	query	string	false	分组
 // @Param	role	query	string	false	权限
+// @Param	phone	query	string	false	手机号
 // @Param	crt	query	string	false	创建时间
 // @Param	upt	query	string	false	修改时间
 // @Param	det	query	string	false	删除时间
@@ -281,7 +282,7 @@ func (u *UserController) GetUsersByPage() {
 		return
 	}
 	page.Sort = analysisOrderBy(u.GetString("sort"))
-	result, count, err := models.QueryUsersPage(page, u.GetString("name"), u.GetString("nickname"), u.GetString("role"), u.GetString("group"))
+	result, count, err := models.QueryUsersPage(page, u.GetString("name"), u.GetString("nickname"), u.GetString("role"), u.GetString("group"), u.GetString("phone"))
 	if err != nil {
 		u.Ctx.ResponseWriter.WriteHeader(400)
 		u.Ctx.WriteString("请求参数错误")

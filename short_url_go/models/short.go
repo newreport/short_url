@@ -3,7 +3,7 @@
 import (
 	"errors"
 	"fmt"
-	"short_url_go/common"
+	"short_url_go/utils"
 	"strconv"
 	"time"
 
@@ -15,14 +15,14 @@ import (
 )
 
 type Short struct {
-	ID           string         `json:"id" gorm:"primaryKey,size:50;"`         //主键uuid
-	SourceURL    string         `json:"sourceURL" gorm:"not null"`             //需要跳转的url
-	SourceUrlMD5 string         `json:"sourceMD5" gorm:"not null"`             //需要跳转url的MD5
-	TargetURL    string         `json:"targetURL" gorm:"not null;uniqueIndex"` //目标URL
-	FKUser       uint           `json:"fkUser" gorm:"not null"`                //外键关联用户
-	ShortGroup   string         `json:"shortGroup" gorm:"not null"`            //外键关联分组
-	IsEnable     bool           `json:"isEnable" gorm:"not null"`              //是否启用
-	ExpireAt     time.Time      `json:"exp"`                                   //过期时间
+	ID           string         `json:"id" gorm:"primaryKey,size:50;"` //主键uuid
+	SourceURL    string         `json:"sourceURL" gorm:"not null"`     //需要跳转的url
+	SourceUrlMD5 string         `json:"sourceMD5" gorm:"not null"`     //需要跳转url的MD5
+	TargetURL    string         `json:"targetURL" gorm:"not null"`     //目标URL
+	FKUser       uint           `json:"fkUser" gorm:"not null"`        //外键关联用户
+	ShortGroup   string         `json:"shortGroup" gorm:"not null"`    //外键关联分组
+	IsEnable     bool           `json:"isEnable" gorm:"not null"`      //是否启用
+	ExpireAt     time.Time      `json:"exp"`                           //过期时间
 	CreatedAt    time.Time      `json:"crt"`
 	UpdatedAt    time.Time      `json:"upt"`
 	DeletedAt    gorm.DeletedAt `json:"det" gorm:"index"`
@@ -61,7 +61,7 @@ func CreateShort(short Short, length int) error {
 		return errors.New("已存在短链接")
 	}
 	short.ID = uuid.Must(uuid.NewV4(), err).String()
-	short.SourceUrlMD5 = common.MD5(short.SourceURL)
+	short.SourceUrlMD5 = utils.MD5(short.SourceURL)
 	result := DB.Create(&short)
 	if result.RowsAffected == 0 {
 		return errors.New("创建失败")
@@ -78,7 +78,7 @@ func CreateShort(short Short, length int) error {
 func CreateShortCustom(short Short) error {
 	var err error
 	short.ID = uuid.Must(uuid.NewV4(), err).String()
-	short.SourceUrlMD5 = common.MD5(short.SourceURL)
+	short.SourceUrlMD5 = utils.MD5(short.SourceURL)
 	var count int64
 	DB.Model(&Short{}).Where("target_url = ?", short.TargetURL).Count(&count)
 	if count > 0 { //已存在
@@ -105,7 +105,7 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 	var sourceUrlMD5s []string
 	for _, v := range shorts {
 		v.ID = uuid.Must(uuid.NewV4(), err).String()
-		v.SourceUrlMD5 = common.MD5(v.SourceURL)
+		v.SourceUrlMD5 = utils.MD5(v.SourceURL)
 		targetStrs = append(targetStrs, v.TargetURL)
 		sourceUrlMD5s = append(sourceUrlMD5s, v.SourceUrlMD5)
 	}
@@ -233,7 +233,7 @@ func DeletedShortUrlByIds(ids []string) bool {
 // @Return			result		string		"生成后的短链接(查找到的)"
 func generateUrl(url string, length int) (result string) {
 	logs.Info(url)
-	md5Url := common.MD5(url)
+	md5Url := utils.MD5(url)
 	var count int64
 	DB.Model(&Short{}).Where("source_url_md5 = ? ", md5Url).Count(&count)
 	if count > 0 { //存在记录，直接使用
@@ -247,7 +247,7 @@ func generateUrl(url string, length int) (result string) {
 	for i := 0; i < len(md5Arr); i++ {
 		num, _ := strconv.ParseUint(md5Arr[i], 16, 32)
 		// fmt.Print("num:", num)
-		by := common.UInt32ToBytes(uint32(num))
+		by := utils.UInt32ToBytes(uint32(num))
 		//将数据密度提升至16个字节，即短url支持4~16长度，有(4*5*6*....*15*16)^64种可能性
 		by = append(by, by[0]&by[1])  //与
 		by = append(by, by[1]|by[2])  //非
@@ -286,7 +286,7 @@ func generateUrl(url string, length int) (result string) {
 func generateUrls(urls []string, length int) (result map[string]string) {
 	var md5Urls []string
 	for i := 0; i < len(urls); i++ {
-		md5Urls = append(md5Urls, common.MD5(urls[i]))
+		md5Urls = append(md5Urls, utils.MD5(urls[i]))
 	}
 
 	var count int64
@@ -300,7 +300,7 @@ func generateUrls(urls []string, length int) (result map[string]string) {
 	}
 
 	for i := 0; i < len(urls); i++ {
-		md5Url := common.MD5(urls[i])
+		md5Url := utils.MD5(urls[i])
 		if _, ok := result[urls[i]]; ok { //存在，直接下一次循环
 			continue
 		}
@@ -308,7 +308,7 @@ func generateUrls(urls []string, length int) (result map[string]string) {
 		md5Arr := []string{md5Url[0:8], md5Url[8:16], md5Url[16:24], md5Url[24:32]}
 		for j := 0; j < len(md5Arr); j++ {
 			num, _ := strconv.ParseUint(md5Arr[j], 16, 32)
-			by := common.UInt32ToBytes(uint32(num))
+			by := utils.UInt32ToBytes(uint32(num))
 			//将数据密度提升至16个字节，即短url支持4~16长度，有(4*5*6*....*15*16)^64种可能性
 			by = append(by, by[0]&by[1])
 			by = append(by, by[1]|by[2])

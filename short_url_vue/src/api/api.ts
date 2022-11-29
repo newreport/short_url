@@ -28,20 +28,30 @@ export class UserService {
    * @param {number}  uid 用户id
    * @return {HttpResponse} result
    */
-  static async deleteUser(uid){
-    return request("/users/"+uid,uid,"delete")
+  static async deleteUser(uid) {
+    return request("/users/" + uid, uid, "delete");
+  }
+
+  /**
+   * @description 分页查询
+   * @param {int} offset  偏移量
+   * @param {int} limit   返回行数
+   * @param {string}  sort  排序
+   * @param {string}  name  账号名
+   * @param {string}  nickname  昵称
+   * @param {string}  phone 手机号
+   * @return  {HttpResponse}  result
+   */
+  static async getUsersPage(params) {
+    return request("/users", params, "get");
   }
   /**
    * @description 修改用户信息
    * @param
    */
-  static async updateUser(){
+  static async updateUser() {}
 
-  }
-
-  static async updateUserPasswd(){
-    
-  }
+  static async updateUserPasswd() {}
 }
 
 export class ShortService {
@@ -110,4 +120,3 @@ export class ShortService {
     return request("/shorts/" + data.id, data, "delete");
   }
 }
-
