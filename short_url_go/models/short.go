@@ -29,6 +29,17 @@ type Short struct {
 	Remarks      string         `json:"remarks"` //备注
 }
 
+type AddEditShort struct {
+	SourceURL  string    `json:"sourceURL"`  //需要跳转的url
+	Automatic  bool      `json:"automactic"` //是否自动生成
+	Length     int       `json:"length"`     //自动生成的长度
+	TargetURL  string    `json:"targetURL"`  //目标URL
+	ShortGroup string    `json:"shortGroup"` //外键关联分组
+	IsEnable   bool      `json:"isEnable"`   //是否启用
+	ExpireAt   time.Time `json:"exp"`        //过期时间
+	Remarks    string    `json:"remarks"`    //备注
+}
+
 type ShortQueryParams struct {
 	ID         string `json:"id"`
 	SourceURL  string `json:"source_url"`

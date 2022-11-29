@@ -100,9 +100,7 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/shorts/default_length/{len}": {
+            },
             "post": {
                 "tags": [
                     "shorts"
@@ -125,7 +123,7 @@
                         "description": "链接",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Short"
+                            "$ref": "#/definitions/models.AddEditShort"
                         }
                     }
                 ],
@@ -159,7 +157,7 @@
                         "description": "body for short",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Short"
+                            "$ref": "#/definitions/models.AddEditShort"
                         }
                     }
                 ],
@@ -256,6 +254,12 @@
                         "in": "query",
                         "name": "phone",
                         "description": "手机号",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "domain",
+                        "description": "域名",
                         "type": "string"
                     },
                     {
@@ -563,34 +567,27 @@
             "title": "len",
             "type": "object"
         },
-        "models.Short": {
-            "title": "Short",
+        "models.AddEditShort": {
+            "title": "AddEditShort",
             "type": "object",
             "properties": {
-                "crt": {
-                    "type": "string",
-                    "format": "datetime"
-                },
-                "det": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
+                "automactic": {
+                    "description": "是否自动生成",
+                    "type": "boolean"
                 },
                 "exp": {
                     "description": "过期时间",
                     "type": "string",
                     "format": "datetime"
                 },
-                "fkUser": {
-                    "description": "外键关联用户",
-                    "type": "integer",
-                    "format": "int32"
-                },
-                "id": {
-                    "description": "主键uuid",
-                    "type": "string"
-                },
                 "isEnable": {
                     "description": "是否启用",
                     "type": "boolean"
+                },
+                "length": {
+                    "description": "自动生成的长度",
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "remarks": {
                     "description": "备注",
@@ -600,10 +597,6 @@
                     "description": "外键关联分组",
                     "type": "string"
                 },
-                "sourceMD5": {
-                    "description": "需要跳转url的MD5",
-                    "type": "string"
-                },
                 "sourceURL": {
                     "description": "需要跳转的url",
                     "type": "string"
@@ -611,10 +604,6 @@
                 "targetURL": {
                     "description": "目标URL",
                     "type": "string"
-                },
-                "upt": {
-                    "type": "string",
-                    "format": "datetime"
                 }
             }
         },
@@ -643,7 +632,7 @@
                     "$ref": "#/definitions/gorm.DeletedAt",
                     "description": "软删除时间"
                 },
-                "domainURL": {
+                "domain": {
                     "description": "域名",
                     "type": "string"
                 },

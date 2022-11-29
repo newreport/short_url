@@ -1,4 +1,4 @@
-﻿dpackage controllers
+﻿package controllers
 
 import (
 	"encoding/json"
@@ -15,27 +15,68 @@ type ShortController struct {
 // @Summary	新增一个短链接
 // @Description add one short url
 // @Param	len	path	len	"默认长度"
-// @Param	body	body	models.Short	true	"链接"
+// @Param	body	body	models.AddEditShort	true	"链接"
 // @Success 200	{string}	"add success"
 // @Failure 200	{string} 	"add fail"
-// @router /default_length/:len [post]
+// @router / [post]
 func (s *ShortController) CreateShort() {
-	var short models.Short
 	accInfo := s.analysisAccountClaims()
-	json.Unmarshal(s.Ctx.Input.RequestBody, &short)
-	length, err := s.GetInt64(":len")
-	if err != nil || (len(short.TargetURL) == 0 && (length < 4 || length > 16)) {
+	var dtoShort models.AddEditShort
+	json.Unmarshal(s.Ctx.Input.RequestBody, &dtoShort)
+	var short models.Short
+	short.SourceURL = dtoShort.SourceURL
+	short.TargetURL = dtoShort.TargetURL
+	short.ShortGroup = dtoShort.ShortGroup
+	short.IsEnable = dtoShort.IsEnable
+	short.ExpireAt = dtoShort.ExpireAt
+	short.Remarks = dtoShort.Remarks
+	if dtoShort.Length == 0 && (dtoShort.Length < 4 || dtoShort.Length > 16) {
 		s.Ctx.WriteString("创建失败，参数错误")
+		s.Ctx.ResponseWriter.WriteHeader(400)
 		return
 	}
 	short.FKUser = accInfo.ID
-	if len(short.TargetURL) > 0 {
-		err = models.CreateShortCustom(short)
+	var err error
+	if dtoShort.Automatic {
+		err = models.CreateShort(short, dtoShort.Length)
 	} else {
-		err = models.CreateShort(short, int(length))
+		err = models.CreateShortCustom(short)
 	}
 	if err != nil {
 		s.Ctx.WriteString(err.Error())
+	}
+}
+
+// @Title	UpdateUser
+// @Summary	修改一个短链接
+// @Param	sid		path	models.Short.ID	true	"短链接id"
+// @Param	short	body	models.AddEditShort	true	"body for short"
+// @Success	200	{string}	"update success"
+// @Failure	403	{string}	"Insufficient user permissions"
+// @router /:sid [put]
+func (s *ShortController) UpdateShort() {
+	var dtoShort models.AddEditShort
+	json.Unmarshal(s.Ctx.Input.RequestBody, &dtoShort)
+
+	var short models.Short
+	short.ID = s.GetString(":sid")
+	accInfo := s.analysisAccountClaims()
+	if accInfo.Role == 1 || accInfo.ID == short.FKUser {
+		existShort := models.QueryShortByID(short.ID)
+		existShort.TargetURL = dtoShort.TargetURL
+		existShort.ShortGroup = dtoShort.ShortGroup
+		existShort.IsEnable = dtoShort.IsEnable
+		existShort.ExpireAt = dtoShort.ExpireAt
+		existShort.Remarks = dtoShort.Remarks
+		err := models.UpdateShort(short)
+		if err != nil {
+			s.Ctx.WriteString(err.Error())
+			return
+		}
+		s.Ctx.WriteString("修改成功")
+	} else {
+		s.Ctx.ResponseWriter.WriteHeader(403)
+		s.Ctx.WriteString("无权修改其他用户的链接")
 	}
 }
 
@@ -115,35 +156,4 @@ func (s *ShortController) GetShortsPage() {
 		"data":  result,
 	}
 	s.ServeJSON()
-}
-
-// @Title	UpdateUser
-// @Summary	修改一个短链接
-// @Param	sid		path	models.Short.ID	true	"短链接id"
-// @Param	short	body	models.Short	true	"body for short"
-// @Success	200	{string}	"update success"
-// @Failure	403	{string}	"Insufficient user permissions"
-// @router /:sid [put]
-func (s *ShortController) UpdateShort() {
-	var short models.Short
-	json.Unmarshal(s.Ctx.Input.RequestBody, &short)
-	short.ID = s.GetString(":sid")
-	accInfo := s.analysisAccountClaims()
-	if accInfo.Role == 1 || accInfo.ID == short.FKUser {
-		existShort := models.QueryShortByID(short.ID)
-		existShort.TargetURL = short.TargetURL
-		existShort.ShortGroup = short.ShortGroup
-		existShort.IsEnable = short.IsEnable
-		existShort.Remarks = short.Remarks
-		existShort.ExpireAt = short.ExpireAt
-		err := models.UpdateShort(short)
-		if err != nil {
-			s.Ctx.WriteString(err.Error())
-			return
-		}
-		s.Ctx.WriteString("修改成功")
-	} else {
-		s.Ctx.ResponseWriter.WriteHeader(403)
-		s.Ctx.WriteString("无权修改其他用户的链接")
-	}
 }

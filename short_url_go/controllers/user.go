@@ -3,8 +3,8 @@
 import (
 	"encoding/json"
 	"fmt"
-	"short_url_go/utils"
 	"short_url_go/models"
+	"short_url_go/utils"
 	"strings"
 
 	"github.com/beego/beego/v2/core/logs"
@@ -254,6 +254,7 @@ func (u *UserController) UpdateUserPassword() {
 // @Param	group	query	string	false	分组
 // @Param	role	query	string	false	权限
 // @Param	phone	query	string	false	手机号
+// @Param	domain	query	string flase	域名
 // @Param	crt	query	string	false	创建时间
 // @Param	upt	query	string	false	修改时间
 // @Param	det	query	string	false	删除时间
@@ -282,7 +283,7 @@ func (u *UserController) GetUsersByPage() {
 		return
 	}
 	page.Sort = analysisOrderBy(u.GetString("sort"))
-	result, count, err := models.QueryUsersPage(page, u.GetString("name"), u.GetString("nickname"), u.GetString("role"), u.GetString("group"), u.GetString("phone"))
+	result, count, err := models.QueryUsersPage(page, u.GetString("name"), u.GetString("nickname"), u.GetString("role"), u.GetString("group"), u.GetString("phone"), u.GetString("domain"))
 	if err != nil {
 		u.Ctx.ResponseWriter.WriteHeader(400)
 		u.Ctx.WriteString("请求参数错误")

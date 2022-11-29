@@ -27,7 +27,7 @@ type User struct { //用户表
 	Remarks          string         `json:"remarks"`                        //备注
 	I18n             string         `json:"i18n"`                           //国际化
 	AutoInsertSpace  bool           `json:"autoInsertSpace"`                //盘古之白
-	Domain           string         `json:"domainURL"`                      //域名
+	Domain           string         `json:"domain" gorm:"uniqueIndex"`      //域名
 }
 
 // @Title 获取所有用户
@@ -83,7 +83,7 @@ func UpdateUser(user User) bool {
 	if DB.Where("name = ? ", user.Name).First(&existUser).RowsAffected > 0 {
 		return false
 	}
-	result := DB.Model(&user).Updates(User{Name: user.Name, Nickname: user.Nickname, Password: user.Password, Role: user.Role, AuthorURL: user.AuthorURL, Phone: user.Phone, Group: user.Group, I18n: user.I18n, AutoInsertSpace: user.AutoInsertSpace, Remarks: user.Remarks, DefaultURLLength: user.DefaultURLLength})
+	result := DB.Model(&user).Updates(User{Name: user.Name, Nickname: user.Nickname, Password: user.Password, Role: user.Role, AuthorURL: user.AuthorURL, Phone: user.Phone, Group: user.Group, I18n: user.I18n, AutoInsertSpace: user.AutoInsertSpace, Remarks: user.Remarks, DefaultURLLength: user.DefaultURLLength, Domain: user.Domain})
 	return result.RowsAffected > 0
 }
 
@@ -93,16 +93,17 @@ func UpdateUser(user User) bool {
 // @Param	query	models.UserQueryUsersPage	查询参数
 // @Param	page	models.Page	分页查询struct
 // @Return	users	[]models.User,error
-func QueryUsersPage(page Page, name string, nickname string, role string, group string, phone string) (result []User, count int64, err error) {
+func QueryUsersPage(page Page, name string, nickname string, role string, group string, phone string, domain string) (result []User, count int64, err error) {
 	express := DB.Model(&User{})
 	if analysisRestfulRHS(express, "name", name) &&
 		analysisRestfulRHS(express, "nickname", group) &&
 		analysisRestfulRHS(express, "role", role) &&
 		analysisRestfulRHS(express, "phone", phone) &&
+		analysisRestfulRHS(express, "domain", domain) &&
 		analysisRestfulRHS(express, "group", group) {
 		express.Count(&count)
 		express = express.Order(page.Sort).Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
-		express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "i18n", "auto_insert_space", "remarks").Find(&result)
+		express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "i18n", "auto_insert_space", "remarks", "domain").Find(&result)
 	} else {
 		err = errors.New("查詢參數錯誤")
 	}

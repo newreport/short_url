@@ -94,10 +94,10 @@ formAddEdit.shortGroup = scope.row.shortGroup;
           <el-input v-model="formAddEdit.sourceURL" />
         </el-form-item>
         <el-form-item label="分组">
-          <el-input v-model="formAddEdit.shortGroup" />
+          <el-input v-model="formAddEdit.shortGroup"/>
         </el-form-item>
         <el-form-item label="短链接" v-if="!formAddEdit.isAutoGenerate">
-          <el-input v-model="formAddEdit.sourceURL" />
+          <el-input v-model="formAddEdit.targetURL" />
         </el-form-item>
         <el-form-item label="URL长度" v-if="formAddEdit.isAutoGenerate">
           <el-input-number v-model="formAddEdit.urlLength" :min="4" :max="16" />

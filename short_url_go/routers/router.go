@@ -27,8 +27,9 @@ var FilterToken = func(ctx *context.Context) {
 	if ctx.Request.RequestURI != "/v1/users/all" &&
 		ctx.Request.RequestURI != "/v1/users/login" &&
 		ctx.Request.RequestURI != "/v1/users/register" &&
-		ctx.Request.RequestURI != "/v1/users/tocken/account"&&
-		ctx.Request.RequestURI != "/v1/users/delete"  {
+		ctx.Request.RequestURI != "/v1/users/tocken/account" &&
+		ctx.Request.RequestURI != "/v1/users/delete" &&
+		ctx.Request.RequestURI == "/v1/*" {
 		//没有token
 		if ctx.Input.Header("Authorization") == "" {
 			logs.Error("without token, unauthorized !!")
@@ -71,6 +72,7 @@ func init() {
 		// AllowCredentials: true,
 	}))
 	beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
+	beego.Router("/:url:string", &controllers.RedirectController{})
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/users",
 			beego.NSInclude(
