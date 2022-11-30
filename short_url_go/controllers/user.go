@@ -146,6 +146,7 @@ func (u *UserController) CreateUser() {
 			u.Ctx.WriteString("创建成功")
 		} else {
 			u.Ctx.WriteString("创建失败，用户名重复")
+			u.Ctx.ResponseWriter.WriteHeader(403)
 		}
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(403)
@@ -157,20 +158,31 @@ func (u *UserController) CreateUser() {
 // @Summary 删除一个用户
 // @Description delete the user
 // @Param	uid		path 	unit	true	"The uid you want to delete"
+// @Param	isUnscoped	body	bool	false	"body for isUnscoped"
 // @Success 200	{string}	delete success!
 // @Failure 403	{string}	Insufficient user permissions
 // @router /:uid [delete]
 func (u *UserController) DeleteUser() {
 	uid, err := u.GetUint64(":uid")
 	if err != nil {
-		fmt.Println(err)
+		u.Ctx.ResponseWriter.WriteHeader(400)
+		u.Ctx.WriteString("参数错误")
+		return
+	}
+	var isUnscoped bool
+	isUnscoped, err = u.GetBool("isUnscoped")
+	if err != nil {
+		u.Ctx.ResponseWriter.WriteHeader(400)
+		u.Ctx.WriteString("参数错误")
+		return
 	}
 	accInfo := u.analysisAccountClaims()
 	if accInfo.Role == 1 || accInfo.ID == uint(uid) {
-		if models.DeleteUser(uint(uid)) {
+		if models.DeleteUser(uint(uid), isUnscoped) {
 			u.Ctx.WriteString("delete success!")
 		} else {
-			u.Ctx.WriteString("删除失败，该用户存在url链接")
+			u.Ctx.WriteString("删除失败，该用户存在链接")
+			u.Ctx.ResponseWriter.WriteHeader(403)
 		}
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(403)
@@ -203,6 +215,7 @@ func (u *UserController) UpdateUser() {
 			u.Ctx.WriteString("修改成功")
 		} else {
 			u.Ctx.WriteString("修改失败,账号名重复")
+			u.Ctx.ResponseWriter.WriteHeader(403)
 		}
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(403)
@@ -224,6 +237,7 @@ func (u *UserController) UpdateUserPassword() {
 	if err != nil {
 		u.Ctx.ResponseWriter.WriteHeader(400)
 		u.Ctx.WriteString("参数类型错误")
+		return
 	}
 	var pwd string
 	accInfo := u.analysisAccountClaims()
@@ -235,10 +249,11 @@ func (u *UserController) UpdateUserPassword() {
 			u.Ctx.WriteString("修改成功")
 		} else {
 			u.Ctx.WriteString("修改失败")
+			u.Ctx.ResponseWriter.WriteHeader(403)
 		}
 	} else {
-		u.Ctx.ResponseWriter.WriteHeader(403)
 		u.Ctx.WriteString("无权修改他人密码")
+		u.Ctx.ResponseWriter.WriteHeader(403)
 	}
 }
 
@@ -258,6 +273,7 @@ func (u *UserController) UpdateUserPassword() {
 // @Param	crt	query	string	false	创建时间
 // @Param	upt	query	string	false	修改时间
 // @Param	det	query	string	false	删除时间
+// @Param	isUnscoped	query	bool	false	回收站
 // @Success	200
 // @Failure 403	{string}	Insufficient user permissions
 // @router / [get]
@@ -273,20 +289,20 @@ func (u *UserController) GetUsersByPage() {
 	page.Offset, err = u.GetInt("offset")
 	if err != nil {
 		u.Ctx.ResponseWriter.WriteHeader(400)
-		u.Ctx.WriteString("请求参数类型错误")
+		u.Ctx.WriteString("参数错误")
 		return
 	}
 	page.Lmit, err = u.GetInt("limit")
 	if err != nil {
 		u.Ctx.ResponseWriter.WriteHeader(400)
-		u.Ctx.WriteString("请求参数类型错误")
+		u.Ctx.WriteString("参数错误")
 		return
 	}
 	page.Sort = analysisOrderBy(u.GetString("sort"))
 	result, count, err := models.QueryUsersPage(page, u.GetString("name"), u.GetString("nickname"), u.GetString("role"), u.GetString("group"), u.GetString("phone"), u.GetString("domain"))
 	if err != nil {
 		u.Ctx.ResponseWriter.WriteHeader(400)
-		u.Ctx.WriteString("请求参数错误")
+		u.Ctx.WriteString("参数错误")
 		return
 	}
 	u.Data["json"] = map[string]interface{}{

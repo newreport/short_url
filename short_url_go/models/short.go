@@ -53,9 +53,6 @@ type ShortQueryParams struct {
 	DeletedAt  string `json:"det"`
 }
 
-// URL种子，即浏览器支持的非转义字符，这里只取了64个
-// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~!*
-const URLSTRS = "LMndefNq3~ZaUVWvw4sQRABCY56rHz0DEFJ127KxyX89IbcPhijklmGS-TgtOopu"
 
 // @Title			CreateShort
 // @Description		生成单个短链接url

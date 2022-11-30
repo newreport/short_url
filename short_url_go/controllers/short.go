@@ -80,6 +80,12 @@ func (s *ShortController) UpdateShort() {
 	}
 }
 
+func (ctrl *ShortController) DownloadFile() {
+	// The file LICENSE is under root path.
+	// and the downloaded file name is license.txt
+	ctrl.Ctx.Output.Download("LICENSE", "license.txt")
+}
+
 // @Title	DeleteShort
 // @Summary	根据id删除一个短链接
 // @Param	sid	path	string true	"链接id"

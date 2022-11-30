@@ -22,9 +22,13 @@ type Page struct {
 
 var U5Seed uuid.UUID
 
+// URL种子，即浏览器支持的非转义字符，这里只取了64个
+// ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~!*
+var URLSTRS = "LMndeJ127KxyX89IbVWvw4sQRABCY56rHfNq3~ZaUz0DEFcPhijklmGS-TgtOopu"
+
 func init() {
 	var err error
-	utils.INIconf, err = config.NewConfig("ini", "conf/secret.conf")
+	utils.INIconf, err = config.NewConfig("ini", "data/secret.conf")
 	if err != nil {
 		fmt.Println(err)
 		panic(err) //https://zhuanlan.zhihu.com/p/373653492
@@ -45,9 +49,10 @@ func init() {
 	if !existDic {
 		os.Mkdir(_path, os.ModePerm)
 	}
+
+	//2.创建sqlite数据库
 	_path += "/main.db"
 	if existSqlFile, _ := utils.PathExists(_path); !existSqlFile {
-		//创建sqlite文件
 		DB, err = gorm.Open(sqlite.Open(_path), &gorm.Config{})
 		if err != nil {
 			panic("failed to connect database")
@@ -56,13 +61,18 @@ func init() {
 		DB.AutoMigrate(&User{}, &Short{})
 		userAdmin := User{Name: "admin", Nickname: "admin", Password: uuid.NewV5(U5Seed, "admin").String(), Role: 1, DefaultURLLength: 6, Remarks: "默认管理员"}
 		DB.Create(&userAdmin)
-		userUser1 := User{Name: "user", Nickname: "user", Password: uuid.NewV5(U5Seed, "user").String(), DefaultURLLength: 9, Role: 0}
-		DB.Create(&userUser1)
 	} else {
 		DB, err = gorm.Open(sqlite.Open(_path), &gorm.Config{})
 		if err != nil {
 			panic("failed to connect database")
 		}
+	}
+
+	//3.引用URL种子
+	URLSTRS, err = utils.INIconf.String("URL::Seed")
+	if err != nil {
+		fmt.Printf("get URLSeed error![%v]\n", err)
+		panic(err)
 	}
 }
 

@@ -65,14 +65,17 @@ func Login(username, password string) User {
 }
 
 // @Title 根据id删除用户
-func DeleteUser(id uint) bool {
+func DeleteUser(id uint, isUnscoped bool) bool {
 	var count int64
 	//存在url不允许删除
-	DB.Model(Short{}).Where("fk_user = ? ", id).Count(&count)
+	DB.Model(Short{}).Unscoped().Where("fk_user = ? ", id).Count(&count)
 	if count > 0 {
 		return false
 	}
 	result := DB.Delete(&User{}, id)
+	if isUnscoped {
+		result = DB.Unscoped().Delete(&User{}, id) //永久删除
+	}
 	return result.RowsAffected > 0
 }
 
