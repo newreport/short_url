@@ -1,0 +1,3 @@
+﻿[response]
+paramsError = "params error"
+insufficientPermissions= "insufficient permissions"

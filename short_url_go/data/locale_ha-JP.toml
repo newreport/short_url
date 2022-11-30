@@ -1,0 +1,3 @@
+﻿[response]
+paramsError = "参数错误"
+insufficientPermissions = "权限不足"

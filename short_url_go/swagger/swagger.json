@@ -279,6 +279,12 @@
                         "name": "det",
                         "description": "删除时间",
                         "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "isUnscoped",
+                        "description": "回收站",
+                        "type": "boolean"
                     }
                 ],
                 "responses": {
@@ -491,6 +497,15 @@
                         "schema": {
                             "$ref": "#/definitions/unit"
                         }
+                    },
+                    {
+                        "in": "body",
+                        "name": "isUnscoped",
+                        "description": "body for isUnscoped",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "type": "boolean"
                     }
                 ],
                 "responses": {
