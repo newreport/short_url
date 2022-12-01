@@ -9,18 +9,18 @@ func init() {
 
     beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
         beego.ControllerComments{
-            Method: "GetShortsPage",
+            Method: "CreateShort",
             Router: `/`,
-            AllowHTTPMethods: []string{"get"},
+            AllowHTTPMethods: []string{"post"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})
 
     beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
         beego.ControllerComments{
-            Method: "DeleteShort",
-            Router: `/:sid`,
-            AllowHTTPMethods: []string{"delete"},
+            Method: "GetShortsPage",
+            Router: `/`,
+            AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})
@@ -36,9 +36,9 @@ func init() {
 
     beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
         beego.ControllerComments{
-            Method: "CreateShort",
-            Router: `/default_length/:len`,
-            AllowHTTPMethods: []string{"post"},
+            Method: "DeleteShort",
+            Router: `/:sid`,
+            AllowHTTPMethods: []string{"delete"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})
