@@ -1,6 +1,6 @@
 ﻿<template>
   <div>
-    <el-form inline="true" label-position="left" label-width="68px" :model="form">
+    <el-form :inline="true" label-position="left" label-width="68px" :model="form">
       <el-form-item label="源链接">
         <el-input v-model="form.sourceURL" />
       </el-form-item>
@@ -77,7 +77,7 @@ formAddEdit.shortGroup = scope.row.shortGroup;
 
     <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="page.count"
       :page-sizes="[100, 200, 300, 400]" v-model:currentPage="page.currentPage" v-model:page-size="page.pageSize"
-      @size-change="handleSizeChange" @current-change="handleCurrentChange" hide-on-single-page="true" />
+      @size-change="handleSizeChange" @current-change="handleCurrentChange" :hide-on-single-page="true" />
 
 
     <el-dialog v-model="dialogVisible" :title="formAddEdit.id ? '修改链接' : '新增链接'" :before-close="handleClose">

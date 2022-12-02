@@ -18,6 +18,7 @@ short_url_go/short_url_go
 short_url_go/data/main.db
 short_url_go/swagger/*
 short_url_go/swagger.zip
+short_url_go/go.mod
 
 # cache
 cache_file/*

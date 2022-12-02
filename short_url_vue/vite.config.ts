@@ -24,7 +24,6 @@ export default defineConfig({
   },
   plugins: [
     vue(),
-    'vue-router',
     AutoImport({
       resolvers: [
         ElementPlusResolver(),

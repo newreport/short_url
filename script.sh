@@ -15,6 +15,10 @@ vit vite --port=8888    # 预览测试
 lsof -i:8080    @ #端口占用
 
 
-docker run -it --rm busybox
 docker build -t st:example .
+docker run -itd --rm -p 8080:8080 st:example
+docker run -itd --rm -p 8989:8989 st:example
+docker exec -it  /bin/bash
+
+
 # https://cloud.tencent.com/developer/article/1574630 #linux打開文件過多

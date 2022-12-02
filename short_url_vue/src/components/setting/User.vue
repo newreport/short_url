@@ -1,6 +1,6 @@
 ﻿<template>
   <div>
-  <el-form inline="true" label-position="left" label-width="68px" :model="form">
+  <el-form :inline="true" label-position="left" label-width="68px" :model="form">
     <el-form-item label="用户名">
       <el-input v-model="form.name" />
     </el-form-item>
