@@ -47,7 +47,7 @@ func (s *ShortController) CreateShort() {
 	}
 }
 
-// @Title	UpdateUser
+// @Title	UpdateShort
 // @Summary	修改一个短链接
 // @Param	sid		path	models.Short.ID	true	"短链接id"
 // @Param	short	body	models.AddEditShort	true	"body for short"
@@ -80,20 +80,60 @@ func (s *ShortController) UpdateShort() {
 	}
 }
 
-func (ctrl *ShortController) DownloadFile() {
+// @Title	RecoverShort
+// @Summary 恢復一個鏈接
+// @Param	sid		path	models.Short.ID	true	"短链接id"
+// @Success	200	{string}	"update success"
+// @Failure	403	{string}	"Insufficient user permissions"
+// @router /:sid [put]/recover
+func (s *ShortController) RecoverShort() {
+
+	id := s.GetString(":sid")
+	accInfo := s.analysisAccountClaims()
+	existShort := models.QueryShortByID(id)
+	if accInfo.Role == 1 || accInfo.ID == existShort.FKUser {
+		if models.RecoverShort(id) {
+			s.Ctx.WriteString("恢復成功")
+		} else {
+			s.Ctx.WriteString("恢復失敗")
+		}
+	} else {
+		s.Ctx.ResponseWriter.WriteHeader(403)
+		s.Ctx.WriteString("无权恢復其他用户的链接")
+	}
+}
+
+func (s *ShortController) ExportExcel() {
 	// The file LICENSE is under root path.
 	// and the downloaded file name is license.txt
-	ctrl.Ctx.Output.Download("LICENSE", "license.txt")
+	s.Ctx.Output.Download("LICENSE", "license.txt")
+}
+
+// @Title	UpdateUser
+// @Summary	修改一个短链接
+// @Param	sid		path	models.Short.ID	true	"短链接id"
+// @Param	short	body	models.AddEditShort	true	"body for short"
+// @Success	200	{string}	"update success"
+// @Failure	403	{string}	"Insufficient user permissions"
+// @router /:sid [put]
+func (s *ShortController) ExportHtml() {
+	// The file LICENSE is under root path.
+	// and the downloaded file name is license.txt
+	s.Ctx.Output.Download("LICENSE", "license.txt")
 }
 
 // @Title	DeleteShort
 // @Summary	根据id删除一个短链接
 // @Param	sid	path	string true	"链接id"
+// @Param	unscoped body string false	"是否永久刪除"
 // @Success	200	{string}	"delete success!"
 // @Failure	403	{string}	"无权删除"
 // @router /:sid [delete]
 func (s *ShortController) DeleteShort() {
 	sid := s.GetString(":sid")
+	var unscoped string
+	json.Unmarshal(s.RequestBody(), &unscoped)
+	isUnscoped := unscoped == "1"
 	accInfo := s.analysisAccountClaims()
 	short := models.QueryShortByID(sid)
 	if accInfo.ID != short.FKUser {
@@ -101,7 +141,7 @@ func (s *ShortController) DeleteShort() {
 		s.Ctx.WriteString("无权删除其他用户的链接")
 		return
 	}
-	if models.DeletedShortUrlById(sid) {
+	if models.DeletedShortUrlByID(sid, isUnscoped) {
 		s.Ctx.WriteString("delete success!")
 	} else {
 		s.Ctx.WriteString("delete fail!")
@@ -114,7 +154,8 @@ func (s *ShortController) DeleteShort() {
 // @Auth	sfhj
 // @Param	offset	query	int	true	偏移量
 // @Param	limit	query	int	true	指定返回记录的数量
-// @Param	sort	query	string	true	排序
+// @Param	sort	query	string	false	排序
+// @Param	unscoped	query	string	false	回收站
 // @Param	source_url	query	string	false	源url
 // @Param	target_url	query	string	false	目标url
 // @Param	group	query	string	false	分组
@@ -142,6 +183,8 @@ func (s *ShortController) GetShortsPage() {
 		return
 	}
 	page.Sort = analysisOrderBy(s.GetString("sort"))
+	page.Unscoped = s.GetString("unscoped") == "1"
+
 	fkUser := strconv.FormatUint(uint64(accInfo.ID), 10)
 	sourceURL := s.GetString("source_url")
 	targetURL := s.GetString("target_url")

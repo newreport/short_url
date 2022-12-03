@@ -1,27 +1,13 @@
 ﻿package controllers
 
 import (
-	"short_url_go/utils"
 	"short_url_go/models"
+	"short_url_go/utils"
 	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 )
-
-type AccountClaims struct {
-	ID               uint   `json:"id"`
-	Name             string `json:"name"`
-	Nickname         string `json:"nickname"`
-	Role             int8   `json:"role"`
-	DefaultURLLength uint8  `json:"urlLength"`
-	jwt.RegisteredClaims
-}
-
-type RefreshClaims struct {
-	ID uint `json:"id"`
-	jwt.RegisteredClaims
-}
 
 // @Title analysisAccountClaims
 // @Description 從 http head 中解析 AccessTokenKey
@@ -65,6 +51,7 @@ func generateAccountJWT(user models.User) string {
 		user.Nickname,
 		user.Role,
 		user.DefaultURLLength,
+		user.I18n,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(10 * time.Minute)), //10分组刷新一次
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -78,6 +65,16 @@ func generateAccountJWT(user models.User) string {
 	key, _ := utils.INIconf.String("JWT::AccessTokenKey")
 	tokenString, _ := token.SignedString([]byte(key))
 	return tokenString
+}
+
+type AccountClaims struct {
+	ID               uint   `json:"id"`
+	Name             string `json:"name"`
+	Nickname         string `json:"nickname"`
+	Role             int8   `json:"role"`
+	DefaultURLLength uint8  `json:"urlLength"`
+	I18n             string `json:"i18n"`
+	jwt.RegisteredClaims
 }
 
 // @Title generateRefreshJWT
@@ -101,4 +98,9 @@ func generateRefreshJWT(id uint) string {
 	key, _ := utils.INIconf.String("JWT::RefreshTokenKey")
 	tokenString, _ := token.SignedString([]byte(key))
 	return tokenString
+}
+
+type RefreshClaims struct {
+	ID uint `json:"id"`
+	jwt.RegisteredClaims
 }

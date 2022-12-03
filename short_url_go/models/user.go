@@ -49,7 +49,7 @@ func Clean() bool {
 func CreateUser(user User) uint {
 	user.Password = uuid.NewV5(U5Seed, user.Password).String()
 	var existUser User
-	if DB.Where("name = ? OR domain = ?", user.Name, user.Domain).First(&existUser).RowsAffected > 0 {
+	if DB.Unscoped().Where("name = ? OR domain = ?", user.Name, user.Domain).First(&existUser).RowsAffected > 0 {
 		return 0
 	}
 	DB.Create(&user)
@@ -83,7 +83,7 @@ func DeleteUser(id uint, isUnscoped bool) bool {
 func UpdateUser(user User) bool {
 	user.Password = uuid.NewV5(U5Seed, user.Password).String()
 	var existUser User
-	if DB.Where("name = ? ", user.Name).First(&existUser).RowsAffected > 0 {
+	if DB.Unscoped().Where("name = ? ", user.Name).First(&existUser).RowsAffected > 0 {
 		return false
 	}
 	result := DB.Model(&user).Updates(User{Name: user.Name, Nickname: user.Nickname, Password: user.Password, Role: user.Role, AuthorURL: user.AuthorURL, Phone: user.Phone, Group: user.Group, I18n: user.I18n, AutoInsertSpace: user.AutoInsertSpace, Remarks: user.Remarks, DefaultURLLength: user.DefaultURLLength, Domain: user.Domain})
@@ -106,7 +106,7 @@ func QueryUsersPage(page Page, name string, nickname string, role string, group 
 		analysisRestfulRHS(express, "group", group) {
 		express.Count(&count)
 		if page.Unscoped {
-			express = express.Unscoped()
+			express = express.Unscoped().Where(" deleted_at IS NULL ")
 		}
 		express = express.Order(page.Sort).Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
 		express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "i18n", "auto_insert_space", "remarks", "domain").Find(&result)
@@ -123,21 +123,18 @@ func QueryUserByID(id uint) User {
 	return user
 }
 
-// @Title 根据账号查询用户
-func QueryUserByName(name string) User {
-	var user User
-	DB.Where("name = ? ", name).First(&user)
-	return user
-}
-
 // @Title 根据用户id集合删除用户
-func DeleteUsers(ids []uint) bool {
+func DeleteUsers(ids []uint, isUnscoped bool) bool {
 	var count int64
-	DB.Model(Short{}).Where("fk_user IN ?", ids).Count(&count)
+	DB.Model(Short{}).Unscoped().Where("fk_user IN ?", ids).Count(&count)
 	if count > 0 {
 		return false
 	}
 	var users []User
-	result := DB.Model(User{}).Where(&users, ids).Delete(&User{})
+	express := DB.Model(User{})
+	if isUnscoped {
+		express = express.Unscoped()
+	}
+	result := express.Where(&users, ids).Delete(&User{})
 	return result.RowsAffected > 0
 }

@@ -22,5 +22,4 @@ func (r *RedirectController) Get() {
 	// helloPerson := localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: "paramsError"})
 	// logs.Info(helloPerson)
 	// r.Ctx.WriteString(helloPerson)
-
 }

@@ -2,7 +2,6 @@
 
 import (
 	"errors"
-	"fmt"
 	"short_url_go/utils"
 	"strconv"
 	"time"
@@ -62,18 +61,29 @@ type ShortQueryParams struct {
 // @Return			result		bool			"操作是否成功"
 func CreateShort(short Short, length int) error {
 	var err error
-	short.TargetURL = generateUrl(short.SourceURL, length)
+	short.TargetURL = generateUrl(short.SourceURL, short.FKUser, length)
 	var existShort Short
-	if DB.Where("target_url = ? ", short.TargetURL).First(&existShort).RowsAffected > 0 {
-		return errors.New("已存在短链接")
+	if DB.Unscoped().Where("target_url = ? AND fk_user = ? ", short.TargetURL, short.FKUser).First(&existShort).RowsAffected > 0 {
+		return errors.New("該用戶已存在該短链接")
 	}
 	short.ID = uuid.Must(uuid.NewV4(), err).String()
 	short.SourceUrlMD5 = utils.MD5(short.SourceURL)
 	result := DB.Create(&short)
 	if result.RowsAffected == 0 {
-		return errors.New("创建失败")
+		return errors.New("數據庫錯誤，创建失败")
 	}
 	return nil
+}
+
+// @Title			CreateShort
+// @Description		生成单个短链接url
+// @Auth			sfhj
+// @Date			2022-10-23
+// @Param     		short		models.Short	"需要生成短链接的url"
+// @Param     		length		int				"短链接长度"
+// @Return			result		bool			"操作是否成功"
+func CreateShorts(urls []string, fkUser uint, length int) (result map[string]string) {
+	return generateUrls(urls, fkUser, length)
 }
 
 // @Title			CreateShortCustom
@@ -87,14 +97,13 @@ func CreateShortCustom(short Short) error {
 	short.ID = uuid.Must(uuid.NewV4(), err).String()
 	short.SourceUrlMD5 = utils.MD5(short.SourceURL)
 	var count int64
-	DB.Model(&Short{}).Where("target_url = ?", short.TargetURL).Count(&count)
+	DB.Model(&Short{}).Unscoped().Where("target_url = ? AND fk_user = ? ", short.TargetURL, short.FKUser).Count(&count)
 	if count > 0 { //已存在
-		return errors.New("已存在短链接")
+		return errors.New("該用戶已存在該短链接")
 	}
 	result := DB.Create(&short)
 	if result.RowsAffected == 0 {
-		logs.Info(result.Error)
-		return errors.New("创建失败")
+		return errors.New("數據庫錯誤，创建失败")
 	}
 	return nil
 }
@@ -117,44 +126,32 @@ func CreateShortsCustom(shorts []Short) (alreadyResult map[string]string, repeat
 		sourceUrlMD5s = append(sourceUrlMD5s, v.SourceUrlMD5)
 	}
 	var count int64
-	var fkUserID uint
-	if len(shorts) > 0 && shorts[0].FKUser != 0 {
-		fkUserID = shorts[0].FKUser
-		DB.Model(&Short{}).Where("( target_url IN ? OR source_url_md5 IN ? ) AND fk_user = ?", targetStrs, sourceUrlMD5s, fkUserID).Count(&count)
-	} else {
-		DB.Model(&Short{}).Where("target_url IN ? OR source_url_md5 IN ?", targetStrs, sourceUrlMD5s).Count(&count)
-	}
+	fkUser := shorts[0].FKUser
+	DB.Model(&Short{}).Unscoped().Where("( target_url IN ? OR source_url_md5 IN ? ) AND fk_user = ?", targetStrs, sourceUrlMD5s, fkUser).Count(&count)
 	var existSouceShorts []Short
 	var existTargetShorts []Short
 	var existSouceURLs []string
 	var existTargetURLs []string
-	even := lo.Filter[int]([]int{1, 2, 3, 4}, func(x int, index int) bool {
-		return x%2 == 0
-	})
-	fmt.Println(even)
 	if count > 0 { //已存在
-		sourceExpress := DB.Where(" source_url_md5 IN ? ", sourceUrlMD5s)
-		tagetExpress := DB.Where(" target_url IN ? ", targetStrs)
-		if len(shorts) > 0 && shorts[0].FKUser != 0 { //查詢用戶外鍵關聯
-			sourceExpress = sourceExpress.Where("fk_user = ?", shorts[0].FKUser)
-			tagetExpress = tagetExpress.Where("fk_user = ?", shorts[0].FKUser)
-		}
+		sourceExpress := DB.Unscoped().Where(" source_url_md5 IN ?  AND fk_user = ?", sourceUrlMD5s, shorts[0].FKUser)
+		tagetExpress := DB.Unscoped().Where(" target_url IN ? AND fk_user = ?", targetStrs, shorts[0].FKUser)
 		sourceExpress.Select("source_url").Find(&existSouceShorts)
 		tagetExpress.Select("source_url").Find(&existTargetShorts)
-		linq.From(existSouceShorts).SelectT(func(e Short) string { //查詢已存在的sourceURL集合
+
+		linq.From(existSouceShorts).SelectT(func(e Short) string {
 			return e.SourceURL
-		}).ToSlice(&existSouceURLs)
-		linq.From(existTargetShorts).SelectT(func(e Short) string { //查詢已經存在的targetURL集合
+		}).ToSlice(&existSouceURLs) //查詢已存在的sourceURL集合
+		linq.From(existTargetShorts).SelectT(func(e Short) string {
 			return e.SourceURL
-		}).ToSlice(&existTargetURLs)
-		//移除已經存在的sourceURL (數據庫不創建)
+		}).ToSlice(&existTargetURLs) //查詢已經存在的targetURL集合
+
 		linq.From(shorts).WhereT(func(s Short) bool {
 			return !lo.Contains[string](existSouceURLs, s.SourceURL)
-		}).ToSlice(&shorts)
-		//移除已經存在的targetURL
+		}).ToSlice(&shorts) //移除已經存在的sourceURL (數據庫不創建)
+
 		linq.From(shorts).WhereT(func(s Short) bool {
 			return !lo.Contains[string](existTargetURLs, s.SourceURL)
-		}).ToSlice(&shorts)
+		}).ToSlice(&shorts) //移除已經存在的targetURL
 	}
 	DB.Create(&shorts)
 	if err != nil {
@@ -168,7 +165,7 @@ func UpdateShort(short Short) error {
 	result := DB.Where("id = ? ", short.ID).First(&existShort)
 	if result.RowsAffected > 0 {
 		var count int64
-		DB.Model(&Short{}).Where("target_url = ? AND fk_user <> ?", short.TargetURL, short.FKUser).Count(&count)
+		DB.Model(&Short{}).Unscoped().Where("target_url = ? AND fk_user = ? AND target_url != ?", short.TargetURL, short.FKUser, existShort.TargetURL).Count(&count)
 		if count > 0 {
 			return errors.New("短链接重复")
 		}
@@ -177,11 +174,21 @@ func UpdateShort(short Short) error {
 		if result.RowsAffected > 0 {
 			return nil
 		}
-		return errors.New("修改失败")
+		return errors.New("數據庫錯誤，修改失败")
 	} else {
 		return errors.New("没有查询到该链接")
 	}
+}
 
+// @Title	RecoverShort
+// @Description	從回收站移除
+// @Auth	sfhj
+// @Date	2022-12-03
+// @Param	id	string
+func RecoverShort(id string) bool {
+	// 条件更新
+	result := DB.Model(&Short{}).Unscoped().Where("id = ?", id).Update("deleted_at", nil)
+	return result.RowsAffected > 0
 }
 
 //https://www.cnblogs.com/liuhui5599/p/14081524.html
@@ -203,8 +210,11 @@ func QueryShortsPage(page Page, fkUser string, sourceURL string, targetURL strin
 		analysisRestfulRHS(express, "created_at", crt) &&
 		analysisRestfulRHS(express, "updated_at", upt) &&
 		analysisRestfulRHS(express, "deleted_at", del) {
-		express.Debug().Count(&count)
-		express.Debug().Order(page.Sort).Select("id,source_url,source_url_md5,target_url,fk_user,short_group,is_enable,created_at,updated_at,expire_at,remarks").Find(&result)
+		express.Count(&count)
+		if page.Unscoped {
+			express = express.Unscoped().Where(" deleted_at IS NULL ")
+		}
+		express.Order(page.Sort).Select("id,source_url,source_url_md5,target_url,fk_user,short_group,is_enable,created_at,updated_at,expire_at,remarks").Find(&result)
 	} else {
 		err = errors.New("查詢參數錯誤")
 	}
@@ -213,21 +223,29 @@ func QueryShortsPage(page Page, fkUser string, sourceURL string, targetURL strin
 
 func QueryShortByID(id string) Short {
 	var one Short
-	DB.Model(&Short{}).Where("id = ?", id).First(&one)
+	DB.Model(&Short{}).Unscoped().Where("id = ?", id).First(&one)
 	return one
 }
 
-// @Title DeletedShortUrlById
+// @Title DeletedShortUrlByID
 // @Description	根據id刪除url
-func DeletedShortUrlById(id string) bool {
-	result := DB.Where("id = ?", id).Delete(&Short{})
+func DeletedShortUrlByID(id string, isUnscoped bool) bool {
+	express := DB.Where("id = ?", id)
+	if isUnscoped {
+		express = express.Unscoped()
+	}
+	result := express.Delete(&Short{})
 	return result.RowsAffected > 0
 }
 
-// @Title DeletedShortUrlByIds
+// @Title DeletedShortUrlByIDs
 // @Description 根據多個id刪除url
-func DeletedShortUrlByIds(ids []string) bool {
-	result := DB.Delete(&Short{}, "id IN ?", ids)
+func DeletedShortUrlByIDs(ids []string, isUnscoped bool) bool {
+	express := DB.Where(" id IN ?", ids)
+	if isUnscoped {
+		express = express.Unscoped()
+	}
+	result := express.Delete(&Short{})
 	return result.RowsAffected > 0
 }
 
@@ -238,14 +256,14 @@ func DeletedShortUrlByIds(ids []string) bool {
 // @Param     		urls        string		"需要生成短链接的url"
 // @Param     		length       int		"短链接长度"
 // @Return			result		string		"生成后的短链接(查找到的)"
-func generateUrl(url string, length int) (result string) {
+func generateUrl(url string, fkUser uint, length int) (result string) {
 	logs.Info(url)
 	md5Url := utils.MD5(url)
 	var count int64
-	DB.Model(&Short{}).Where("source_url_md5 = ? ", md5Url).Count(&count)
+	DB.Model(&Short{}).Unscoped().Where("source_url_md5 = ? AND fk_user = ? ", md5Url, fkUser).Count(&count)
 	if count > 0 { //存在记录，直接使用
 		var one Short
-		DB.Where("source_url_md5 = ?", md5Url).First(&one)
+		DB.Unscoped().Where("source_url_md5 = ?  AND fk_user = ? ", md5Url, fkUser).First(&one)
 		result = one.TargetURL
 		return
 	}
@@ -274,7 +292,7 @@ func generateUrl(url string, length int) (result string) {
 			urlNum := by[j] % 64
 			result += string(URLSTRS[urlNum])
 		}
-		DB.Model(&Short{}).Where("target_url = ? ", result).Count(&count)
+		DB.Model(&Short{}).Unscoped().Where("target_url = ? AND fk_user = ? ", result, fkUser).Count(&count)
 		if count == 0 {
 			return //不重复，则直接结束循环
 		}
@@ -290,27 +308,27 @@ func generateUrl(url string, length int) (result string) {
 // @Param     		urls        []string				"需要生成短链接的url"
 // @Param     		length        int				"url长度"
 // @Return			result		map[string]string		"生成后的键值对集合"
-func generateUrls(urls []string, length int) (result map[string]string) {
+func generateUrls(urls []string, fkUser uint, length int) (result map[string]string) {
 	var md5Urls []string
 	for i := 0; i < len(urls); i++ {
 		md5Urls = append(md5Urls, utils.MD5(urls[i]))
 	}
-
+	result = make(map[string]string)
 	var count int64
-	DB.Model(&Short{}).Where("source_url_md5 IN ? ", md5Urls).Count(&count)
+	DB.Model(&Short{}).Unscoped().Where("source_url_md5 IN ?  AND fk_user = ? ", md5Urls, fkUser).Count(&count)
 	if count > 0 { //存在记录，直接使用
 		var alreadyShort []Short
-		DB.Where("source_url_md5 IN ?", md5Urls).Select([]string{"source_url", "target_url"}).Find(&alreadyShort)
+		DB.Unscoped().Where("source_url_md5 IN ?  AND fk_user = ?", md5Urls, fkUser).Select([]string{"source_url", "target_url"}).Find(&alreadyShort)
 		for i := 0; i < len(alreadyShort); i++ {
 			result[alreadyShort[i].SourceURL] = alreadyShort[i].TargetURL
 		}
 	}
 
 	for i := 0; i < len(urls); i++ {
-		md5Url := utils.MD5(urls[i])
 		if _, ok := result[urls[i]]; ok { //存在，直接下一次循环
 			continue
 		}
+		md5Url := utils.MD5(urls[i])
 		//不存在，开始生成
 		md5Arr := []string{md5Url[0:8], md5Url[8:16], md5Url[16:24], md5Url[24:32]}
 		for j := 0; j < len(md5Arr); j++ {
@@ -332,12 +350,11 @@ func generateUrls(urls []string, length int) (result map[string]string) {
 			by = append(by, by[2]^by[1])
 			by = append(by, by[3]&^by[2])
 
-			// fmt.Println("   ;smbit：", by)
 			for k := 0; k < length; k++ {
 				urlNum := by[k] % 64
 				result[urls[i]] += string(URLSTRS[urlNum])
 			}
-			DB.Model(&Short{}).Where("target_url = ? ", result).Count(&count)
+			DB.Model(&Short{}).Unscoped().Where("target_url = ? AND fk_user = ? ", result, fkUser).Count(&count)
 			if count == 0 {
 				break //不重复，则直接结束循环
 			}

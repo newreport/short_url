@@ -41,7 +41,7 @@ func init() {
 	U5Seed = uuid.Must(uuid.FromString(pwdUUID))
 
 	//1.创建data文件夹，用于存放数据
-	_path := "./data"
+	_path := "../data/go/data"
 	existDic, err := utils.PathExists(_path)
 	if err != nil {
 		fmt.Printf("get dir error![%v]\n", err)
