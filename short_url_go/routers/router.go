@@ -71,7 +71,7 @@ func init() {
 		// AllowHeaders:     []string{"*"},
 		// AllowCredentials: true,
 	}))
-	// beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
+	beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
 	beego.Router("/test", &controllers.RedirectController{})
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/users",

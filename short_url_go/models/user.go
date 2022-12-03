@@ -49,7 +49,7 @@ func Clean() bool {
 func CreateUser(user User) uint {
 	user.Password = uuid.NewV5(U5Seed, user.Password).String()
 	var existUser User
-	if DB.Where("name = ?", user.Name).First(&existUser).RowsAffected > 0 {
+	if DB.Where("name = ? OR domain = ?", user.Name, user.Domain).First(&existUser).RowsAffected > 0 {
 		return 0
 	}
 	DB.Create(&user)
@@ -105,6 +105,9 @@ func QueryUsersPage(page Page, name string, nickname string, role string, group 
 		analysisRestfulRHS(express, "domain", domain) &&
 		analysisRestfulRHS(express, "group", group) {
 		express.Count(&count)
+		if page.Unscoped {
+			express = express.Unscoped()
+		}
 		express = express.Order(page.Sort).Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
 		express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "i18n", "auto_insert_space", "remarks", "domain").Find(&result)
 	} else {
@@ -116,7 +119,7 @@ func QueryUsersPage(page Page, name string, nickname string, role string, group 
 // @Title 根据id查询用户
 func QueryUserByID(id uint) User {
 	var user User
-	DB.First(&user, id)
+	DB.Unscoped().First(&user, id)
 	return user
 }
 

@@ -53,7 +53,6 @@ type ShortQueryParams struct {
 	DeletedAt  string `json:"det"`
 }
 
-
 // @Title			CreateShort
 // @Description		生成单个短链接url
 // @Auth			sfhj

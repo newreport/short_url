@@ -15,9 +15,10 @@ import (
 var DB *gorm.DB
 
 type Page struct {
-	Offset int    `json:"offset"` //偏移量
-	Lmit   int    `json:"limit"`  //指定返回记录的数量
-	Sort   string `json:"sort"`   //排序 RHS 例:id+,create_at- ——> id asc,create_at desc
+	Offset   int    `json:"offset"`   //偏移量
+	Lmit     int    `json:"limit"`    //指定返回记录的数量
+	Sort     string `json:"sort"`     //排序 RHS 例:id+,create_at- ——> id asc,create_at desc
+	Unscoped bool   `json:"unscoped"` //回收站
 }
 
 var U5Seed uuid.UUID
@@ -28,7 +29,7 @@ var URLSTRS = "LMndeJ127KxyX89IbVWvw4sQRABCY56rHfNq3~ZaUz0DEFcPhijklmGS-TgtOopu"
 
 func init() {
 	var err error
-	utils.INIconf, err = config.NewConfig("ini", "data/secret.conf")
+	utils.INIconf, err = config.NewConfig("ini", "../data/go/data/secret.conf")
 	if err != nil {
 		fmt.Println(err)
 		panic(err) //https://zhuanlan.zhihu.com/p/373653492

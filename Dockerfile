@@ -25,8 +25,7 @@ yarn run build
 
 FROM nginx:alpine
 COPY --from=gobuild /go/src/short_url_go/app /app/go/
-COPY --from=gobuild /go/src/short_url_go/data /app/data/go/data
-COPY --from=gobuild /go/src/short_url_go/conf /app/data/go/conf
+COPY --from=gobuild /go/src/data /app/data
 COPY --from=vuebuild /short_url_vue/dist /app/vue/
 
 
