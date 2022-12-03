@@ -16,8 +16,11 @@ lsof -i:8080    @ #端口占用
 
 
 docker build -t st:example .
+docker rm $(docker ps -a -q)
+docker rm $(docker ps -qf status=exited)
 docker run -itd --rm -p 8080:8080 st:example
 docker run -itd --rm -p 8989:8989 st:example
+docker run -itd --rm -p 8080:8080 -p 8989:8989 st:example
 docker exec -it  /bin/bash
 
 

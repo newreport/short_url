@@ -1,26 +1,34 @@
-﻿# FROM golang:alpine AS gobuild
-# WORKDIR $GOPATH/src/short_url_go
-# ENV GOPROXY https://goproxy.cn
-# ENV CGO_CFLAGS -g -O2 -Wno-return-local-addr
-# COPY short_url_go/ .
-# RUN apk add --update gcc musl-dev && \
-# go build -o app .
+﻿FROM golang:alpine AS gobuild
+WORKDIR $GOPATH/src/short_url_go
+ENV GOPROXY https://goproxy.cn
+ENV CGO_CFLAGS -g -O2 -Wno-return-local-addr
+COPY short_url_go/ .
+RUN apk add --update gcc musl-dev && \
+go build -o app .
 
 FROM node:latest AS vuebuild
 WORKDIR /short_url_vue
 COPY short_url_vue/ .
 RUN rm -f package-lock.json && \
+rm -rf yarn.lock && \
+rm -rf node_modules/ && \
+npm config set registry https://registry.npm.taobao.org && \
+npm config set disturl https://npm.taobao.org/dist && \
+yarn config set registry http://registry.npm.taobao.org/ && \
+yarn config set registry https://registry.npmjs.org/ && \
+yarn config set chromedriver_cdnurl "https://npm.taobao.org/mirrors/chromedriver" && \
 yarn cache clean && \
+npm install -g npm && \
+npm i node-sass -D --verbose &&\
 yarn install && \
 yarn run build 
 
-# FROM nginx:alpine
-# COPY --from=gobuild /go/app .
-# COPY --from=vuebuild /short_url_vue/dist .
+FROM nginx:alpine
+COPY --from=gobuild /go/src/short_url_go/app /app/go/
+COPY --from=gobuild /go/src/short_url_go/data /app/data/go/data
+COPY --from=gobuild /go/src/short_url_go/conf /app/data/go/conf
+COPY --from=vuebuild /short_url_vue/dist /app/vue/
 
-# rm -rf node_modules/ && \
-# npm install -g yarn && \
-# npm cache clean --force && \
 
 # FROM nginx:alpine
 # RUN mkdir /go && echo "test" > /go/1.text && \
