@@ -4,6 +4,7 @@ import (
 	"github.com/beego/beego/v2/core/logs"
 )
 
+// 302 後台跳轉
 type RedirectController struct {
 	BaseController
 }
