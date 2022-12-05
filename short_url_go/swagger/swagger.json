@@ -144,7 +144,7 @@
                 "tags": [
                     "shorts"
                 ],
-                "summary": "修改一个短链接",
+                "summary": "导出html静态页",
                 "operationId": "ShortController.ExportHtml",
                 "parameters": [
                     {

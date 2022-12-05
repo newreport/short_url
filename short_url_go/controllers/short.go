@@ -108,14 +108,8 @@ func (s *ShortController) RecoverShort() {
 	}
 }
 
-// func (s *ShortController) ExportExcel() {
-// 	// The file LICENSE is under root path.
-// 	// and the downloaded file name is license.txt
-// 	s.Ctx.Output.Download("LICENSE", "license.txt")
-// }
-
 // @Title	ExportHtml
-// @Summary	修改一个短链接
+// @Summary	导出html静态页
 // @Param	id		path	models.User.ID	true	"短链接id"
 // @Param	short	body	models.AddEditShort	true	"body for short"
 // @Success	200	{file}	"get success"
@@ -152,7 +146,7 @@ func (s *ShortController) ExportHtml() {
 		if err != nil {
 			panic(err)
 		}
-		f, err := w.Create(k)
+		f, err := w.Create(k + ".html")
 		if err != nil {
 			panic(err)
 		}
@@ -266,3 +260,5 @@ func (s *ShortController) GetShortsPage() {
 	}
 	s.ServeJSON()
 }
+
+

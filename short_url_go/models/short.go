@@ -373,3 +373,9 @@ func generateUrls(urls []string, fkUser uint, length int) (result map[string]str
 	}
 	return
 }
+
+func QueryShortByFKUserSourceURL(fkUser uint, targetURL string) Short {
+	var short Short
+	DB.Where("fk_user = ? AND target_url = ?", fkUser, targetURL).First(&short)
+	return short
+}

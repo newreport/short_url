@@ -82,7 +82,7 @@ func init() {
 			AllowHeaders: []string{"*"},
 		}))
 	}
-	beego.Router("/", &controllers.RedirectController{})
+	beego.Router("/:shortURL", &controllers.RedirectController{})
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/users",
 			beego.NSInclude(

@@ -138,3 +138,9 @@ func DeleteUsers(ids []uint, isUnscoped bool) bool {
 	result := express.Where(&users, ids).Delete(&User{})
 	return result.RowsAffected > 0
 }
+
+func QueryUserByDomain(domian string) User {
+	var user User
+	DB.Where("domian = ?", domian).First(&user, user)
+	return user
+}
