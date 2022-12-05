@@ -34,7 +34,10 @@ paths:
       - in: query
         name: sort
         description: 排序
-        required: true
+        type: string
+      - in: query
+        name: unscoped
+        description: 回收站
         type: string
       - in: query
         name: source_url
@@ -94,15 +97,15 @@ paths:
       responses:
         "200":
           description: "{string} \t\"add fail\""
-  /shorts/{sid}:
+  /shorts/{id}:
     put:
       tags:
       - shorts
       summary: 修改一个短链接
-      operationId: ShortController.UpdateUser
+      operationId: ShortController.UpdateShort
       parameters:
       - in: path
-        name: sid
+        name: id
         description: 短链接id
         required: true
         schema:
@@ -125,15 +128,63 @@ paths:
       operationId: ShortController.DeleteShort
       parameters:
       - in: path
-        name: sid
+        name: id
         description: 链接id
         required: true
+        type: string
+      - in: body
+        name: unscoped
+        description: 是否永久刪除
+        schema:
+          type: string
         type: string
       responses:
         "200":
           description: "{string}\t\"delete success!\""
         "403":
           description: "{string}\t\"无权删除\""
+  /shorts/{id}/recover:
+    put:
+      tags:
+      - shorts
+      summary: 恢復一個鏈接
+      operationId: ShortController.RecoverShort
+      parameters:
+      - in: path
+        name: id
+        description: 短链接id
+        required: true
+        schema:
+          $ref: '#/definitions/models.Short.ID'
+      responses:
+        "200":
+          description: "{string}\t\"recover success\""
+        "403":
+          description: "{string}\t\"Insufficient user permissions\""
+  /shorts/html/{id}:
+    get:
+      tags:
+      - shorts
+      summary: 修改一个短链接
+      operationId: ShortController.ExportHtml
+      parameters:
+      - in: path
+        name: id
+        description: 短链接id
+        required: true
+        schema:
+          $ref: '#/definitions/models.User.ID'
+      - in: body
+        name: short
+        description: body for short
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddEditShort'
+      responses:
+        "200":
+          description: "{file}\t\"get success\""
+        "403":
+          description: "{string}\t\"Insufficient user permissions\""
   /users/:
     get:
       tags:
@@ -153,6 +204,10 @@ paths:
         required: true
         type: integer
         format: int64
+      - in: query
+        name: unscoped
+        description: 回收站
+        type: string
       - in: query
         name: sort
         description: 排序
@@ -194,10 +249,6 @@ paths:
         name: det
         description: 删除时间
         type: string
-      - in: query
-        name: isUnscoped
-        description: 回收站
-        type: boolean
       responses:
         "200":
           description: ""
@@ -260,11 +311,11 @@ paths:
         schema:
           $ref: '#/definitions/unit'
       - in: body
-        name: isUnscoped
-        description: body for isUnscoped
+        name: unscoped
+        description: 是否永久刪除
         schema:
-          type: boolean
-        type: boolean
+          type: string
+        type: string
       responses:
         "200":
           description: "{string}\tdelete success!"
@@ -501,6 +552,9 @@ definitions:
         description: 配置项：url默认长度
         type: integer
         format: int32
+  models.User.ID:
+    title: ID
+    type: object
   unit:
     title: unit
     type: object

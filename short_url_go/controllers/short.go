@@ -1,12 +1,14 @@
 ﻿package controllers
 
 import (
+	"archive/zip"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"short_url_go/models"
 	"strconv"
+
+	beego "github.com/beego/beego/v2/server/web"
 )
 
 // Operations about Shorts
@@ -122,10 +124,7 @@ func (s *ShortController) RecoverShort() {
 func (s *ShortController) ExportHtml() {
 	accountInfo := s.analysisAccountClaims()
 	t := template.New("html")
-	text := `<script>
-	window.location.href = "{{.}}"
-	</script>
-	`
+	text := `<script>window.location.href="{{.}}"</script>`
 	t.Parse(text)
 	id, err := s.GetInt(":id")
 	if err != nil {
@@ -133,25 +132,54 @@ func (s *ShortController) ExportHtml() {
 		s.Ctx.WriteString("请求参数类型错误")
 		return
 	}
-	if uint(id) != accountInfo.ID {
-		s.Ctx.ResponseWriter.WriteHeader(403)
-		s.Ctx.WriteString("权限错误")
-		return
+	if beego.BConfig.RunMode != "dev" {
+		if uint(id) != accountInfo.ID {
+			s.Ctx.ResponseWriter.WriteHeader(403)
+			s.Ctx.WriteString("权限错误")
+			return
+		}
 	}
 	data := models.QueryAllByUserID(accountInfo.ID)
+
+	// data := map[string]string{"1.html": "hello", "2.html": "world"}
+	buf := new(bytes.Buffer)
+	// 创建一个压缩文档
+	w := zip.NewWriter(buf)
+
 	for k, v := range data {
-		buf := new(bytes.Buffer)
-		err = t.Execute(buf, v)
+		bufHtml := new(bytes.Buffer)
+		err = t.Execute(bufHtml, v)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(buf.String())
-		fmt.Println(k)
+		f, err := w.Create(k)
+		if err != nil {
+			panic(err)
+		}
+		_, err = f.Write(bufHtml.Bytes())
+		if err != nil {
+			panic(err)
+		}
+
+	}
+	err = w.Close()
+	if err != nil {
+		panic(err)
 	}
 
-	// The file LICENSE is under root path.
-	// and the downloaded file name is license.txt
-	s.Ctx.Output.Download("LICENSE", "license.txt")
+	// f, err := os.OpenFile("file.zip", os.O_CREATE|os.O_WRONLY, 0666)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// buf.WriteTo(f)
+	// s.Ctx.Output.Download("file.zip")
+
+	s.Ctx.Output.Header("Content-Type", "application/octet-stream")
+	s.Ctx.Output.Header("Content-Transfer-Encoding", "binary")
+	s.Ctx.Output.Header("Content-Disposition", "attachment; filename=file.zip")
+	s.Ctx.Output.Header("Content-Description", "File Transfer")
+	s.Ctx.Output.Header("Accept-Ranges", "bytes")
+	s.Ctx.Output.Body(buf.Bytes())
 }
 
 // @Title	DeleteShort
