@@ -221,6 +221,17 @@ func QueryShortsPage(page Page, fkUser string, sourceURL string, targetURL strin
 	return
 }
 
+func QueryAllByUserID(userID uint) map[string]string {
+	var shorts []Short
+	DB.Where(" fk_user = ?", userID).Select("source_url", "target_url").Find(&shorts)
+	result := make(map[string]string, len(shorts))
+
+	linq.From(shorts).SelectT(func(e Short) map[string]string {
+		return map[string]string{e.TargetURL: e.SourceURL}
+	}).ToMap(&result) //查詢已存在的sourceURL集合
+	return result
+}
+
 func QueryShortByID(id string) Short {
 	var one Short
 	DB.Model(&Short{}).Unscoped().Where("id = ?", id).First(&one)

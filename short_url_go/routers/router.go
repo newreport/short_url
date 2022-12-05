@@ -62,16 +62,26 @@ func init() {
 	// 	ExposeHeaders: []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 	// 	// 如果设置，则允许共享身份验证凭据，例如cookie
 	// 	// AllowCredentials: true,
+	// AllowAllOrigins: true,
+	// AllowOrigins:     []string{"*"},
+	// AllowMethods:     []string{"*"},
+	// AllowHeaders:     []string{"*"},
+	// AllowCredentials: true,
 	// }))
-	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-		AllowAllOrigins: true,
-		AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-		// AllowOrigins:     []string{"*"},
-		// AllowMethods:     []string{"*"},
-		// AllowHeaders:     []string{"*"},
-		// AllowCredentials: true,
-	}))
-	beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
+	if beego.BConfig.RunMode != "dev" {
+		beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
+			AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+			AllowOrigins: []string{"http://127.0.0.1:8088", "https://short.newreport.top"},
+			AllowHeaders: []string{"Origin"},
+		}))
+		beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
+	} else {
+		beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
+			AllowOrigins: []string{"*"},
+			AllowMethods: []string{"*"},
+			AllowHeaders: []string{"*"},
+		}))
+	}
 	beego.Router("/", &controllers.RedirectController{})
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/users",

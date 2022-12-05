@@ -1,7 +1,10 @@
 ﻿package controllers
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"html/template"
 	"short_url_go/models"
 	"strconv"
 )
@@ -49,17 +52,17 @@ func (s *ShortController) CreateShort() {
 
 // @Title	UpdateShort
 // @Summary	修改一个短链接
-// @Param	sid		path	models.Short.ID	true	"短链接id"
+// @Param	id		path	models.Short.ID	true	"短链接id"
 // @Param	short	body	models.AddEditShort	true	"body for short"
 // @Success	200	{string}	"update success"
 // @Failure	403	{string}	"Insufficient user permissions"
-// @router /:sid [put]
+// @router /:id [put]
 func (s *ShortController) UpdateShort() {
 	var dtoShort models.AddEditShort
 	json.Unmarshal(s.Ctx.Input.RequestBody, &dtoShort)
 
 	var short models.Short
-	short.ID = s.GetString(":sid")
+	short.ID = s.GetString(":id")
 	accInfo := s.analysisAccountClaims()
 	if accInfo.Role == 1 || accInfo.ID == short.FKUser {
 		existShort := models.QueryShortByID(short.ID)
@@ -82,13 +85,13 @@ func (s *ShortController) UpdateShort() {
 
 // @Title	RecoverShort
 // @Summary 恢復一個鏈接
-// @Param	sid		path	models.Short.ID	true	"短链接id"
-// @Success	200	{string}	"update success"
+// @Param	id		path	models.Short.ID	true	"短链接id"
+// @Success	200	{string}	"recover success"
 // @Failure	403	{string}	"Insufficient user permissions"
-// @router /:sid [put]/recover
+// @router /:id/recover [put]
 func (s *ShortController) RecoverShort() {
 
-	id := s.GetString(":sid")
+	id := s.GetString(":id")
 	accInfo := s.analysisAccountClaims()
 	existShort := models.QueryShortByID(id)
 	if accInfo.Role == 1 || accInfo.ID == existShort.FKUser {
@@ -103,20 +106,49 @@ func (s *ShortController) RecoverShort() {
 	}
 }
 
-func (s *ShortController) ExportExcel() {
-	// The file LICENSE is under root path.
-	// and the downloaded file name is license.txt
-	s.Ctx.Output.Download("LICENSE", "license.txt")
-}
+// func (s *ShortController) ExportExcel() {
+// 	// The file LICENSE is under root path.
+// 	// and the downloaded file name is license.txt
+// 	s.Ctx.Output.Download("LICENSE", "license.txt")
+// }
 
-// @Title	UpdateUser
+// @Title	ExportHtml
 // @Summary	修改一个短链接
-// @Param	sid		path	models.Short.ID	true	"短链接id"
+// @Param	id		path	models.User.ID	true	"短链接id"
 // @Param	short	body	models.AddEditShort	true	"body for short"
-// @Success	200	{string}	"update success"
+// @Success	200	{file}	"get success"
 // @Failure	403	{string}	"Insufficient user permissions"
-// @router /:sid [put]
+// @router /html/:id [get]
 func (s *ShortController) ExportHtml() {
+	accountInfo := s.analysisAccountClaims()
+	t := template.New("html")
+	text := `<script>
+	window.location.href = "{{.}}"
+	</script>
+	`
+	t.Parse(text)
+	id, err := s.GetInt(":id")
+	if err != nil {
+		s.Ctx.ResponseWriter.WriteHeader(400)
+		s.Ctx.WriteString("请求参数类型错误")
+		return
+	}
+	if uint(id) != accountInfo.ID {
+		s.Ctx.ResponseWriter.WriteHeader(403)
+		s.Ctx.WriteString("权限错误")
+		return
+	}
+	data := models.QueryAllByUserID(accountInfo.ID)
+	for k, v := range data {
+		buf := new(bytes.Buffer)
+		err = t.Execute(buf, v)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(buf.String())
+		fmt.Println(k)
+	}
+
 	// The file LICENSE is under root path.
 	// and the downloaded file name is license.txt
 	s.Ctx.Output.Download("LICENSE", "license.txt")
@@ -124,24 +156,24 @@ func (s *ShortController) ExportHtml() {
 
 // @Title	DeleteShort
 // @Summary	根据id删除一个短链接
-// @Param	sid	path	string true	"链接id"
+// @Param	id	path	string true	"链接id"
 // @Param	unscoped body string false	"是否永久刪除"
 // @Success	200	{string}	"delete success!"
 // @Failure	403	{string}	"无权删除"
-// @router /:sid [delete]
+// @router /:id [delete]
 func (s *ShortController) DeleteShort() {
-	sid := s.GetString(":sid")
+	id := s.GetString(":id")
 	var unscoped string
 	json.Unmarshal(s.RequestBody(), &unscoped)
 	isUnscoped := unscoped == "1"
 	accInfo := s.analysisAccountClaims()
-	short := models.QueryShortByID(sid)
+	short := models.QueryShortByID(id)
 	if accInfo.ID != short.FKUser {
 		s.Ctx.ResponseWriter.WriteHeader(403)
 		s.Ctx.WriteString("无权删除其他用户的链接")
 		return
 	}
-	if models.DeletedShortUrlByID(sid, isUnscoped) {
+	if models.DeletedShortUrlByID(id, isUnscoped) {
 		s.Ctx.WriteString("delete success!")
 	} else {
 		s.Ctx.WriteString("delete fail!")
