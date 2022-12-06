@@ -10,24 +10,32 @@ const store = myStore;
 // 设置接口超时时间
 // axios.defaults.timeout = 6000;
 
-// 请求地址，这里是动态赋值的的环境变量，下一篇会细讲，这里跳过
-// @ts-ignore
-axios.defaults.baseURL = import.meta.env.VITE_API_DOMAIN;
+// @ts-ignore //开发环境
+if (process.env.NODE_ENV == "development") {
+  axios.defaults.baseURL = import.meta.env.VITE_API_DOMAIN;
+} else if (process.env.NODE_ENV == "production") {
+  //生产环境
+  axios.defaults.baseURL = window.g.VITE_API_DOMAIN;
+}
 
 // http request 拦截器
 axios.interceptors.request.use(
   (config) => {
     // 配置请求头
     let acessToken = store.state.token.acessToken;
-    if (acessToken && config.url != "/users/login"&&config.url != "/users/tocken/account") {
-      acessToken = "Bearer "+acessToken;
+    if (
+      acessToken &&
+      config.url != "/users/login" &&
+      config.url != "/users/tocken/account"
+    ) {
+      acessToken = "Bearer " + acessToken;
     }
     config.headers = {
       "Content-Type":
         config.url != "/users/tocken/account"
           ? "application/json;"
           : "text/plain; charset=utf-8", // 传参方式json charset=UTF-8
-        "Authorization":acessToken
+      Authorization: acessToken,
     };
     return config;
   },
@@ -47,29 +55,34 @@ axios.interceptors.response.use(
     console.log(error);
     if (response) {
       showMessage(response.status); // 传入响应码，匹配响应码对应信息
-      if(response.status==401&&response.config.url!="/users/login"&&response.config.url!="/users/tocken/account"){
-       let promise = axios({
+      if (
+        response.status == 401 &&
+        response.config.url != "/users/login" &&
+        response.config.url != "/users/tocken/account"
+      ) {
+        let promise = axios({
           method: "post",
           url: "/users/tocken/account",
           data: store.state.token.refreshToken,
         });
-        promise.then(result=>{
+        promise.then((result) => {
           if (result?.status == 200) {
-            console.log("刷新了accesstoken：")
-            console.log(result.data)
-            store.commit('accessToken', result.data)
+            console.log("刷新了accesstoken：");
+            console.log(result.data);
+            store.commit("accessToken", result.data);
             return new Promise(
               (resolve: (value: AxiosResponse<any, any>) => void, reject) => {
-                axios(error.config).then((res) => {
-                  resolve(res);
-                })
-                .catch((err) => {
-                  reject(err);
-                });
-              })
-            
+                axios(error.config)
+                  .then((res) => {
+                    resolve(res);
+                  })
+                  .catch((err) => {
+                    reject(err);
+                  });
+              }
+            );
           }
-        })
+        });
       }
       return Promise.reject(response.data);
     } else {
@@ -107,13 +120,13 @@ export function request(url = "", params, type = "POST") {
           url: url,
           data: params,
         });
-      }else if(type.toUpperCase() == "DELETE") {
+      } else if (type.toUpperCase() == "DELETE") {
         promise = axios({
           method: "delete",
           url: url,
           // data: {data:params},
-      })
-    }
+        });
+      }
       //处理返回
       promise
         .then((res) => {

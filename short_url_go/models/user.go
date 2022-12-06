@@ -141,6 +141,6 @@ func DeleteUsers(ids []uint, isUnscoped bool) bool {
 
 func QueryUserByDomain(domian string) User {
 	var user User
-	DB.Where("domian = ?", domian).First(&user, user)
+	DB.Where("domain = ?", domian).First(&user, user)
 	return user
 }

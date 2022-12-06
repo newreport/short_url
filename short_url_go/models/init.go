@@ -29,7 +29,7 @@ var URLSTRS = "LMndeJ127KxyX89IbVWvw4sQRABCY56rHfNq3~ZaUz0DEFcPhijklmGS-TgtOopu"
 
 func init() {
 	var err error
-	utils.INIconf, err = config.NewConfig("ini", "../data/go/data/secret.conf")
+	utils.INIconf, err = config.NewConfig("ini", "../data/go/conf/secret.conf")
 	if err != nil {
 		fmt.Println(err)
 		panic(err) //https://zhuanlan.zhihu.com/p/373653492
@@ -41,7 +41,7 @@ func init() {
 	U5Seed = uuid.Must(uuid.FromString(pwdUUID))
 
 	//1.创建data文件夹，用于存放数据
-	_path := "../data/go/data"
+	_path := "../data/go/db"
 	existDic, err := utils.PathExists(_path)
 	if err != nil {
 		fmt.Printf("get dir error![%v]\n", err)

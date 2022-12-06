@@ -11,8 +11,8 @@ var Bundle *i18n.Bundle
 func init() {
 	Bundle = i18n.NewBundle(language.English)
 	Bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-	Bundle.LoadMessageFile("../data/go/data/en.toml")
-	Bundle.LoadMessageFile("../data/go/data/zh.toml")
+	Bundle.LoadMessageFile("../data/go/i18n/en.toml")
+	Bundle.LoadMessageFile("../data/go/i18n/zh.toml")
 	Bundle.MustParseMessageFileBytes([]byte(`
 	HelloWorld = "Hola Mundo!"
 	`), "es.toml")

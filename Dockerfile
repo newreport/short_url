@@ -21,7 +21,8 @@ yarn cache clean && \
 npm install -g npm && \
 npm i node-sass -D --verbose &&\
 yarn install && \
-yarn run build 
+yarn run build && \
+echo 'www.example.com' > dist/CNAME
 
 FROM nginx:alpine
 COPY --from=gobuild /go/src/short_url_go/app /app/go/
