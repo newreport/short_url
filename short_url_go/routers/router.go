@@ -71,7 +71,7 @@ func init() {
 	if beego.BConfig.RunMode != "dev" {
 		beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 			AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-			AllowOrigins: []string{"http://127.0.0.1:8088", "https://short.newreport.top"},
+			AllowOrigins: []string{"http://127.0.0.1:*/", "http://localhost:*/", "https://short.newreport.top"},
 			AllowHeaders: []string{"Origin"},
 		}))
 		beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
