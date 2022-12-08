@@ -25,3 +25,6 @@ docker exec -it  /bin/bash
 
 
 # https://cloud.tencent.com/developer/article/1574630 #linux打開文件過多
+
+
+

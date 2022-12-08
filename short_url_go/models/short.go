@@ -311,6 +311,9 @@ func generateUrl(url string, fkUser uint, length int) (result string) {
 	}
 	return
 }
+func GenerateUrl(url string, fkUser uint, length int) string {
+	return generateUrl(url, fkUser, length)
+}
 
 // @Title			generateUrls
 // @Description		生成多个短链接url，默认6位

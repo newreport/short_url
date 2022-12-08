@@ -115,14 +115,6 @@
                 "operationId": "ShortController.create short",
                 "parameters": [
                     {
-                        "in": "path",
-                        "name": "len",
-                        "description": "默认长度",
-                        "schema": {
-                            "$ref": "#/definitions/len"
-                        }
-                    },
-                    {
                         "in": "body",
                         "name": "body",
                         "description": "链接",
@@ -655,10 +647,6 @@
         },
         "http": {
             "title": "http",
-            "type": "object"
-        },
-        "len": {
-            "title": "len",
             "type": "object"
         },
         "models.AddEditShort": {

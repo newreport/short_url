@@ -163,8 +163,6 @@ const getShortsPage = () => {
 getShortsPage()
 
 
-
-
 const dialogVisible = ref(false)
 
 
@@ -185,12 +183,14 @@ const addShort = () => {
   dialogVisible.value = false
   const addShort = async () => {
     const addShortParams = {
-      shortGroup: formAddEdit.shortGroup,
       sourceURL: formAddEdit.sourceURL,
-      isEnable: formAddEdit.isEnable,
+      automactic:formAddEdit.isAutoGenerate,
       length: formAddEdit.urlLength,
+      shortGroup: formAddEdit.shortGroup,
+      targetURL:  formAddEdit.targetURL,
+      isEnable: formAddEdit.isEnable,
       remarks: formAddEdit.remarks,
-      targetURL: formAddEdit.isAutoGenerate ? '' : formAddEdit.targetURL
+      exp:formAddEdit.exp
     }
     ShortService.createShort(addShortParams).
       then(result => {
@@ -208,6 +208,8 @@ const updateShort = () => {
   dialogVisible.value = false
   const updateShort = async () => {
     let updateShortParams=tableData.value.find(x=>x.id==formAddEdit.id)
+    updateShortParams.automactic=formAddEdit.isAutoGenerate
+    updateShortParams.length=formAddEdit.urlLength
     updateShortParams.targetURL=formAddEdit.targetURL
     updateShortParams.shortGroup=formAddEdit.shortGroup
     updateShortParams.isEnable=formAddEdit.isEnable
@@ -245,7 +247,7 @@ const deleteShort = (id: string) => {
 
 const cleanAddShort = () => {
   formAddEdit.id = '',
-    formAddEdit.sourceURL = ''
+  formAddEdit.sourceURL = ''
   formAddEdit.isAutoGenerate = true
   formAddEdit.targetURL = ''
   formAddEdit.remarks = ''
@@ -254,8 +256,6 @@ const cleanAddShort = () => {
   formAddEdit.exp = ''
   formAddEdit.shortGroup = ''
 }
-
-
 
 
 const handleSelectionChange = (val) => {

@@ -11,6 +11,7 @@ import (
 	"short_url_go/controllers"
 	"strings"
 
+	"github.com/beego/beego/v2/core/config"
 	"github.com/beego/beego/v2/server/web/context"
 	cors "github.com/beego/beego/v2/server/web/filter/cors"
 
@@ -22,7 +23,7 @@ import (
 
 // 过滤器all
 var FilterToken = func(ctx *context.Context) {
-	ctx.Output.Header("Access-Control-Allow-Origin", "*")
+	// ctx.Output.Header("Access-Control-Allow-Origin", "*")
 	logs.Info("current router path is ", ctx.Request.RequestURI)
 	if ctx.Request.RequestURI != "/v1/users/all" &&
 		ctx.Request.RequestURI != "/v1/users/login" &&
@@ -49,8 +50,23 @@ var FilterToken = func(ctx *context.Context) {
 	}
 }
 
+var FilterHeader = func(ctx *context.Context) {
+	ctx.Output.Header("Access-Control-Allow-Origin", strings.Join(allDomain, ","))
+}
+
+var allDomain []string
+
 // https://beego.gocn.vip/
 func init() {
+	iniConf, err := config.NewConfig("ini", "../data/go/conf/secret.conf")
+	if err != nil {
+		panic(err)
+	}
+	corsDomains, err := iniConf.String("FilterHttp::AllowOrigins")
+	if err != nil {
+		panic(err)
+	}
+	allDomain = strings.Split(corsDomains, ",")
 	// beego.InsertFilter("/*", beego.BeforeRouter, cors.Allow(&cors.Options{
 	// 	// 允许访问所有源
 	// 	AllowAllOrigins: true,
@@ -61,27 +77,16 @@ func init() {
 	// 	// 公开的HTTP标头列表
 	// 	ExposeHeaders: []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 	// 	// 如果设置，则允许共享身份验证凭据，例如cookie
-	// 	// AllowCredentials: true,
-	// AllowAllOrigins: true,
-	// AllowOrigins:     []string{"*"},
-	// AllowMethods:     []string{"*"},
-	// AllowHeaders:     []string{"*"},
-	// AllowCredentials: true,
+
 	// }))
-	if beego.BConfig.RunMode != "dev" {
-		beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-			AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-			AllowOrigins: []string{"http://127.0.0.1:*/", "http://localhost:*/", "https://short.newreport.top"},
-			AllowHeaders: []string{"Origin"},
-		}))
-		beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
-	} else {
-		beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-			AllowOrigins: []string{"*"},
-			AllowMethods: []string{"*"},
-			AllowHeaders: []string{"*"},
-		}))
-	}
+	beego.InsertFilter("*", beego.BeforeRouter, FilterHeader)
+	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
+		AllowMethods:  []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowOrigins:  allDomain,
+		AllowHeaders:  []string{"Origin", "Authorization", "Content-Type"},
+		ExposeHeaders: []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
+	}))
+	beego.InsertFilter("*", beego.BeforeRouter, FilterToken)
 	beego.Router("/:shortURL", &controllers.RedirectController{})
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/users",

@@ -75,26 +75,30 @@ export class ShortService {
   }
   /**
    * @description 新增一个短链接
-   * @param   {string}    shortGroup //分组
    * @param   {string}    sourceURL  //源链接
-   * @param   {bool}  isEnable   //是否启用
-   * @param   {string}    targetURL  //目标url(长度大于0时为自定义链接)
+   * @param   {bool}  automactic  //自动生成
    * @param   {int}   length  //默认长度
+   * @param   {string}    targetURL  //目标url(长度大于0时为自定义链接)
+   * @param   {string}    shortGroup //分组
+   * @param   {bool}  isEnable   //是否启用
    * @param   {string}    remarks //备注
+   * @param   {string}  exp //过期时间
    * @returns {HttpResponse} result
    */
   static async createShort(data) {
-    return request("/shorts/default_length/" + data.length, data, "post");
+    return request("/shorts", data, "post");
   }
 
   /**
    * @description 修改一个短链接(全部信息)
    * @param   {string}    id  //短链接id
-   * @param   {string}    targetURL   //目标url
-   * @param   {string}    shortGroup  //分组
-   * @param   {bool}    isEnable    //是否启用
+   * @param   {bool}  automactic  //自动生成
+   * @param   {int}   length  //默认长度
+   * @param   {string}    targetURL  //目标url(长度大于0时为自定义链接)
+   * @param   {string}    shortGroup //分组
+   * @param   {bool}  isEnable   //是否启用
    * @param   {string}    remarks //备注
-   * @param   {Date}  exp //过期时间
+   * @param   {string}  exp //过期时间
    * @returns {HttpResponse} result
    */
   static async updateShort(data) {

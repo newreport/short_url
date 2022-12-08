@@ -7,8 +7,6 @@ import (
 	"html/template"
 	"short_url_go/models"
 	"strconv"
-
-	beego "github.com/beego/beego/v2/server/web"
 )
 
 // Operations about Shorts
@@ -19,7 +17,6 @@ type ShortController struct {
 // @Title	create short
 // @Summary	新增一个短链接
 // @Description add one short url
-// @Param	len	path	len	"默认长度"
 // @Param	body	body	models.AddEditShort	true	"链接"
 // @Success 200	{string}	"add success"
 // @Failure 200	{string} 	"add fail"
@@ -73,6 +70,10 @@ func (s *ShortController) UpdateShort() {
 		existShort.IsEnable = dtoShort.IsEnable
 		existShort.ExpireAt = dtoShort.ExpireAt
 		existShort.Remarks = dtoShort.Remarks
+		//自动生成
+		if dtoShort.Automatic {
+			existShort.TargetURL = models.GenerateUrl(short.SourceURL, short.FKUser, dtoShort.Length)
+		}
 		err := models.UpdateShort(short)
 		if err != nil {
 			s.Ctx.WriteString(err.Error())
@@ -126,12 +127,10 @@ func (s *ShortController) ExportHtml() {
 		s.Ctx.WriteString("请求参数类型错误")
 		return
 	}
-	if beego.BConfig.RunMode != "dev" {
-		if uint(id) != accountInfo.ID {
-			s.Ctx.ResponseWriter.WriteHeader(403)
-			s.Ctx.WriteString("权限错误")
-			return
-		}
+	if uint(id) != accountInfo.ID {
+		s.Ctx.ResponseWriter.WriteHeader(403)
+		s.Ctx.WriteString("权限错误")
+		return
 	}
 	data := models.QueryAllByUserID(accountInfo.ID)
 
@@ -154,7 +153,6 @@ func (s *ShortController) ExportHtml() {
 		if err != nil {
 			panic(err)
 		}
-
 	}
 	err = w.Close()
 	if err != nil {
@@ -260,5 +258,3 @@ func (s *ShortController) GetShortsPage() {
 	}
 	s.ServeJSON()
 }
-
-
