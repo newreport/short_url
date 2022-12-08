@@ -30,12 +30,13 @@ var FilterToken = func(ctx *context.Context) {
 		ctx.Request.RequestURI != "/v1/users/register" &&
 		ctx.Request.RequestURI != "/v1/users/tocken/account" &&
 		ctx.Request.RequestURI != "/v1/users/delete" &&
-		ctx.Request.RequestURI == "/v1/*" {
+		ctx.Request.RequestURI[0:4] == "/v1/" {
 		//没有token
 		if ctx.Input.Header("Authorization") == "" {
 			logs.Error("without token, unauthorized !!")
 			ctx.ResponseWriter.WriteHeader(401)
 			ctx.ResponseWriter.Write([]byte("no permission")) //没有权限
+			return
 		} else {
 			//accessToken错误
 			token := ctx.Input.Header("Authorization")
@@ -45,6 +46,7 @@ var FilterToken = func(ctx *context.Context) {
 			if !ok {
 				ctx.ResponseWriter.WriteHeader(401)
 				ctx.ResponseWriter.Write([]byte("no permission"))
+				return
 			}
 		}
 	}

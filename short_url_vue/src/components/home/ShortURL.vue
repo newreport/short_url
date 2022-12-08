@@ -162,9 +162,7 @@ const getShortsPage = () => {
 }
 getShortsPage()
 
-
 const dialogVisible = ref(false)
-
 
 const formAddEdit = reactive({
   id: '',
@@ -177,7 +175,6 @@ const formAddEdit = reactive({
   exp: '',
   shortGroup: ''
 })
-
 
 const addShort = () => {
   dialogVisible.value = false
@@ -257,7 +254,6 @@ const cleanAddShort = () => {
   formAddEdit.shortGroup = ''
 }
 
-
 const handleSelectionChange = (val) => {
   console.log(val)
 }
@@ -271,6 +267,7 @@ const handleClose = (done: () => void) => {
   //     // catch error
   //   })
 }
+
 const handleSizeChange = (val: number) => {
   console.log(`${val} items per page`)
 }

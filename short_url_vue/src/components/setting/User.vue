@@ -19,11 +19,28 @@
     <el-table-column type="selection" width="55" />
     <el-table-column prop="group" sortable label="分组" />
     <el-table-column prop="name" sortable label="用户名" />
+    <el-table-column prop="domain" sortable label="域名" />
     <el-table-column prop="nickname" sortable label="昵称" />
     <el-table-column prop="urlLength" sortable label="默认长度" />
     <el-table-column prop="phone" sortable label="电话" />
     <el-table-column prop="role" sortable label="权限" />
-    <el-table-column prop="remarks" sortable label="备注" />
+    <el-table-column prop="remarks" label="备注" />
+    <el-table-column fixed="right" width="193">
+        <template #header>
+          <el-button size="small">新增</el-button>
+        </template>
+        <template #default="scope">
+
+          <el-button link type="primary" size="small">Detail</el-button>
+
+          <el-button link type="primary" size="small" >Edit</el-button>
+          <el-popconfirm title="确定删除吗?" >
+            <template #reference>
+              <el-button link type="primary" size="small">Delete</el-button>
+            </template>
+          </el-popconfirm>
+        </template>
+      </el-table-column>
   </el-table>
 </div>
 </template>

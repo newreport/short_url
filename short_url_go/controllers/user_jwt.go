@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -21,6 +22,7 @@ func (b *BaseController) analysisAccountClaims() (result AccountClaims) {
 			key, _ := utils.INIconf.String("JWT::AccessTokenKey")
 			return []byte(key), nil
 		})
+		logs.Info("token ok:")
 		if claims, ok := token.Claims.(*AccountClaims); ok && token.Valid {
 			result = *claims
 		}
