@@ -22,7 +22,7 @@ docker run -itd --rm -p 8080:8080 st:example
 docker run -itd --rm -p 8989:8989 st:example
 docker run -itd --rm -p 8080:8080 -p 8989:8989 st:example
 docker exec -it  /bin/bash
-test
+
 
 
 # https://cloud.tencent.com/developer/article/1574630 #linux打開文件過多
