@@ -23,7 +23,11 @@
     <el-table-column prop="nickname" sortable label="昵称" />
     <el-table-column prop="urlLength" sortable label="默认长度" />
     <el-table-column prop="phone" sortable label="电话" />
-    <el-table-column prop="role" sortable label="权限" />
+    <el-table-column  label="权限" >
+      <template #default="scope">
+        {{ scope.row.role == 1?"管理员":"普通用户" }}
+      </template>
+      </el-table-column>
     <el-table-column prop="remarks" label="备注" />
     <el-table-column fixed="right" width="193">
         <template #header>
@@ -42,6 +46,42 @@
         </template>
       </el-table-column>
   </el-table>
+
+
+  <el-dialog v-model="dialogVisible" :title="formAddEdit.id ? '修改链接' : '新增链接'" :before-close="handleClose">
+    <el-form label-position="left" label-width="79px">
+      <el-form-item label="启用">
+        <el-switch v-model="formAddEdit.isEnable" class="mt-2" style="margin-left: 24px" inline-prompt
+          :active-icon="Check" :inactive-icon="Close" />
+      </el-form-item>
+      <el-form-item label="自动生成">
+        <el-switch v-model="formAddEdit.isAutoGenerate" class="mt-2" style="margin-left: 24px" inline-prompt
+          :active-icon="Check" :inactive-icon="Close" />
+      </el-form-item>
+      <el-form-item label="源链接">
+        <el-input v-model="formAddEdit.sourceURL" />
+      </el-form-item>
+      <el-form-item label="分组">
+        <el-input v-model="formAddEdit.shortGroup"/>
+      </el-form-item>
+      <el-form-item label="短链接" v-if="!formAddEdit.isAutoGenerate">
+        <el-input v-model="formAddEdit.targetURL" />
+      </el-form-item>
+      <el-form-item label="URL长度" v-if="formAddEdit.isAutoGenerate">
+        <el-input-number v-model="formAddEdit.urlLength" :min="4" :max="16" />
+      </el-form-item>
+      <el-form-item label="过期时间">
+        <el-date-picker v-model="formAddEdit.exp" type="datetime" placeholder="Select date and time" />
+      </el-form-item>
+      <el-form-item label="备注">
+        <el-input v-model="formAddEdit.remarks" />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="formAddEdit.id ? updateShort() : addShort();"> Submit</el-button>
+        <el-button @click="cleanAddShort()">Reset</el-button>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
 </div>
 </template>
   
@@ -82,6 +122,20 @@ const getUsersPage = () => {
   }
   getUsersPage()
 }
+
+const dialogVisible = ref(false)
+
+const formAddEdit = reactive({
+  id: '',
+  sourceURL: '',
+  isAutoGenerate: true,
+  targetURL: '',
+  remarks: '',
+  urlLength: 6,
+  isEnable: true,
+  exp: '',
+  shortGroup: ''
+})
 
 </script>
 
