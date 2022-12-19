@@ -15,6 +15,7 @@ vit vite --port=8888    # 预览测试
 lsof -i:8080    @ #端口占用
 
 
+
 docker build -t st:example .
 docker rm $(docker ps -a -q)
 docker rm $(docker ps -qf status=exited)
