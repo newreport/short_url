@@ -51,7 +51,7 @@ rm -f /back/go/db/main.db && \
 cp /back /app/data && \
 nohub /app/go/app & 
 
-
+# ss
 # FROM nginx:alpine
 # RUN mkdir /go && echo "test" > /go/1.text && \
 # wget https://golang.google.cn/dl/go1.19.3.linux-amd64.tar.gz && \
