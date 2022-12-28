@@ -47,12 +47,6 @@
                     },
                     {
                         "in": "query",
-                        "name": "unscoped",
-                        "description": "回收站",
-                        "type": "string"
-                    },
-                    {
-                        "in": "query",
                         "name": "source_url",
                         "description": "源url",
                         "type": "string"
@@ -217,15 +211,6 @@
                         "description": "链接id",
                         "required": true,
                         "type": "string"
-                    },
-                    {
-                        "in": "body",
-                        "name": "unscoped",
-                        "description": "是否永久刪除",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -234,34 +219,6 @@
                     },
                     "403": {
                         "description": "{string}\t\"无权删除\""
-                    }
-                }
-            }
-        },
-        "/shorts/{id}/recover": {
-            "put": {
-                "tags": [
-                    "shorts"
-                ],
-                "summary": "恢復一個鏈接",
-                "operationId": "ShortController.RecoverShort",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "description": "短链接id",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Short.ID"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{string}\t\"recover success\""
-                    },
-                    "403": {
-                        "description": "{string}\t\"Insufficient user permissions\""
                     }
                 }
             }
@@ -289,12 +246,6 @@
                         "required": true,
                         "type": "integer",
                         "format": "int64"
-                    },
-                    {
-                        "in": "query",
-                        "name": "unscoped",
-                        "description": "回收站",
-                        "type": "string"
                     },
                     {
                         "in": "query",
@@ -410,6 +361,12 @@
                         "schema": {
                             "$ref": "#/definitions/models.User"
                         }
+                    },
+                    {
+                        "in": "header",
+                        "name": "Authorization",
+                        "description": "Bearer 用户令牌",
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -418,47 +375,6 @@
                     },
                     "403": {
                         "description": "{string}\tInsufficient user permissions"
-                    }
-                }
-            }
-        },
-        "/users/all": {
-            "get": {
-                "tags": [
-                    "users"
-                ],
-                "summary": "获取所有用户和链接",
-                "description": "logs.Info user into the system\n\u003cbr\u003e",
-                "operationId": "UserController.users",
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    },
-                    "403": {
-                        "description": "User not exist"
-                    }
-                }
-            }
-        },
-        "/users/delete": {
-            "get": {
-                "tags": [
-                    "users"
-                ],
-                "description": "logs.Info user into the system\n\u003cbr\u003e",
-                "operationId": "UserController.Delete",
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    },
-                    "403": {
-                        "description": "User not exist"
                     }
                 }
             }
@@ -568,15 +484,6 @@
                         "schema": {
                             "$ref": "#/definitions/unit"
                         }
-                    },
-                    {
-                        "in": "body",
-                        "name": "unscoped",
-                        "description": "是否永久刪除",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -641,10 +548,6 @@
                 }
             }
         },
-        "gorm.DeletedAt": {
-            "title": "DeletedAt",
-            "type": "object"
-        },
         "http": {
             "title": "http",
             "type": "object"
@@ -662,6 +565,10 @@
                     "type": "string",
                     "format": "datetime"
                 },
+                "group": {
+                    "description": "外键关联分组",
+                    "type": "string"
+                },
                 "isEnable": {
                     "description": "是否启用",
                     "type": "boolean"
@@ -675,16 +582,12 @@
                     "description": "备注",
                     "type": "string"
                 },
-                "shortGroup": {
-                    "description": "外键关联分组",
-                    "type": "string"
-                },
-                "sourceURL": {
-                    "description": "需要跳转的url",
+                "shortURL": {
+                    "description": "短链接",
                     "type": "string"
                 },
                 "targetURL": {
-                    "description": "目标URL",
+                    "description": "目标url",
                     "type": "string"
                 }
             }
@@ -697,9 +600,13 @@
             "title": "User",
             "type": "object",
             "properties": {
-                "authorURL": {
+                "author": {
                     "description": "头像地址",
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "format": "byte"
+                    }
                 },
                 "autoInsertSpace": {
                     "description": "盘古之白",
@@ -709,10 +616,6 @@
                     "description": "创建时间",
                     "type": "string",
                     "format": "datetime"
-                },
-                "det": {
-                    "$ref": "#/definitions/gorm.DeletedAt",
-                    "description": "软删除时间"
                 },
                 "domain": {
                     "description": "域名",

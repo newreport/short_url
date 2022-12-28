@@ -20,39 +20,6 @@ type UserController struct {
 //模板
 //https://cloud.tencent.com/developer/article/1557075
 
-// @Title users
-// @Summary 获取所有用户和链接
-// @Description logs.Info user into the system
-// @Success 200 {object} models.User
-// @Failure 403 User not exist
-// @router /all [get]
-func (u *UserController) GetAllUsers() {
-	r1, r2 := models.GetAllUsers()
-	u.Data["json"] = map[string]interface{}{
-		"r1": r1,
-		"r2": r2,
-	}
-	// var num uint
-	// var num2 int
-	// var num3 int8
-	// var num4 uint64
-	// fmt.Println("uint:", unsafe.Sizeof(num))
-	// fmt.Println("uint64:", unsafe.Sizeof(num4))
-	// fmt.Println("int:", unsafe.Sizeof(num2))
-	// fmt.Println("int8:", unsafe.Sizeof(num3))
-	u.ServeJSON()
-}
-
-// @Title Delete
-// @Description logs.Info user into the system
-// @Success 200 {object} models.User
-// @Failure 403 User not exist
-// @router /delete [get]
-func (u *UserController) Delete() {
-	r1 := models.Clean()
-	u.Data["json"] = r1
-	u.ServeJSON()
-}
 
 // @Title Register
 // @Summary 注册
@@ -134,6 +101,7 @@ func (u *UserController) RefreshTocken() {
 // @Summary 新增一个用户
 // @Description logs.Info user into the system
 // @Param	body	body 	models.User	true	"body for user"
+// @Param Authorization header string false "Bearer 用户令牌"
 // @Success 200	{string}	Create success
 // @Failure 403	{string}	Insufficient user permissions
 // @router / [post]
@@ -146,7 +114,7 @@ func (u *UserController) CreateUser() {
 			u.Ctx.WriteString("创建成功")
 		} else {
 			u.Ctx.WriteString("创建失败，用户名或域名重复")
-			u.Ctx.ResponseWriter.WriteHeader(403)
+			u.Ctx.ResponseWriter.WriteHeader(400)
 		}
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(403)
@@ -173,8 +141,8 @@ func (u *UserController) DeleteUser() {
 		if models.DeleteUser(uint(uid)) {
 			u.Ctx.WriteString("delete success!")
 		} else {
-			u.Ctx.WriteString("删除失败，该用户存在链接")
-			u.Ctx.ResponseWriter.WriteHeader(403)
+			u.Ctx.WriteString("删除失败")
+			u.Ctx.ResponseWriter.WriteHeader(400)
 		}
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(403)
@@ -209,7 +177,7 @@ func (u *UserController) UpdateUser() {
 			u.Ctx.WriteString("修改成功")
 		} else {
 			u.Ctx.WriteString("修改失败,账号名或域名重复")
-			u.Ctx.ResponseWriter.WriteHeader(403)
+			u.Ctx.ResponseWriter.WriteHeader(400)
 		}
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(403)
@@ -243,7 +211,7 @@ func (u *UserController) UpdateUserPassword() {
 			u.Ctx.WriteString("修改成功")
 		} else {
 			u.Ctx.WriteString("修改失败")
-			u.Ctx.ResponseWriter.WriteHeader(403)
+			u.Ctx.ResponseWriter.WriteHeader(400)
 		}
 	} else {
 		u.Ctx.WriteString("无权修改他人密码")

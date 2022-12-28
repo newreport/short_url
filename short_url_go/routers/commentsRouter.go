@@ -45,15 +45,6 @@ func init() {
 
     beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
         beego.ControllerComments{
-            Method: "RecoverShort",
-            Router: `/:id/recover`,
-            AllowHTTPMethods: []string{"put"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["short_url_go/controllers:ShortController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:ShortController"],
-        beego.ControllerComments{
             Method: "ExportHtml",
             Router: `/html/:id`,
             AllowHTTPMethods: []string{"get"},
@@ -102,24 +93,6 @@ func init() {
             Method: "UpdateUserPassword",
             Router: `/:uid/pwd`,
             AllowHTTPMethods: []string{"patch"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
-        beego.ControllerComments{
-            Method: "GetAllUsers",
-            Router: `/all`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["short_url_go/controllers:UserController"] = append(beego.GlobalControllerRouter["short_url_go/controllers:UserController"],
-        beego.ControllerComments{
-            Method: "Delete",
-            Router: `/delete`,
-            AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})

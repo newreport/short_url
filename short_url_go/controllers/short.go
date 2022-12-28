@@ -26,9 +26,9 @@ func (s *ShortController) CreateShort() {
 	var dtoShort models.AddEditShort
 	json.Unmarshal(s.Ctx.Input.RequestBody, &dtoShort)
 	var short models.Short
-	short.SourceURL = dtoShort.SourceURL
+	short.ShortURL = dtoShort.ShortURL
 	short.TargetURL = dtoShort.TargetURL
-	short.ShortGroup = dtoShort.ShortGroup
+	short.Group = dtoShort.Group
 	short.IsEnable = dtoShort.IsEnable
 	short.ExpireAt = dtoShort.ExpireAt
 	short.Remarks = dtoShort.Remarks
@@ -41,11 +41,10 @@ func (s *ShortController) CreateShort() {
 	var err error
 	if dtoShort.Automatic {
 		err = models.CreateShort(short, dtoShort.Length)
-	} else {
-		err = models.CreateShortCustom(short)
-	}
+	} 
 	if err != nil {
 		s.Ctx.WriteString(err.Error())
+		s.Ctx.ResponseWriter.WriteHeader(400)
 	}
 }
 
@@ -66,13 +65,13 @@ func (s *ShortController) UpdateShort() {
 	if accInfo.Role == 1 || accInfo.ID == short.FKUser {
 		existShort := models.QueryShortByID(short.ID)
 		existShort.TargetURL = dtoShort.TargetURL
-		existShort.ShortGroup = dtoShort.ShortGroup
+		existShort.Group = dtoShort.Group
 		existShort.IsEnable = dtoShort.IsEnable
 		existShort.ExpireAt = dtoShort.ExpireAt
 		existShort.Remarks = dtoShort.Remarks
 		//自动生成
 		if dtoShort.Automatic {
-			existShort.TargetURL = models.GenerateUrl(short.SourceURL, short.FKUser, dtoShort.Length)
+			existShort.TargetURL = models.GenerateUrl(short.TargetURL, short.FKUser, dtoShort.Length)
 		}
 		err := models.UpdateShort(short)
 		if err != nil {
@@ -86,28 +85,6 @@ func (s *ShortController) UpdateShort() {
 	}
 }
 
-// @Title	RecoverShort
-// @Summary 恢復一個鏈接
-// @Param	id		path	models.Short.ID	true	"短链接id"
-// @Success	200	{string}	"recover success"
-// @Failure	403	{string}	"Insufficient user permissions"
-// @router /:id/recover [put]
-func (s *ShortController) RecoverShort() {
-
-	id := s.GetString(":id")
-	accInfo := s.analysisAccountClaims()
-	existShort := models.QueryShortByID(id)
-	if accInfo.Role == 1 || accInfo.ID == existShort.FKUser {
-		if models.RecoverShort(id) {
-			s.Ctx.WriteString("恢復成功")
-		} else {
-			s.Ctx.WriteString("恢復失敗")
-		}
-	} else {
-		s.Ctx.ResponseWriter.WriteHeader(403)
-		s.Ctx.WriteString("无权恢復其他用户的链接")
-	}
-}
 
 // @Title	ExportHtml
 // @Summary	导出html静态页
@@ -193,6 +170,7 @@ func (s *ShortController) DeleteShort() {
 		s.Ctx.WriteString("delete success!")
 	} else {
 		s.Ctx.WriteString("delete fail!")
+		s.Ctx.ResponseWriter.WriteHeader(400)
 	}
 }
 
@@ -239,8 +217,7 @@ func (s *ShortController) GetShortsPage() {
 	exp := s.GetString("exp")
 	crt := s.GetString("crt")
 	upt := s.GetString("upt")
-	del := s.GetString("del")
-	result, count, err := models.QueryShortsPage(page, fkUser, sourceURL, targetURL, shortGroup, isEnable, exp, crt, upt, del)
+	result, count, err := models.QueryShortsPage(page, fkUser, sourceURL, targetURL, shortGroup, isEnable, exp, crt, upt)
 	if err != nil {
 		s.Ctx.ResponseWriter.WriteHeader(400)
 		s.Ctx.WriteString(err.Error())

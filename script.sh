@@ -14,7 +14,8 @@ vit vite --port=8888    # 预览测试
 
 lsof -i:8080    @ #端口占用
 
-
+github.com/beego/beego/v2/core/logs
+github.com/samber/lo"
 
 docker build -t st:example .
 docker rm $(docker ps -a -q)
