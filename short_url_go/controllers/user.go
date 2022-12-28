@@ -158,7 +158,6 @@ func (u *UserController) CreateUser() {
 // @Summary 删除一个用户
 // @Description delete the user
 // @Param	uid		path 	unit	true	"The uid you want to delete"
-// @Param	unscoped body string false	"是否永久刪除"
 // @Success 200	{string}	delete success!
 // @Failure 403	{string}	Insufficient user permissions
 // @router /:uid [delete]
@@ -169,12 +168,9 @@ func (u *UserController) DeleteUser() {
 		u.Ctx.WriteString("参数错误")
 		return
 	}
-	var unscoped string
-	json.Unmarshal(u.RequestBody(), &unscoped)
-	isUnscoped := unscoped == "1"
 	accInfo := u.analysisAccountClaims()
 	if accInfo.Role == 1 || accInfo.ID == uint(uid) {
-		if models.DeleteUser(uint(uid), isUnscoped) {
+		if models.DeleteUser(uint(uid)) {
 			u.Ctx.WriteString("delete success!")
 		} else {
 			u.Ctx.WriteString("删除失败，该用户存在链接")
@@ -208,6 +204,7 @@ func (u *UserController) UpdateUser() {
 		existUser.Remarks = user.Remarks
 		existUser.AutoInsertSpace = user.AutoInsertSpace
 		existUser.Domain = user.Domain
+		existUser.Author=user.Author
 		if models.UpdateUser(existUser) {
 			u.Ctx.WriteString("修改成功")
 		} else {
@@ -260,7 +257,6 @@ func (u *UserController) UpdateUserPassword() {
 // @Auth	sfhj
 // @Param	offset	query	int	true	偏移量
 // @Param	limit	query	int	true	指定返回记录的数量
-// @Param	unscoped	query	string	false	回收站
 // @Param	sort	query	string	true	排序
 // @Param	name	query	string	false	账号
 // @Param	nickname	query	string	false	昵称
@@ -296,7 +292,6 @@ func (u *UserController) GetUsersByPage() {
 		return
 	}
 	page.Sort = analysisOrderBy(u.GetString("sort"))
-	page.Unscoped = u.GetString("unscoped") == "1"
 	result, count, err := models.QueryUsersPage(page, u.GetString("name"), u.GetString("nickname"), u.GetString("role"), u.GetString("group"), u.GetString("phone"), u.GetString("domain"))
 	if err != nil {
 		u.Ctx.ResponseWriter.WriteHeader(400)

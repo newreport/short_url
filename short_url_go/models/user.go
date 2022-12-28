@@ -7,7 +7,6 @@ import (
 	"github.com/beego/beego/v2/core/logs"
 
 	uuid "github.com/satori/go.uuid"
-	"gorm.io/gorm"
 )
 
 // 用户表
@@ -15,13 +14,12 @@ type User struct { //用户表
 	ID               uint           `json:"id" gorm:"primaryKey;<-:create"` //id
 	CreatedAt        time.Time      `json:"crt" gorm:"<-:create"`           //创建时间
 	UpdatedAt        time.Time      `json:"upt" gorm:"<-"`                  //最后更新时间
-	DeletedAt        gorm.DeletedAt `json:"det" gorm:"index"`               //软删除时间
 	Name             string         `json:"name" gorm:"not null"`           //用户名，登录名称
 	Nickname         string         `json:"nickname" gorm:"not null"`       //昵称
 	Password         string         `json:"pwd" gorm:"not null"`            //密码
 	Role             int8           `json:"role" gorm:"not null"`           //角色
 	DefaultURLLength uint8          `json:"urlLength" gorm:"not null"`      //配置项：url默认长度
-	AuthorURL        string         `json:"authorURL"`                      //头像地址
+	Author        	 []byte         `json:"author"`                      //头像地址
 	Phone            string         `json:"phone"`                          //手机号
 	Group            string         `json:"group"`                          //分组
 	Remarks          string         `json:"remarks"`                        //备注
@@ -65,7 +63,7 @@ func Login(username, password string) User {
 }
 
 // @Title 根据id删除用户
-func DeleteUser(id uint, isUnscoped bool) bool {
+func DeleteUser(id uint) bool {
 	var count int64
 	//存在url不允许删除
 	DB.Model(Short{}).Unscoped().Where("fk_user = ? ", id).Count(&count)
@@ -73,9 +71,6 @@ func DeleteUser(id uint, isUnscoped bool) bool {
 		return false
 	}
 	result := DB.Delete(&User{}, id)
-	if isUnscoped {
-		result = DB.Unscoped().Delete(&User{}, id) //永久删除
-	}
 	return result.RowsAffected > 0
 }
 
@@ -86,7 +81,7 @@ func UpdateUser(user User) bool {
 	if DB.Unscoped().Where("name = ? ", user.Name).First(&existUser).RowsAffected > 0 {
 		return false
 	}
-	result := DB.Model(&user).Updates(User{Name: user.Name, Nickname: user.Nickname, Password: user.Password, Role: user.Role, AuthorURL: user.AuthorURL, Phone: user.Phone, Group: user.Group, I18n: user.I18n, AutoInsertSpace: user.AutoInsertSpace, Remarks: user.Remarks, DefaultURLLength: user.DefaultURLLength, Domain: user.Domain})
+	result := DB.Model(&user).Updates(User{Name: user.Name, Nickname: user.Nickname, Password: user.Password, Role: user.Role, Author: user.Author, Phone: user.Phone, Group: user.Group, I18n: user.I18n, AutoInsertSpace: user.AutoInsertSpace, Remarks: user.Remarks, DefaultURLLength: user.DefaultURLLength, Domain: user.Domain})
 	return result.RowsAffected > 0
 }
 
@@ -105,9 +100,6 @@ func QueryUsersPage(page Page, name string, nickname string, role string, group 
 		analysisRestfulRHS(express, "domain", domain) &&
 		analysisRestfulRHS(express, "group", group) {
 		express.Count(&count)
-		if page.Unscoped {
-			express = express.Unscoped().Where(" deleted_at IS NULL ")
-		}
 		express = express.Order(page.Sort).Limit(page.Lmit).Offset((page.Offset - 1) * page.Lmit)
 		express.Select("id", "created_at", "updated_at", "name", "nickname", "role", "default_url_length", "group", "i18n", "auto_insert_space", "remarks", "domain").Find(&result)
 	} else {

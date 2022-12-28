@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port=8989 --host --mode development",
+    "dev": "vite --port=8888 --host --mode development",
     "build2": "vue-tsc --noEmit && vite build",
     "build": " vite build",
     "preview": "vite preview"

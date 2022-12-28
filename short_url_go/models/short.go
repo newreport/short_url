@@ -10,7 +10,6 @@ import (
 	"github.com/beego/beego/logs"
 	"github.com/samber/lo"
 	uuid "github.com/satori/go.uuid"
-	"gorm.io/gorm"
 )
 
 type Short struct {
@@ -24,7 +23,6 @@ type Short struct {
 	ExpireAt     time.Time      `json:"exp"`                           //过期时间
 	CreatedAt    time.Time      `json:"crt"`
 	UpdatedAt    time.Time      `json:"upt"`
-	DeletedAt    gorm.DeletedAt `json:"det" gorm:"index"`
 	Remarks      string         `json:"remarks"` //备注
 }
 
@@ -49,7 +47,6 @@ type ShortQueryParams struct {
 	ExpireAt   string `json:"exp"`
 	CreatedAt  string `json:"crt"`
 	UpdatedAt  string `json:"upt"`
-	DeletedAt  string `json:"det"`
 }
 
 // @Title			CreateShort
@@ -211,9 +208,6 @@ func QueryShortsPage(page Page, fkUser string, sourceURL string, targetURL strin
 		analysisRestfulRHS(express, "updated_at", upt) &&
 		analysisRestfulRHS(express, "deleted_at", del) {
 		express.Count(&count)
-		if page.Unscoped {
-			express = express.Unscoped().Where(" deleted_at IS NULL ")
-		}
 		express.Order(page.Sort).Select("id,source_url,source_url_md5,target_url,fk_user,short_group,is_enable,created_at,updated_at,expire_at,remarks").Find(&result)
 	} else {
 		err = errors.New("查詢參數錯誤")
@@ -240,22 +234,16 @@ func QueryShortByID(id string) Short {
 
 // @Title DeletedShortUrlByID
 // @Description	根據id刪除url
-func DeletedShortUrlByID(id string, isUnscoped bool) bool {
+func DeletedShortUrlByID(id string) bool {
 	express := DB.Where("id = ?", id)
-	if isUnscoped {
-		express = express.Unscoped()
-	}
 	result := express.Delete(&Short{})
 	return result.RowsAffected > 0
 }
 
 // @Title DeletedShortUrlByIDs
 // @Description 根據多個id刪除url
-func DeletedShortUrlByIDs(ids []string, isUnscoped bool) bool {
+func DeletedShortUrlByIDs(ids []string) bool {
 	express := DB.Where(" id IN ?", ids)
-	if isUnscoped {
-		express = express.Unscoped()
-	}
 	result := express.Delete(&Short{})
 	return result.RowsAffected > 0
 }

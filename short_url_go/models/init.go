@@ -18,7 +18,6 @@ type Page struct {
 	Offset   int    `json:"offset"`   //偏移量
 	Lmit     int    `json:"limit"`    //指定返回记录的数量
 	Sort     string `json:"sort"`     //排序 RHS 例:id+,create_at- ——> id asc,create_at desc
-	Unscoped bool   `json:"unscoped"` //回收站
 }
 
 var U5Seed uuid.UUID

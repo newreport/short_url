@@ -177,15 +177,11 @@ func (s *ShortController) ExportHtml() {
 // @Title	DeleteShort
 // @Summary	根据id删除一个短链接
 // @Param	id	path	string true	"链接id"
-// @Param	unscoped body string false	"是否永久刪除"
 // @Success	200	{string}	"delete success!"
 // @Failure	403	{string}	"无权删除"
 // @router /:id [delete]
 func (s *ShortController) DeleteShort() {
 	id := s.GetString(":id")
-	var unscoped string
-	json.Unmarshal(s.RequestBody(), &unscoped)
-	isUnscoped := unscoped == "1"
 	accInfo := s.analysisAccountClaims()
 	short := models.QueryShortByID(id)
 	if accInfo.ID != short.FKUser {
@@ -193,7 +189,7 @@ func (s *ShortController) DeleteShort() {
 		s.Ctx.WriteString("无权删除其他用户的链接")
 		return
 	}
-	if models.DeletedShortUrlByID(id, isUnscoped) {
+	if models.DeletedShortUrlByID(id) {
 		s.Ctx.WriteString("delete success!")
 	} else {
 		s.Ctx.WriteString("delete fail!")
@@ -207,7 +203,6 @@ func (s *ShortController) DeleteShort() {
 // @Param	offset	query	int	true	偏移量
 // @Param	limit	query	int	true	指定返回记录的数量
 // @Param	sort	query	string	false	排序
-// @Param	unscoped	query	string	false	回收站
 // @Param	source_url	query	string	false	源url
 // @Param	target_url	query	string	false	目标url
 // @Param	group	query	string	false	分组
@@ -235,7 +230,6 @@ func (s *ShortController) GetShortsPage() {
 		return
 	}
 	page.Sort = analysisOrderBy(s.GetString("sort"))
-	page.Unscoped = s.GetString("unscoped") == "1"
 
 	fkUser := strconv.FormatUint(uint64(accInfo.ID), 10)
 	sourceURL := s.GetString("source_url")
