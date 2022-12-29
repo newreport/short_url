@@ -27,11 +27,11 @@ type Short struct {
 }
 
 type AddEditShort struct {
-	TargetURL  string    `json:"targetURL"`  //目标url
 	Automatic  bool      `json:"automactic"` //是否自动生成
 	Length     int       `json:"length"`     //自动生成的长度
 	ShortURL  string     `json:"shortURL"` 	 //短链接
-	Group string    `json:"group"` //外键关联分组
+	TargetURL  string    `json:"targetURL"`  //目标url
+	Group 	 string    	`json:"group"` //外键关联分组
 	IsEnable   bool      `json:"isEnable"`   //是否启用
 	ExpireAt   time.Time `json:"exp"`        //过期时间
 	Remarks    string    `json:"remarks"`    //备注
@@ -50,7 +50,7 @@ type ShortQueryParams struct {
 }
 
 // @Title			CreateShort
-// @Description		生成单个短链接url
+// @Description		自动生成单个短链接url
 // @Auth			sfhj
 // @Date			2022-10-23
 // @Param     		short		models.Short	"需要生成短链接的url"
@@ -160,7 +160,7 @@ err = errors.New("查詢參數錯誤")
 
 func QueryAllByUserID(userID uint) map[string]string {
 	var shorts []Short
-	DB.Where(" fk_user = ?", userID).Select("source_url", "target_url").Find(&shorts)
+	DB.Where(" fk_user = ?", userID).Select("short_url", "target_url").Find(&shorts)
 	result := make(map[string]string, len(shorts))
 	linq.From(shorts).SelectT(func(e Short) map[string]string {
 		return map[string]string{e.TargetURL: e.ShortURL}
@@ -178,8 +178,6 @@ func QueryShortByID(id string) Short {
 func GenerateUrl(url string, fkUser uint, length int) string {
 	return generateUrl(url, fkUser, length)
 }
-
-
 
 
 

@@ -8,7 +8,7 @@ import (
 )
 
 // 用户表
-type User struct { //用户表
+type User struct {
 	ID               uint           `json:"id" gorm:"primaryKey;<-:create"` //id
 	CreatedAt        time.Time      `json:"crt" gorm:"<-:create"`           //创建时间
 	UpdatedAt        time.Time      `json:"upt" gorm:"<-"`                  //最后更新时间
@@ -17,7 +17,7 @@ type User struct { //用户表
 	Password         string         `json:"pwd" gorm:"not null"`            //密码
 	Role             int8           `json:"role" gorm:"not null"`           //角色
 	DefaultURLLength uint8          `json:"urlLength" gorm:"not null"`      //配置项：url默认长度
-	Author        	 []byte         `json:"author"`                      //头像地址
+	Author        	 []byte         `json:"author"`                      	//头像地址
 	Phone            string         `json:"phone"`                          //手机号
 	Group            string         `json:"group"`                          //分组
 	Remarks          string         `json:"remarks"`                        //备注
@@ -44,7 +44,7 @@ func CreateUser(user User) uint {
 
 // @Title 根据id删除用户
 func DeleteUser(id uint) bool {
-	DB.Delete(&Short{}, "fk_user = ?", id)
+	DB.Unscoped().Delete(&Short{}, "fk_user = ?", id)
 	result := DB.Delete(&User{}, id)
 	return result.RowsAffected > 0
 }

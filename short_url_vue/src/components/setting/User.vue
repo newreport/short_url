@@ -48,11 +48,11 @@
   </el-table>
 
 
-  <el-dialog v-model="dialogVisible" :title="formAddEdit.id ? '修改链接' : '新增链接'" :before-close="handleClose">
+  <el-dialog v-model="dialogVisible" :title="formAddEdit.id ? '修改用户' : '新增用户'">
     <el-form label-position="left" label-width="79px">
       <el-form-item>
-        <el-button type="primary" @click="formAddEdit.id ? updateShort() : addShort();"> Submit</el-button>
-        <el-button @click="cleanAddShort()">Reset</el-button>
+        <el-button type="primary" @click="formAddEdit.id "> Submit</el-button>
+        <el-button >Reset</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
@@ -101,10 +101,9 @@ const getUsersPage = () => {
 const dialogVisible = ref(false)
 
 const formAddEdit = reactive({
-  authorURL: '',//头像地址
+  author: '',//头像
   autoInsertSpace:false,
   crt:'',//创建时间
-  det:'',
   domain:'',//域名
   group:'',
   i18n:'',
@@ -118,11 +117,10 @@ const formAddEdit = reactive({
   upt:'',
   urlLength:6
 })
-const cleanAddShort = () => {
-  formAddEdit.authorURL = ''
+const cleanAddUser= () => {
+  formAddEdit.author = ''
   formAddEdit.autoInsertSpace = false
   formAddEdit.crt = ''
-  formAddEdit.det = ''
   formAddEdit.domain = ''
   formAddEdit.group = ''
   formAddEdit.i18n = ''

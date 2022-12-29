@@ -151,12 +151,12 @@ const getShortsPage = () => {
       source_url: form.sourceURL.length == 0 ? "" : "lk" + form.sourceURL,
       target_url: form.shortURL.length == 0 ? "" : "lk" + form.shortURL,
     }
-    ShortService.getShortsPage(getShortsPageParams).then(result => {
-      if (result?.status == 200) {
-        page.count = result.data.count
-        tableData.value = result.data.data
-      }
-    })
+    // ShortService.getShortsPage(getShortsPageParams).then(result => {
+    //   if (result?.status == 200) {
+    //     page.count = result.data.count
+    //     tableData.value = result.data.data
+    //   }
+    // })
   }
   getShortsPage()
 }
