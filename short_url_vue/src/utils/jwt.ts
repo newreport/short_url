@@ -1,7 +1,6 @@
 ﻿function JWT(){
     this.analysisClaims =  function (val: string) {
             let strings = val.split("."); //截取token，获取载体\
-            console.log("进入解析")
             let info = JSON.parse(
               decodeURIComponent(
                 window.atob(strings[1].replace(/-/g, "+").replace(/_/g, "/"))

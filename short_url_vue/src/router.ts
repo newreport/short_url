@@ -24,7 +24,6 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from) => {
-  console.log(store);
   if (store.state.token.id == -1) {
     //F5进入页面
     //重新读取token
@@ -43,7 +42,6 @@ router.beforeEach((to, from) => {
     }
     if (to.name == "Login"&&store.state.token.id >0) {
       //登录了但是又返回登录页面
-      console.log("quIndex")
       return { name: "Index" };
     }else if (to.name != "Login"&&store.state.token.id == -1){
       console.log("去Login")

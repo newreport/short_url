@@ -51,8 +51,6 @@ axios.interceptors.response.use(
   },
   (error) => {
     const { response } = error;
-    console.log("errorResponse:");
-    console.log(error);
     if (response) {
       showMessage(response.status); // 传入响应码，匹配响应码对应信息
       if (
@@ -67,8 +65,6 @@ axios.interceptors.response.use(
         });
         promise.then((result) => {
           if (result?.status == 200) {
-            console.log("刷新了accesstoken：");
-            console.log(result.data);
             store.commit("accessToken", result.data);
             return new Promise(
               (resolve: (value: AxiosResponse<any, any>) => void, reject) => {
@@ -81,6 +77,8 @@ axios.interceptors.response.use(
                   });
               }
             );
+          }else{
+            store.commit("cleanToken");
           }
         });
       }

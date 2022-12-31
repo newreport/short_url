@@ -20,7 +20,6 @@ type UserController struct {
 //模板
 //https://cloud.tencent.com/developer/article/1557075
 
-
 // @Title Register
 // @Summary 注册
 // @Description logs.Info user into the system
@@ -84,7 +83,9 @@ func (u *UserController) RefreshTocken() {
 			return []byte(key), nil
 		})
 		if err != nil {
-			panic(err)
+			u.Ctx.ResponseWriter.WriteHeader(401)
+			u.Ctx.WriteString("refresh token 失效，请重新登录")
+			return
 		}
 		if claims, ok := token.Claims.(*RefreshClaims); ok && token.Valid {
 			fmt.Println(claims.ID)
@@ -172,7 +173,7 @@ func (u *UserController) UpdateUser() {
 		existUser.Remarks = user.Remarks
 		existUser.AutoInsertSpace = user.AutoInsertSpace
 		existUser.Domain = user.Domain
-		existUser.Author=user.Author
+		existUser.Author = user.Author
 		if models.UpdateUser(existUser) {
 			u.Ctx.WriteString("修改成功")
 		} else {
