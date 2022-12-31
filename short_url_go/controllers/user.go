@@ -114,8 +114,8 @@ func (u *UserController) CreateUser() {
 		if models.CreateUser(user) > 0 {
 			u.Ctx.WriteString("创建成功")
 		} else {
-			u.Ctx.WriteString("创建失败，用户名或域名重复")
 			u.Ctx.ResponseWriter.WriteHeader(400)
+			u.Ctx.WriteString("创建失败，用户名或域名重复")
 		}
 	} else {
 		u.Ctx.ResponseWriter.WriteHeader(403)

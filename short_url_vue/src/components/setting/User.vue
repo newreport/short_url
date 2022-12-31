@@ -50,30 +50,68 @@
 
     <el-dialog v-model="dialogVisible" :title="formAddEdit.id ? '修改用户' : '新增用户'">
       <el-form label-position="left" label-width="79px">
-        <el-form-item label="留白" v-if="false">
-          <el-switch v-model="formAddEdit.autoInsertSpace" class="mt-2" style="margin-left: 24px" inline-prompt
-            :active-icon="Check" :inactive-icon="Close" />
+
+
+        <el-form-item label="用户名">
+          <el-input v-model="formAddEdit.name" placeholder="请输入用户名"/>
         </el-form-item>
+
+
+        <el-form-item label="密码">
+          <el-input v-model="formAddEdit.pwd" type="password" placeholder="请输入密码"/>
+        </el-form-item>
+
         <el-form-item label="域名">
-          <el-input v-model="formAddEdit.domain" />
+          <el-input v-model="formAddEdit.domain" placeholder="请输入域名"/>
         </el-form-item>
+
+
+        <el-form-item label="昵称">
+          <el-input v-model="formAddEdit.nickname" />
+        </el-form-item>
+
+
+        <el-form-item label="权限">
+          <el-input v-model="formAddEdit.role" />
+        </el-form-item>
+
+        <el-form-item label="默认长度">
+          <el-input-number v-model="formAddEdit.urlLength" :min="4" :max="16"></el-input-number>
+        </el-form-item>
+
+
         <el-form-item label="分组">
           <el-input v-model="formAddEdit.group" />
         </el-form-item>
 
-        <el-form-item label="国际化">
-          <el-input v-model="formAddEdit.i18n" />
+
+        <el-form-item label="联系方式">
+          <el-input v-model="formAddEdit.phone" />
         </el-form-item>
 
-        <el-form-item label="用户名">
-          <el-input v-model="formAddEdit.name" />
+        <el-form-item label="留白">
+          <el-switch v-model="formAddEdit.autoInsertSpace" class="mt-2" style="margin-left: 24px" inline-prompt
+            :active-icon="Check" :inactive-icon="Close" />
         </el-form-item>
-        <el-form-item label="昵称">
-          <el-input v-model="formAddEdit.nickname" />
+
+        <el-form-item label="国际化">
+          <el-select v-model="formAddEdit.i18n" placeholder="请选择">
+    <el-option value="中文"></el-option>
+    <el-option value="Eenlish"></el-option>
+    <el-option value="日本語"></el-option>
+  </el-select>
+
         </el-form-item>
+
+        <el-form-item label="备注">
+          <el-input v-model="formAddEdit.remarks" />
+        </el-form-item>
+
+
+
         <el-form-item>
-          <el-button type="primary" @click="formAddEdit.id"> Submit</el-button>
-          <el-button>Reset</el-button>
+          <el-button type="primary" @click="addUser()"> Submit</el-button>
+          <el-button @click="cleanAddUser()">Reset</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -83,7 +121,6 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
 import { UserService } from '@/api/api'
-import { group } from 'console';
 import { Check, Close } from '@element-plus/icons-vue'
 
 
@@ -92,6 +129,7 @@ const form = reactive({
   nickname: '',
   phone: '',
 })
+
 
 const tableData = ref()
 
@@ -140,13 +178,46 @@ const formAddEdit = reactive({
   upt: '',
   urlLength: 6
 })
+
+const addUser = () => {
+  if (!formAddEdit.domain || !formAddEdit.name || !formAddEdit.pwd) {
+    ElMessage.warning("请输入完整")
+    return
+  }
+  dialogVisible.value = false
+
+  const addUser = async () => {
+    const addUserParams = {
+      autoInsertSpace: formAddEdit.autoInsertSpace,
+      domain: formAddEdit.domain,
+      group: formAddEdit.domain,
+      i18n: formAddEdit.i18n,
+      name: formAddEdit.name,
+      nickname: formAddEdit.nickname,
+      phone: formAddEdit.phone,
+      pwd: formAddEdit.pwd,
+      remarks: formAddEdit.remarks,
+      role: formAddEdit.role,
+      urlLength: formAddEdit.urlLength
+    }
+    UserService.addUser(addUserParams).
+      then(result => {
+        if (result?.status == 200) {
+          ElMessage.success(result.data)
+          cleanAddUser()
+          getUsersPage()
+        }
+      })
+  }
+  addUser()
+}
 const cleanAddUser = () => {
   formAddEdit.author = ''
   formAddEdit.autoInsertSpace = false
   formAddEdit.crt = ''
   formAddEdit.domain = ''
   formAddEdit.group = ''
-  formAddEdit.i18n = ''
+  formAddEdit.i18n = 'English'
   formAddEdit.id = 0
   formAddEdit.name = ''
   formAddEdit.nickname = ''
