@@ -35,9 +35,24 @@
         </template>
         <template #default="scope">
 
-          <el-button link type="primary" size="small">Detail</el-button>
 
-          <el-button link type="primary" size="small">Edit</el-button>
+          <el-button link type="primary" size="small" @click="
+  formAddEdit.id = scope.row.id;
+formAddEdit.author = scope.row.author;
+formAddEdit.autoInsertSpace = scope.row.autoInsertSpace;
+formAddEdit.domain = scope.row.domain;
+formAddEdit.group = scope.row.group;
+formAddEdit.i18n = scope.row.i18n;
+formAddEdit.id = scope.row.id;
+formAddEdit.name = scope.row.name;
+formAddEdit.nickname = scope.row.nickname;
+formAddEdit.phone = scope.row.phone;
+formAddEdit.pwd = scope.row.pwd;
+formAddEdit.remarks = scope.row.remarks;
+formAddEdit.role = scope.row.role;
+formAddEdit.urlLength = scope.row.urlLength;
+dialogVisible = true;
+          ">Edit</el-button>
           <el-popconfirm title="确定删除吗?">
             <template #reference>
               <el-button link type="primary" size="small">Delete</el-button>
@@ -48,21 +63,21 @@
     </el-table>
 
 
-    <el-dialog v-model="dialogVisible" :title="formAddEdit.id ? '修改用户' : '新增用户'">
+    <el-dialog v-model="dialogVisible" :title="formAddEdit.id > 0 ? '修改用户' : '新增用户'">
       <el-form label-position="left" label-width="79px">
 
 
         <el-form-item label="用户名">
-          <el-input v-model="formAddEdit.name" placeholder="请输入用户名"/>
+          <el-input v-model="formAddEdit.name" placeholder="请输入用户名" />
         </el-form-item>
 
 
         <el-form-item label="密码">
-          <el-input v-model="formAddEdit.pwd" type="password" placeholder="请输入密码"/>
+          <el-input v-model="formAddEdit.pwd" type="password" placeholder="请输入密码" />
         </el-form-item>
 
         <el-form-item label="域名">
-          <el-input v-model="formAddEdit.domain" placeholder="请输入域名"/>
+          <el-input v-model="formAddEdit.domain" placeholder="请输入域名" />
         </el-form-item>
 
 
@@ -96,10 +111,10 @@
 
         <el-form-item label="国际化">
           <el-select v-model="formAddEdit.i18n" placeholder="请选择">
-    <el-option value="中文"></el-option>
-    <el-option value="Eenlish"></el-option>
-    <el-option value="日本語"></el-option>
-  </el-select>
+            <el-option value="中文"></el-option>
+            <el-option value="Eenlish"></el-option>
+            <el-option value="日本語"></el-option>
+          </el-select>
 
         </el-form-item>
 
@@ -110,7 +125,7 @@
 
 
         <el-form-item>
-          <el-button type="primary" @click="addUser()"> Submit</el-button>
+          <el-button type="primary" @click="formAddEdit.id > 0 ? updateUser() : addUser()"> Submit</el-button>
           <el-button @click="cleanAddUser()">Reset</el-button>
         </el-form-item>
       </el-form>
@@ -122,6 +137,7 @@
 import { ref, reactive } from 'vue'
 import { UserService } from '@/api/api'
 import { Check, Close } from '@element-plus/icons-vue'
+import { el } from 'element-plus/es/locale';
 
 
 const form = reactive({
@@ -138,6 +154,8 @@ const page = reactive({
   pageSize: 100,
   count: 10
 })
+
+
 
 const getUsersPage = () => {
   const getUsersPage = async () => {
@@ -178,6 +196,45 @@ const formAddEdit = reactive({
   upt: '',
   urlLength: 6
 })
+
+const updateUser = () => {
+  if (!formAddEdit.domain || !formAddEdit.name || !formAddEdit.pwd) {
+    ElMessage.warning("请输入完整")
+    return
+  }
+  dialogVisible.value = false
+
+  const updateUser = async () => {
+    const updateUserParams = {
+      id:formAddEdit.id,
+      autoInsertSpace: formAddEdit.autoInsertSpace,
+      domain: formAddEdit.domain,
+      group: formAddEdit.group,
+      i18n: formAddEdit.i18n,
+      name: formAddEdit.name,
+      nickname: formAddEdit.nickname,
+      phone: formAddEdit.phone,
+      pwd: formAddEdit.pwd,
+      remarks: formAddEdit.remarks,
+      role: formAddEdit.role,
+      urlLength: formAddEdit.urlLength
+    }
+    UserService.updateUser(updateUserParams).
+      then(result => {
+        if (result?.status == 200) {
+          ElMessage.success(result.data)
+          cleanAddUser()
+          getUsersPage()
+        } else {
+          ElMessage.success(result.data)
+          cleanAddUser()
+          getUsersPage()
+        }
+      })
+  }
+  updateUser()
+
+}
 
 const addUser = () => {
   if (!formAddEdit.domain || !formAddEdit.name || !formAddEdit.pwd) {

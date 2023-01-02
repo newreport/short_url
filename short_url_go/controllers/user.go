@@ -174,6 +174,7 @@ func (u *UserController) UpdateUser() {
 		existUser.AutoInsertSpace = user.AutoInsertSpace
 		existUser.Domain = user.Domain
 		existUser.Author = user.Author
+		existUser.Role = user.Role
 		if models.UpdateUser(existUser) {
 			u.Ctx.WriteString("修改成功")
 		} else {

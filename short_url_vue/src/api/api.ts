@@ -64,11 +64,26 @@ export class UserService {
   static async addUser(params){
     return request("/users", params, "post");
   }
-  /**
-   * @description 修改用户信息
-   * @param
+
+   /**
+   * @description 修改一个用户
+   * @param {int} id 
+   * @param {Blob} author 头像
+   * @param {boolean} autoInsertSpace 盘古之白
+   * @param {string} domain 域名
+   * @param {string} group 分组
+   * @param {string} i18n 国际化
+   * @param {string} name 用户名
+   * @param {string} nickname 昵称
+   * @param {string} phone 联系方式
+   * @param {string} pwd 密码
+   * @param {string} remarks 备注
+   * @param {int} role 权限
+   * @param {int} urlLength 默认长度
    */
-  static async updateUser() {}
+   static async updateUser(params){
+    return request("/users", params, "put");
+  }
 
   static async updateUserPasswd() {}
 }
