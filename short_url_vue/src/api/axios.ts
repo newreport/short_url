@@ -15,7 +15,8 @@ if (process.env.NODE_ENV == "development") {
   axios.defaults.baseURL = import.meta.env.VITE_API_DOMAIN;
 } else if (process.env.NODE_ENV == "production") {
   //生产环境
-  axios.defaults.baseURL = window.g.VITE_API_DOMAIN;
+  // axios.defaults.baseURL = window.g.VITE_API_DOMAIN;
+  axios.defaults.baseURL = 'v1/'
 }
 
 // http request 拦截器
